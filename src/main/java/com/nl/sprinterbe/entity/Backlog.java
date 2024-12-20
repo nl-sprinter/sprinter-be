@@ -16,10 +16,11 @@ import java.util.List;
 @Builder
 public class Backlog {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "backlog_id")
     private Long backlogId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "sprint_id", nullable = false)
     private Sprint sprint;
 

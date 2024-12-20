@@ -17,6 +17,7 @@ import java.util.List;
 @Builder
 public class BacklogComment {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "backlog_comment_id")
     private Long backlogCommentId;
 
@@ -28,11 +29,11 @@ public class BacklogComment {
     @Column(name = "created_at")
     private Date createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "backlog_id", nullable = false)
     private Backlog backlog;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

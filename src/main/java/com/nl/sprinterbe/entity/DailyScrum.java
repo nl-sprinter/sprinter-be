@@ -15,10 +15,11 @@ import java.util.Date;
 @Builder
 public class DailyScrum {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "daily_scrum_id")
     private Long dailyScrumId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "sprint_id", nullable = false)
     private Sprint sprint;
 

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Issue {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "issue_id")
     private Long issueId;
 
