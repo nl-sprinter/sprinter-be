@@ -3,6 +3,7 @@ package com.nl.sprinterbe.user.service;
 import com.nl.sprinterbe.user.dto.UserDTO;
 import com.nl.sprinterbe.user.entity.User;
 import com.nl.sprinterbe.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,15 +13,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    UserRepository userRepository;
-    PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
     @Transactional
     public void registerUser(UserDTO userDTO) {
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());

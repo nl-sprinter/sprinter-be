@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**","/api/v1/login", "/oauth2/**", "/login/**").permitAll()
                         .requestMatchers("/api/v1/auth").permitAll()
+                        .requestMatchers("/api/v1/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -70,7 +71,8 @@ public class SecurityConfig {
 
         return http.build();
     }
-
+//https://accounts.google.com/logout
+    //
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
