@@ -2,6 +2,7 @@ package com.nl.sprinterbe.config;
 
 import com.nl.sprinterbe.user.service.CustomOAuth2UserService;
 import com.nl.sprinterbe.user.service.CustomUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -14,23 +15,22 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity(debug =true)
+@EnableWebSecurity(debug =false)
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
     private final CustomOAuth2UserService oAuth2UserService;
-    public SecurityConfig(CustomUserDetailsService userDetailsService, CustomOAuth2UserService oAuth2UserService) {
-        this.userDetailsService = userDetailsService;
-        this.oAuth2UserService = oAuth2UserService;
-    }
+    private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .cors().disable()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**","/api/v1/login", "/oauth2/**", "/login/**").permitAll()
                         .requestMatchers("/api/v1/auth").permitAll()
