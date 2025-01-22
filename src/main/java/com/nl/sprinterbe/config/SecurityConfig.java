@@ -25,7 +25,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity(debug =true)
+@EnableWebSecurity(debug =false)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -43,7 +43,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**","/api/v1/login", "/oauth2/**", "/login/**").permitAll()
                         .requestMatchers("/api/v1/auth", "/login").permitAll()
-                        .requestMatchers("/api/v1/hello").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

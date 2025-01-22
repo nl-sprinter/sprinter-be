@@ -42,14 +42,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             User user = User.builder()
                     .email(oAuth2Response.getEmail())
-                    .nickName(oAuth2Response.getNickName())
+                    .nickname(oAuth2Response.getNickName())
                     .build();
 
             userRepository.save(user);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setEmail(oAuth2Response.getEmail());
-            userDTO.setNickName(oAuth2Response.getNickName());
+            userDTO.setNickname(oAuth2Response.getNickName());
             //userDTO.setProviderName(providerName);
             userDTO.setRole("ROLE_USER");
 
@@ -57,14 +57,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
         else {
 
-            existingUser.setNickName(oAuth2Response.getNickName());
+            existingUser.setNickname(oAuth2Response.getNickName());
             existingUser.setEmail(oAuth2Response.getEmail());
 
             userRepository.save(existingUser);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setEmail(oAuth2Response.getEmail());
-            userDTO.setNickName(oAuth2Response.getNickName());
+            userDTO.setNickname(oAuth2Response.getNickName());
             //userDTO.setProviderName(providerName);
             userDTO.setRole("ROLE_USER");
 

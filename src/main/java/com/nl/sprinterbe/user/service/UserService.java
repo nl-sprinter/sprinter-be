@@ -30,7 +30,7 @@ public class UserService {
         }
 
         User user = User.builder()
-                .nickName(userDTO.getNickName())
+                .nickname(userDTO.getNickname())
                 .email(userDTO.getEmail())
                 .password(encodedPassword)
                 .build();
@@ -44,7 +44,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         //시큐리티context에 있는 유저정보를 업데이트
 
-        user.setNickName(userDTO.getNickName());
+        user.setNickname(userDTO.getNickname());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
         userRepository.save(user);
@@ -55,7 +55,7 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(user -> UserDTO.builder()
                         .userId(user.getUserId())
-                        .nickName(user.getNickName())
+                        .nickname(user.getNickname())
                         .email(user.getEmail())
                         .build())
                 .collect(Collectors.toList());
