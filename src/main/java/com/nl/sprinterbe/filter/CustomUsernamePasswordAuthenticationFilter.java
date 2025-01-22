@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenti
     private static final String USERNAME_KEY = "email"; // 회원 로그인 시 이메일 요청 JSON Key : "email"
     private static final String PASSWORD_KEY = "password"; // 회원 로그인 시 비밀번호 요청 JSon Key : "password"
     private static final AntPathRequestMatcher DEFAULT_LOGIN_PATH_REQUEST_MATCHER =
-            new AntPathRequestMatcher(DEFAULT_LOGIN_REQUEST_URL, HTTP_METHOD); // "/login" + POST로 온 요청에 매칭된다.
+            new AntPathRequestMatcher(DEFAULT_LOGIN_REQUEST_URL, HTTP_METHOD); // "/api/v1/login" + POST로 온 요청에 매칭된다.
 
     private final ObjectMapper objectMapper;
 
@@ -33,7 +34,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenti
         this.objectMapper = objectMapper;
     }
 
-    /**
+                                                      /**
      * 인증 처리 메소드
      *
      * UsernamePasswordAuthenticationFilter와 동일하게 UsernamePasswordAuthenticationToken 사용
@@ -53,7 +54,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenti
      */
 
 
-    @Override
+                                                      @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         if(request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)  ) {
             throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType());
@@ -66,7 +67,10 @@ public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenti
         String email = usernamePasswordMap.get(USERNAME_KEY);
         String password = usernamePasswordMap.get(PASSWORD_KEY);
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);//principal 과 credentials 전달
-
+        this.setDetails(request, authRequest);
         return this.getAuthenticationManager().authenticate(authRequest);
+    }
+    protected void setDetails(HttpServletRequest request, UsernamePasswordAuthenticationToken authRequest) {
+        authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
     }
 }

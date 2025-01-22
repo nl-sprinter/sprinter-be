@@ -21,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -42,6 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**","/api/v1/login", "/oauth2/**", "/login/**").permitAll()
                         .requestMatchers("/api/v1/auth", "/login").permitAll()
+                        .requestMatchers("/api/v1/hello").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -72,9 +74,11 @@ public class SecurityConfig {
                         })
                 )
                 .sessionManagement(session -> session
+                        .invalidSessionUrl("/login")
+                        .sessionFixation().changeSessionId()
                         .maximumSessions(1)
-
                         .maxSessionsPreventsLogin(true)
+                        .expiredUrl("/login")
                 );
 
         return http.build();
@@ -98,6 +102,7 @@ public class SecurityConfig {
         usernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
         usernamePasswordAuthenticationFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
         usernamePasswordAuthenticationFilter.setAuthenticationFailureHandler(loginFailureHandler());
+        usernamePasswordAuthenticationFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
         return usernamePasswordAuthenticationFilter;
     }
 
