@@ -26,7 +26,6 @@ public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenti
     private static final String PASSWORD_KEY = "password"; // 회원 로그인 시 비밀번호 요청 JSon Key : "password"
     private static final AntPathRequestMatcher DEFAULT_LOGIN_PATH_REQUEST_MATCHER =
             new AntPathRequestMatcher(DEFAULT_LOGIN_REQUEST_URL, HTTP_METHOD); // "/api/v1/login" + POST로 온 요청에 매칭된다.
-
     private final ObjectMapper objectMapper;
 
     public CustomUsernamePasswordAuthenticationFilter(ObjectMapper objectMapper) {

@@ -25,7 +25,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity(debug =false)
+@EnableWebSecurity(debug =true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -40,12 +40,12 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**","/api/v1/login", "/oauth2/**", "/login/**").permitAll()
                         .requestMatchers("/api/v1/auth", "/login").permitAll()
+                        .requestMatchers("/h2-console/**","/api/v1/login", "/oauth2/**", "/login/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 //                .formLogin(form -> form
 //                        .loginProcessingUrl("/api/v1/login") // 로그인 URL
 //                        .usernameParameter("email")
@@ -73,7 +73,7 @@ public class SecurityConfig {
                         })
                 )
                 .sessionManagement(session -> session
-                        .invalidSessionUrl("/login")
+//                        .invalidSessionUrl("/login")
                         .sessionFixation().changeSessionId()
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(true)
