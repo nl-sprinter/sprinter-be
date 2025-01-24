@@ -42,8 +42,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth", "/login").permitAll()
-                        .requestMatchers("/h2-console/**","/api/v1/login", "/oauth2/**", "/login/**").permitAll()
+                        .requestMatchers("/api/v1/auth/signin", "/login").permitAll()
+                        .requestMatchers("/h2-console/**","/api/v1/auth/login", "/oauth2/**", "/login/**").permitAll()
                         .anyRequest().authenticated()
                 )
 //                .formLogin(form -> form
@@ -78,6 +78,14 @@ public class SecurityConfig {
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(true)
                         .expiredUrl("/login")
+                )
+                .logout(log -> log
+                        .logoutUrl("/api/v1/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.getWriter().write("Logout successful");
+                        })
+                        .deleteCookies("JSESSIONID")
                 );
 
         return http.build();

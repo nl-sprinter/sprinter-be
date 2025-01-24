@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/auth")
 public class UserController {
 
     UserService userService;
@@ -26,7 +26,7 @@ public class UserController {
         return authentication.getName() + "님! Sprinter에 오신 것을 환영합니다!";
     }
 
-    @PostMapping("/auth")
+    @PostMapping("/signin")
     public ResponseEntity<String> auth(@RequestBody UserDTO userDTO) {
         userService.registerUser(userDTO);
         return ResponseEntity.status(201).body("Auth successful");
