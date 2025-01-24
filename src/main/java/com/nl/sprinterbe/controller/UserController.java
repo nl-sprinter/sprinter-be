@@ -42,4 +42,10 @@ public class UserController {
     public List<UserDTO> getUsers() {
         return userService.getUsers();
     }
+
+    @GetMapping("/check")
+    public ResponseEntity<String> check() {
+        return ResponseEntity.status(200).body("Check successful");
+    }
+
 }
