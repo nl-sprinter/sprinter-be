@@ -33,10 +33,10 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         System.out.println("auth = " + auth);
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+//        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
 
         String id = auth.getUsername();
-        String role = iterator.next().getAuthority();
+//        String role = iterator.next().getAuthority();
         String email = auth.getEmail();
 
 
@@ -46,7 +46,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         refreshTokenService.updateExpiredTokens(id);
         refreshTokenService.addRefresh(id,refreshToken);
 
-        ResponseDto.settingResponse(response, HttpStatus.FOUND, ResponseStatus.LOCAL_LOGIN_SUCCESS,accessToken,refreshToken);
+        ResponseDto.settingResponse(response, HttpStatus.OK, ResponseStatus.LOCAL_LOGIN_SUCCESS,accessToken,refreshToken);
 
     }
 }

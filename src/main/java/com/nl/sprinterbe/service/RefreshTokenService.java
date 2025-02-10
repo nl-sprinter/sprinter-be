@@ -38,14 +38,6 @@ public class RefreshTokenService {
         return refreshTokenEntity;
     }
 
-    public void deleteByRefresh(String refresh){
-        refreshTokenRepository.deleteByRefresh(refresh);
-    }
-
-    public Optional<RefreshToken> findByRefresh(String refresh){
-        return refreshTokenRepository.findByRefresh(refresh);
-    }
-
     public RefreshToken save(String refreshToken,String userId) {
         RefreshToken tokenObj = new RefreshToken();
         tokenObj.setExpired(false);

@@ -1,6 +1,6 @@
 package com.nl.sprinterbe.dto;
 
-import com.nl.sprinterbe.user.entity.User;
+import com.nl.sprinterbe.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

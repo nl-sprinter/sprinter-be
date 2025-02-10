@@ -1,4 +1,4 @@
-package com.nl.sprinterbe.user.dto;
+package com.nl.sprinterbe.dto;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nl.sprinterbe.common.ResponseStatus;
 import com.nl.sprinterbe.dto.CustomUserDetails;
 import com.nl.sprinterbe.dto.ErrorDto;
-import com.nl.sprinterbe.user.entity.User;
+import com.nl.sprinterbe.entity.User;
 import com.nl.sprinterbe.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -35,8 +35,6 @@ public class JwtFilter extends OncePerRequestFilter {
         String authorization = request.getHeader("Authorization");
         String refreshToken = jwtUtil.getRefreshToken(request);
 
-        System.out.println("isLoginRequest(authorization,refreshToken) = " + isLoginRequest(authorization,refreshToken));
-        //System.out.println("isRefreshLogoutRequest(authorization,refreshToken) = " + isRefreshRequest(authorization,refreshToken));
         if(isLoginRequest(authorization,refreshToken) || isRefreshAndLogoutRequest(authorization,refreshToken)){
             filterChain.doFilter(request, response);
             return;

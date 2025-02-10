@@ -1,15 +1,12 @@
-package com.nl.sprinterbe.user.service;
+package com.nl.sprinterbe.service;
 
 import com.nl.sprinterbe.dto.CustomUserDetails;
-import com.nl.sprinterbe.user.entity.User;
-import com.nl.sprinterbe.user.repository.UserRepository;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import com.nl.sprinterbe.entity.User;
+import com.nl.sprinterbe.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

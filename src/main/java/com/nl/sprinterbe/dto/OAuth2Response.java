@@ -1,4 +1,4 @@
-package com.nl.sprinterbe.user.dto;
+package com.nl.sprinterbe.dto;
 
 
 public interface OAuth2Response {

@@ -1,6 +1,6 @@
-package com.nl.sprinterbe.user.repository;
+package com.nl.sprinterbe.repository;
 
-import com.nl.sprinterbe.user.entity.User;
+import com.nl.sprinterbe.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +12,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Override
     Optional<User> findById(Long id);
 
-    User findByEmailAndProvider(String email,String provider);
+    Optional<User> findByEmailAndProvider(String email,String provider);
 }

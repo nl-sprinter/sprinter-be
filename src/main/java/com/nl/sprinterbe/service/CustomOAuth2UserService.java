@@ -1,16 +1,16 @@
-package com.nl.sprinterbe.user.service;
+package com.nl.sprinterbe.service;
 
-import com.nl.sprinterbe.user.dto.GoogleResponse;
-import com.nl.sprinterbe.user.dto.OAuth2Response;
-import com.nl.sprinterbe.user.dto.UserDTO;
-import com.nl.sprinterbe.user.entity.User;
-import com.nl.sprinterbe.user.repository.UserRepository;
+import com.nl.sprinterbe.dto.GoogleResponse;
+import com.nl.sprinterbe.dto.OAuth2Response;
+import com.nl.sprinterbe.dto.UserDTO;
+import com.nl.sprinterbe.entity.User;
+import com.nl.sprinterbe.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import com.nl.sprinterbe.user.dto.CustomOAuth2User;
+import com.nl.sprinterbe.dto.CustomOAuth2User;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {

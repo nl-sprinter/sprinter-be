@@ -19,8 +19,8 @@ public enum ResponseStatus {
     //핸들러 없음 , Http Method 불일치 등등 Dispatcher Servlet 관련 전반 에러
     SERVLET_ERROR("Servlet Error","SERVLET_ERROR"),
     TOKEN_COMI_ERROR("Token Combination Error","TOKEN_COMBI_ERROR"),
-    EMAIL_DUPLICATE("Duplicate Email","EMAIL_DUPLICATED");
-
+    EMAIL_DUPLICATE("Duplicate Email","EMAIL_DUPLICATED"),
+    SIGNUP_SUCCESS("Signup Success","SIGNUP_SUCCESS");
     private final String message;
     private final String code;
 
