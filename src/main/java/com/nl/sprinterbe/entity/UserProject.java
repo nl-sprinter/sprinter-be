@@ -1,6 +1,6 @@
 package com.nl.sprinterbe.entity;
 
-import com.nl.sprinterbe.user.entity.User;
+import com.nl.sprinterbe.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

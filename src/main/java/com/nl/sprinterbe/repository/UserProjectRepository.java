@@ -2,7 +2,7 @@ package com.nl.sprinterbe.repository;
 
 import com.nl.sprinterbe.entity.Project;
 import com.nl.sprinterbe.entity.UserProject;
-import com.nl.sprinterbe.user.entity.User;
+import com.nl.sprinterbe.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
