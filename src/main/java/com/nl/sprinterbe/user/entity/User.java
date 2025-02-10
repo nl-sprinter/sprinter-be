@@ -23,7 +23,7 @@ public class User {
     private String nickname;
     private String password;
     private String email;
-
+    private String provider;
 //    @OneToMany(mappedBy = "user")
 //    private List<Todo> todos = new ArrayList<>();
 //

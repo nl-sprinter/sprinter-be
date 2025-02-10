@@ -33,7 +33,7 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService loginService;
-
+    private final LoginSuccessHandler loginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/**", "/login").permitAll()
                         .requestMatchers("/api/v1/auth/signin", "/login").permitAll()
                         .requestMatchers("/h2-console/**","/api/v1/auth/login", "/oauth2/**", "/login/**").permitAll()
                         .anyRequest().authenticated()
@@ -107,16 +108,16 @@ public class SecurityConfig {
     public CustomUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter() throws Exception {
         CustomUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter = new CustomUsernamePasswordAuthenticationFilter(objectMapper);
         usernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
-        usernamePasswordAuthenticationFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
+        usernamePasswordAuthenticationFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
         usernamePasswordAuthenticationFilter.setAuthenticationFailureHandler(loginFailureHandler());
         usernamePasswordAuthenticationFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
         return usernamePasswordAuthenticationFilter;
     }
 
-    @Bean
-    public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler();
-    }
+//    @Bean
+//    public LoginSuccessHandler loginSuccessHandler() {
+//        return new LoginSuccessHandler();
+//    }
 
     /**
      * 로그인 실패 시 호출되는 LoginFailureHandler 빈 등록

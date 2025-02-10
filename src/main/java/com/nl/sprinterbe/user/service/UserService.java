@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,4 +62,12 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public User findByEmailAndProvider(String email, String provider) {
+        return userRepository.findByEmailAndProvider(email, provider);
+    }
+
+
+    public Optional<User> findById(Long id){
+        return userRepository.findById(id);
+    }
 }
