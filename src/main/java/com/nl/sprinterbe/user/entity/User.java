@@ -1,5 +1,6 @@
 package com.nl.sprinterbe.user.entity;
 //import com.nl.sprinterbe.entity.*;
+import com.nl.sprinterbe.entity.UserProject;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,9 +28,9 @@ public class User {
 //    @OneToMany(mappedBy = "user")
 //    private List<Todo> todos = new ArrayList<>();
 //
-//    @OneToMany(mappedBy = "user")
-//    private List<UserProject> userProjects = new ArrayList<>();
-//
+    @OneToMany(mappedBy = "user")
+    private List<UserProject> userProjects = new ArrayList<>();
+
 //    @OneToMany(mappedBy = "user")
 //    private List<Schedule> schedules = new ArrayList<>();
 //

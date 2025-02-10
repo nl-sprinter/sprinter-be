@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+//import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,7 +25,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity(debug =true)
+//@EnableWebSecurity(debug =true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -35,73 +35,73 @@ public class SecurityConfig {
     private final CustomUserDetailsService loginService;
 
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/signin", "/login").permitAll()
-                        .requestMatchers("/h2-console/**","/api/v1/auth/login", "/oauth2/**", "/login/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-//                .formLogin(form -> form
-//                        .loginProcessingUrl("/api/v1/login") // 로그인 URL
-//                        .usernameParameter("email")
-//                        .passwordParameter("password")
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf().disable()
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+//                .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/v1/auth/signin", "/login").permitAll()
+//                        .requestMatchers("/h2-console/**","/api/v1/auth/login", "/oauth2/**", "/login/**").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+////                .formLogin(form -> form
+////                        .loginProcessingUrl("/api/v1/login") // 로그인 URL
+////                        .usernameParameter("email")
+////                        .passwordParameter("password")
+////                        .successHandler((request, response, authentication) -> {
+////                            response.setStatus(200);
+////                            response.getWriter().write("Login successful");
+////                        })
+////                        .failureHandler((request, response, exception) -> {
+////                            response.setStatus(401);
+////                            response.getWriter().write("Login failed: " + exception.getMessage());
+////                        })
+////                )
+//                .oauth2Login(oauth2 -> oauth2
+//                        .userInfoEndpoint(userInfo -> userInfo
+//                                .userService(oAuth2UserService)
+//                        )
 //                        .successHandler((request, response, authentication) -> {
 //                            response.setStatus(200);
-//                            response.getWriter().write("Login successful");
+//                            response.getWriter().write("OAuth2 Login successful");
 //                        })
 //                        .failureHandler((request, response, exception) -> {
 //                            response.setStatus(401);
-//                            response.getWriter().write("Login failed: " + exception.getMessage());
+//                            response.getWriter().write("OAuth2 Login failed: " + exception.getMessage());
 //                        })
 //                )
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(oAuth2UserService)
-                        )
-                        .successHandler((request, response, authentication) -> {
-                            response.setStatus(200);
-                            response.getWriter().write("OAuth2 Login successful");
-                        })
-                        .failureHandler((request, response, exception) -> {
-                            response.setStatus(401);
-                            response.getWriter().write("OAuth2 Login failed: " + exception.getMessage());
-                        })
-                )
-                .sessionManagement(session -> session
-//                        .invalidSessionUrl("/login")
-                        .sessionFixation().changeSessionId()
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(true)
-                        .expiredUrl("/login")
-                )
-                .logout(log -> log
-                        .logoutUrl("/api/v1/auth/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(200);
-                            response.getWriter().write("Logout successful");
-                        })
-                        .deleteCookies("JSESSIONID")
-                );
-
-        return http.build();
-    }
+//                .sessionManagement(session -> session
+////                        .invalidSessionUrl("/login")
+//                        .sessionFixation().changeSessionId()
+//                        .maximumSessions(1)
+//                        .maxSessionsPreventsLogin(true)
+//                        .expiredUrl("/login")
+//                )
+//                .logout(log -> log
+//                        .logoutUrl("/api/v1/auth/logout")
+//                        .logoutSuccessHandler((request, response, authentication) -> {
+//                            response.setStatus(200);
+//                            response.getWriter().write("Logout successful");
+//                        })
+//                        .deleteCookies("JSESSIONID")
+//                );
+//
+//        return http.build();
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    @ConditionalOnProperty(name = "spring.h2.console.enabled",havingValue = "true")
-    public WebSecurityCustomizer configureH2ConsoleEnable() {
-        return web -> web.ignoring()
-                .requestMatchers(PathRequest.toH2Console());
-    }
+//    @Bean
+//    @ConditionalOnProperty(name = "spring.h2.console.enabled",havingValue = "true")
+//    public WebSecurityCustomizer configureH2ConsoleEnable() {
+//        return web -> web.ignoring()
+//                .requestMatchers(PathRequest.toH2Console());
+//    }
 
     @Bean
     public CustomUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter() throws Exception {
