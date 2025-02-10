@@ -2,11 +2,10 @@ package com.nl.sprinterbe.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nl.sprinterbe.filter.CustomUsernamePasswordAuthenticationFilter;
-import com.nl.sprinterbe.filter.JwtFilter;
 import com.nl.sprinterbe.handler.LoginFailureHandler;
 import com.nl.sprinterbe.handler.LoginSuccessHandler;
-import com.nl.sprinterbe.service.CustomOAuth2UserService;
-import com.nl.sprinterbe.service.CustomUserDetailsService;
+import com.nl.sprinterbe.user.service.CustomOAuth2UserService;
+import com.nl.sprinterbe.user.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -34,8 +33,7 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final ObjectMapper objectMapper;
     private final CustomUserDetailsService loginService;
-    private final LoginSuccessHandler loginSuccessHandler;
-    private final JwtFilter jwtFilter;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -43,10 +41,8 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtFilter, CustomUsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/logout", "/login").permitAll()
-                        .requestMatchers("/api/v1/auth/signup", "/login").permitAll()
+                        .requestMatchers("/api/v1/auth/signin", "/login").permitAll()
                         .requestMatchers("/h2-console/**","/api/v1/auth/login", "/oauth2/**", "/login/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -75,22 +71,22 @@ public class SecurityConfig {
                             response.setStatus(401);
                             response.getWriter().write("OAuth2 Login failed: " + exception.getMessage());
                         })
+                )
+                .sessionManagement(session -> session
+//                        .invalidSessionUrl("/login")
+                        .sessionFixation().changeSessionId()
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true)
+                        .expiredUrl("/login")
+                )
+                .logout(log -> log
+                        .logoutUrl("/api/v1/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.getWriter().write("Logout successful");
+                        })
+                        .deleteCookies("JSESSIONID")
                 );
-//                .sessionManagement(session -> session
-////                        .invalidSessionUrl("/login")
-//                        .sessionFixation().changeSessionId()
-//                        .maximumSessions(1)
-//                        .maxSessionsPreventsLogin(true)
-//                        .expiredUrl("/login")
-//                )
-//                .logout(log -> log
-//                        .logoutUrl("/api/v1/auth/logout")
-//                        .logoutSuccessHandler((request, response, authentication) -> {
-//                            response.setStatus(200);
-//                            response.getWriter().write("Logout successful");
-//                        })
-//                        .deleteCookies("JSESSIONID")
-//                );
 
         return http.build();
     }
@@ -111,16 +107,16 @@ public class SecurityConfig {
     public CustomUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter() throws Exception {
         CustomUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter = new CustomUsernamePasswordAuthenticationFilter(objectMapper);
         usernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
-        usernamePasswordAuthenticationFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
+        usernamePasswordAuthenticationFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
         usernamePasswordAuthenticationFilter.setAuthenticationFailureHandler(loginFailureHandler());
         usernamePasswordAuthenticationFilter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
         return usernamePasswordAuthenticationFilter;
     }
 
-//    @Bean
-//    public LoginSuccessHandler loginSuccessHandler() {
-//        return new LoginSuccessHandler();
-//    }
+    @Bean
+    public LoginSuccessHandler loginSuccessHandler() {
+        return new LoginSuccessHandler();
+    }
 
     /**
      * 로그인 실패 시 호출되는 LoginFailureHandler 빈 등록
