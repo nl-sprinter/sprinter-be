@@ -2,7 +2,7 @@ package com.nl.sprinterbe.controller;
 
 import com.nl.sprinterbe.dto.ProjectDTO;
 import com.nl.sprinterbe.service.ProjectService;
-import com.nl.sprinterbe.user.dto.UserDTO;
+import com.nl.sprinterbe.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
