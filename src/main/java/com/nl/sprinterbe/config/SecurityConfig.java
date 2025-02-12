@@ -5,6 +5,7 @@ import com.nl.sprinterbe.filter.CustomUsernamePasswordAuthenticationFilter;
 import com.nl.sprinterbe.filter.JwtFilter;
 import com.nl.sprinterbe.handler.LoginFailureHandler;
 import com.nl.sprinterbe.handler.LoginSuccessHandler;
+import com.nl.sprinterbe.handler.OAuth2LoginSuccessHandler;
 import com.nl.sprinterbe.service.CustomOAuth2UserService;
 import com.nl.sprinterbe.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -36,6 +38,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService loginService;
     private final LoginSuccessHandler loginSuccessHandler;
     private final JwtFilter jwtFilter;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -45,8 +48,8 @@ public class SecurityConfig {
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtFilter, CustomUsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/logout", "/login").permitAll()
-                        .requestMatchers("/api/v1/auth/signup", "/login").permitAll()
+                        .requestMatchers("/api/v1/auth/logout", "/login", "/error").permitAll()
+                        .requestMatchers("/api/v1/auth/signup","/api/v1/auth/refresh", "/login").permitAll()
                         .requestMatchers("/h2-console/**","/api/v1/auth/login", "/oauth2/**", "/login/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -67,22 +70,20 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(oAuth2UserService)
                         )
-                        .successHandler((request, response, authentication) -> {
-                            response.setStatus(200);
-                            response.getWriter().write("OAuth2 Login successful");
-                        })
+                        .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler((request, response, exception) -> {
                             response.setStatus(401);
                             response.getWriter().write("OAuth2 Login failed: " + exception.getMessage());
                         })
-                );
-//                .sessionManagement(session -> session
-////                        .invalidSessionUrl("/login")
+                )
+                .sessionManagement(session -> session
+//                        .invalidSessionUrl("/login")
 //                        .sessionFixation().changeSessionId()
 //                        .maximumSessions(1)
 //                        .maxSessionsPreventsLogin(true)
 //                        .expiredUrl("/login")
-//                )
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
 //                .logout(log -> log
 //                        .logoutUrl("/api/v1/auth/logout")
 //                        .logoutSuccessHandler((request, response, authentication) -> {

@@ -28,16 +28,6 @@ public class RefreshTokenService {
         refreshTokenRepository.save(refreshToken);
     }
 
-    //User의 Db id로 Refresh 테이블의 userId와 일치하는 토큰이 있는지 확인
-    public Optional<RefreshToken> findMatchingRefreshToken(String userId, String refreshToken) {
-        Optional<RefreshToken> refreshTokenEntity = refreshTokenRepository.findByUserIdAndExpiredFalse(userId)
-                .stream()
-                .filter(token -> token.getRefresh().equals(refreshToken))
-                .findFirst();
-
-        return refreshTokenEntity;
-    }
-
     public RefreshToken save(String refreshToken,String userId) {
         RefreshToken tokenObj = new RefreshToken();
         tokenObj.setExpired(false);
