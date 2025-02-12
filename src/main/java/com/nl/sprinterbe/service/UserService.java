@@ -54,10 +54,11 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<User> findById(Long id){
-        return userRepository.findById(id);
+    public String findUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        return user.getNickname();
     }
-
     //jwt로 회원가입
     public void join(SignUpRequestDto dto){
         String email = dto.getEmail();
@@ -92,7 +93,8 @@ public class UserService {
 
         String id = jwtUtil.getId(refreshToken);
         // DB에서 Refresh Token 조회
-        Optional<RefreshToken> refreshTokenOpt = refreshTokenService.findMatchingRefreshToken(id, refreshToken);
+        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefreshAndUserIdAndExpiredFalse(refreshToken, id);
+        //
         Optional<User> userOpt = userRepository.findById(Long.parseLong(id));
 
         if (refreshTokenOpt.isEmpty() || userOpt.isEmpty()) {
@@ -106,10 +108,16 @@ public class UserService {
         String newAccessToken = jwtUtil.createJwt(id,user.getEmail());
 
         refreshTokenEntity.setExpired(true); // 기존 refreshToken Expire 필드 값 true로 변경
+
+        if(newRefreshToken.equals(refreshToken)){
+            throw new JwtException("Invalid Refresh Token");
+        }
+
         refreshTokenService.save(newRefreshToken,id); // 새로운 refreshToken DB에 저장
 
         response.setHeader("Authorization","Bearer "+ newAccessToken);
         response.addCookie(jwtUtil.createCookie("Refresh",newRefreshToken));
+
         return ResponseDto.settingResponse(HttpStatus.CREATED, ResponseStatus.TOKEN_CREATED);
     }
 }

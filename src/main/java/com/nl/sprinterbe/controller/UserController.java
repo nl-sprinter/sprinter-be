@@ -1,5 +1,6 @@
 package com.nl.sprinterbe.controller;
 
+import com.nl.sprinterbe.dto.ResponseDto;
 import com.nl.sprinterbe.dto.SignUpRequestDto;
 import com.nl.sprinterbe.dto.SignUpResponseDto;
 import com.nl.sprinterbe.exception.LoginFormException;
@@ -25,14 +26,12 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
-    private final RefreshTokenService refreshTokenService;
-
 
     @GetMapping("/hello")
-    public String hello() {
+    public String hello(HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // 프로필 수정했다면 로그아웃하고 재접속시 새로 context생성돼서 새로운 정보로 바뀜
-        return authentication.getName() + "님! Sprinter에 오신 것을 환영합니다!";
+        String name = userService.findUser(Long.parseLong(authentication.getName()));
+        return name + "님! Sprinter에 오신 것을 환영합니다!";
     }
 
     @PutMapping("/{user_id}")
@@ -68,6 +67,10 @@ public class UserController {
     @GetMapping("/refresh")
     public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response){
         String refresh= jwtUtil.getRefreshToken(request);
-        return userService.refresh(refresh, response);
+
+        ResponseEntity<ResponseDto<?>> refresh1 = userService.refresh(refresh, response);
+        System.out.println("refresh1 = " + refresh1);
+
+        return refresh1;
     }
 }

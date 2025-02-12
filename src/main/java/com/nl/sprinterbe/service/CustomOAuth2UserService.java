@@ -32,6 +32,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         if(registrationId.equalsIgnoreCase("google")) {
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
+            System.out.println("oAuth2Response.getNickname() = " + oAuth2Response.getNickname());
         }
 
         String providerName = oAuth2Response.getProvider() + "_" + oAuth2Response.getProviderId();
@@ -42,14 +43,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             User user = User.builder()
                     .email(oAuth2Response.getEmail())
-                    .nickname(oAuth2Response.getNickName())
+                    .nickname(oAuth2Response.getNickname())
                     .build();
 
             userRepository.save(user);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setEmail(oAuth2Response.getEmail());
-            userDTO.setNickname(oAuth2Response.getNickName());
+            userDTO.setUserId(user.getUserId());
+            userDTO.setNickname(oAuth2Response.getNickname());
             //userDTO.setProviderName(providerName);
             userDTO.setRole("ROLE_USER");
 
@@ -57,14 +59,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
         else {
 
-            existingUser.setNickname(oAuth2Response.getNickName());
+            existingUser.setNickname(oAuth2Response.getNickname());
             existingUser.setEmail(oAuth2Response.getEmail());
 
             userRepository.save(existingUser);
 
             UserDTO userDTO = new UserDTO();
             userDTO.setEmail(oAuth2Response.getEmail());
-            userDTO.setNickname(oAuth2Response.getNickName());
+            userDTO.setNickname(oAuth2Response.getNickname());
             //userDTO.setProviderName(providerName);
             userDTO.setRole("ROLE_USER");
 
