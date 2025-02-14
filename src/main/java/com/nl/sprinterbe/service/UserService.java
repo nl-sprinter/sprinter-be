@@ -1,8 +1,10 @@
 package com.nl.sprinterbe.service;
 
 import com.nl.sprinterbe.common.ResponseStatus;
+import com.nl.sprinterbe.dto.ProjectDTO;
 import com.nl.sprinterbe.dto.ResponseDto;
 import com.nl.sprinterbe.dto.SignUpRequestDto;
+import com.nl.sprinterbe.entity.Project;
 import com.nl.sprinterbe.entity.RefreshToken;
 import com.nl.sprinterbe.exception.LoginFormException;
 import com.nl.sprinterbe.repository.RefreshTokenRepository;
@@ -44,21 +46,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public List<UserDTO> getUsers() {
-        return userRepository.findAll().stream()
-                .map(user -> UserDTO.builder()
-                        .userId(user.getUserId())
-                        .nickname(user.getNickname())
-                        .email(user.getEmail())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    public String findUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        return user.getNickname();
-    }
     //jwt로 회원가입
     public void join(SignUpRequestDto dto){
         String email = dto.getEmail();
@@ -119,5 +106,17 @@ public class UserService {
         response.addCookie(jwtUtil.createCookie("Refresh",newRefreshToken));
 
         return ResponseDto.settingResponse(HttpStatus.CREATED, ResponseStatus.TOKEN_CREATED);
+    }
+
+    public List<ProjectDTO> getProjects(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        return user.getUserProjects().stream()
+                .map(userProject -> {
+                    Project project = userProject.getProject();
+                    return new ProjectDTO(project.getProjectName());
+                })
+                .collect(Collectors.toList());
     }
 }

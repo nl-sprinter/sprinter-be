@@ -11,6 +11,4 @@ import java.util.Optional;
 
 @Repository
 public interface UserProjectRepository extends JpaRepository<UserProject,Long> {
-    void deleteByProject(Project project);
-    List<UserProject> findByProject(Project project);
 }

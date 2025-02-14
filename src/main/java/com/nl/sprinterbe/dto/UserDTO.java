@@ -15,5 +15,8 @@ public class UserDTO {
     private String password;
     private String email;
     private String role;
-//    private String providerName;
+    public UserDTO(String email, String nickname) {
+        this.nickname = nickname;
+        this.email = email;
+    }
 }
