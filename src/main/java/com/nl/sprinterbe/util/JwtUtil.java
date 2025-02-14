@@ -94,4 +94,11 @@ public class JwtUtil {
         cookie.setHttpOnly(true);   //JS로 접근 불가, 탈취 위험 감소
         return cookie;
     }
+
+    //jwt토큰 bearer 제거
+    public Long removeBearerAndReturnId(HttpServletRequest request){
+        String authorization = request.getHeader("Authorization");
+        String token=authorization.substring(7);
+        return Long.parseLong(Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("id", String.class));
+    }
 }
