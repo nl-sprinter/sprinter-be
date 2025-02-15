@@ -28,8 +28,6 @@ public class User {
 //    @OneToMany(mappedBy = "user")
 //    private List<Todo> todos = new ArrayList<>();
 //
-    @OneToMany(mappedBy = "user")
-    private List<UserProject> userProjects = new ArrayList<>();
 
 //    @OneToMany(mappedBy = "user")
 //    private List<Schedule> schedules = new ArrayList<>();
