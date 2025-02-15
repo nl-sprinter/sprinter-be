@@ -1,11 +1,12 @@
 package com.nl.sprinterbe.service;
 
-import com.nl.sprinterbe.dto.ProjectDTO;
+import com.nl.sprinterbe.dto.ProjectDto;
+import com.nl.sprinterbe.dto.SprintDto;
 import com.nl.sprinterbe.entity.Project;
 import com.nl.sprinterbe.entity.UserProject;
 import com.nl.sprinterbe.repository.ProjectRepository;
 import com.nl.sprinterbe.repository.UserProjectRepository;
-import com.nl.sprinterbe.dto.UserDTO;
+import com.nl.sprinterbe.dto.UserDto;
 import com.nl.sprinterbe.entity.User;
 import com.nl.sprinterbe.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class ProjectService {
     public final UserProjectRepository userProjectRepository;
 
     // 프로젝트 생성
-    public void createProject(ProjectDTO projectDTO, Long userId) {
+    public void createProject(ProjectDto projectDTO, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
@@ -38,7 +39,7 @@ public class ProjectService {
     }
 
     //프로젝트 유저추가
-    public void addUserToProject(UserDTO userDTO, Long projectId) {
+    public void addUserToProject(UserDto userDTO, Long projectId) {
         User user = userRepository.findByEmail(userDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + userDTO.getEmail()));
 
@@ -70,22 +71,23 @@ public class ProjectService {
         projectRepository.delete(project); // 프로젝트 삭제
     }
 
-    public List<UserDTO> getUsers(Long projectId) {
+    public List<UserDto> getUsers(Long projectId) {
         List<User> users = userProjectRepository.findByProjectProjectId(projectId)
                 .stream()
                 .map(UserProject::getUser)
                 .toList();
 
         return users.stream()
-                .map(user -> new UserDTO(user.getEmail(), user.getNickname()))
+                .map(user -> new UserDto(user.getEmail(), user.getNickname()))
                 .toList();
     }
 
-    public void updateProject(Long projectId, ProjectDTO projectDTO) {
+    public void updateProject(Long projectId, ProjectDto projectDTO) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
 
         project.setProjectName(projectDTO.getProjectName());
         projectRepository.save(project);
     }
+
 }

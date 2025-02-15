@@ -2,7 +2,7 @@ package com.nl.sprinterbe.service;
 
 import com.nl.sprinterbe.dto.GoogleResponse;
 import com.nl.sprinterbe.dto.OAuth2Response;
-import com.nl.sprinterbe.dto.UserDTO;
+import com.nl.sprinterbe.dto.UserDto;
 import com.nl.sprinterbe.entity.User;
 import com.nl.sprinterbe.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -48,7 +48,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             userRepository.save(user);
 
-            UserDTO userDTO = new UserDTO();
+            UserDto userDTO = new UserDto();
             userDTO.setEmail(oAuth2Response.getEmail());
             userDTO.setUserId(user.getUserId());
             userDTO.setNickname(oAuth2Response.getNickname());
@@ -64,7 +64,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             userRepository.save(existingUser);
 
-            UserDTO userDTO = new UserDTO();
+            UserDto userDTO = new UserDto();
             userDTO.setEmail(oAuth2Response.getEmail());
             userDTO.setNickname(oAuth2Response.getNickname());
             //userDTO.setProviderName(providerName);

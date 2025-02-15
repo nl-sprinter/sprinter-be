@@ -1,7 +1,7 @@
 package com.nl.sprinterbe.service;
 
 import com.nl.sprinterbe.common.ResponseStatus;
-import com.nl.sprinterbe.dto.ProjectDTO;
+import com.nl.sprinterbe.dto.ProjectDto;
 import com.nl.sprinterbe.dto.ResponseDto;
 import com.nl.sprinterbe.dto.SignUpRequestDto;
 import com.nl.sprinterbe.entity.Project;
@@ -9,7 +9,7 @@ import com.nl.sprinterbe.entity.RefreshToken;
 import com.nl.sprinterbe.entity.UserProject;
 import com.nl.sprinterbe.exception.LoginFormException;
 import com.nl.sprinterbe.repository.RefreshTokenRepository;
-import com.nl.sprinterbe.dto.UserDTO;
+import com.nl.sprinterbe.dto.UserDto;
 import com.nl.sprinterbe.entity.User;
 import com.nl.sprinterbe.repository.UserProjectRepository;
 import com.nl.sprinterbe.repository.UserRepository;
@@ -38,7 +38,7 @@ public class UserService {
     private final UserProjectRepository userProjectRepository;
     private final JwtUtil jwtUtil;
 
-    public void updateUser(Long userId, UserDTO userDTO) {
+    public void updateUser(Long userId, UserDto userDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         //시큐리티context에 있는 유저정보를 업데이트
@@ -111,14 +111,14 @@ public class UserService {
         return ResponseDto.settingResponse(HttpStatus.CREATED, ResponseStatus.TOKEN_CREATED);
     }
 
-    public List<ProjectDTO> getProjects(Long userId) {
+    public List<ProjectDto> getProjects(Long userId) {
         List<Project> projects = userProjectRepository.findByUserUserId(userId)
                 .stream()
                 .map(UserProject::getProject)
                 .collect(Collectors.toList());
 
         return projects.stream()
-                .map(project -> new ProjectDTO(project.getProjectName()))
+                .map(project -> new ProjectDto(project.getProjectName()))
                 .collect(Collectors.toList());
     }
 }

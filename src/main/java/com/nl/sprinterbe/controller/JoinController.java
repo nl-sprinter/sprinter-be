@@ -4,7 +4,6 @@ import com.nl.sprinterbe.dto.ResponseDto;
 import com.nl.sprinterbe.dto.SignUpRequestDto;
 import com.nl.sprinterbe.dto.SignUpResponseDto;
 import com.nl.sprinterbe.exception.LoginFormException;
-import com.nl.sprinterbe.dto.UserDTO;
 import com.nl.sprinterbe.service.UserService;
 import com.nl.sprinterbe.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth")

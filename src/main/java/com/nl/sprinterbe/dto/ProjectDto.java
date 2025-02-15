@@ -7,11 +7,11 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class ProjectDTO {
+public class ProjectDto {
     public String projectName;
     private Date createdAt;
 
-    public ProjectDTO(String projectName) {
+    public ProjectDto(String projectName) {
         this.projectName = projectName;
     }
 }

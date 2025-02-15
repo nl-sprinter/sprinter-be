@@ -1,13 +1,12 @@
 package com.nl.sprinterbe.controller;
 
-import com.nl.sprinterbe.dto.ProjectDTO;
+import com.nl.sprinterbe.dto.ProjectDto;
 import com.nl.sprinterbe.service.ProjectService;
-import com.nl.sprinterbe.dto.UserDTO;
+import com.nl.sprinterbe.dto.UserDto;
 import com.nl.sprinterbe.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,15 +20,15 @@ public class ProjectController {
 
     //프로젝트 생성
     @PostMapping("/create")
-    public ResponseEntity<String> createProject(@RequestBody ProjectDTO projectDTO, HttpServletRequest request) {
+    public ResponseEntity<String> createProject(@RequestBody ProjectDto projectDTO, HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
         projectService.createProject(projectDTO, userId);
         return ResponseEntity.status(201).body("Project created successfully");
     }
 
     //프로젝트 유저추가(일단 이메일 받아와서 추가하는식)
-    @PostMapping("/{projectId}/addUser")
-    public ResponseEntity<String> addUserToProject(@RequestBody UserDTO userDTO, @PathVariable Long projectId) {
+    @PostMapping("/addUser/{projectId}")
+    public ResponseEntity<String> addUserToProject(@RequestBody UserDto userDTO, @PathVariable Long projectId) {
         projectService.addUserToProject(userDTO, projectId);
         return ResponseEntity.status(201).body("User added to project successfully");
     }
@@ -43,16 +42,18 @@ public class ProjectController {
     }
 
     //유저 조회
-    @GetMapping("/{projectId}/users")
-    public ResponseEntity<List<UserDTO>> getUsers(@PathVariable Long projectId) {
-        List<UserDTO> users = projectService.getUsers(projectId);
+    @GetMapping("/users/{projectId}")
+    public ResponseEntity<List<UserDto>> getUsers(@PathVariable Long projectId) {
+        List<UserDto> users = projectService.getUsers(projectId);
         return ResponseEntity.status(200).body(users);
     }
 
     //프로젝트 업데이트
-    @PostMapping("/{projectId}/update")
-    public ResponseEntity<String> updateProject(@PathVariable Long projectId, @RequestBody ProjectDTO projectDTO) {
+    @PostMapping("/update/{projectId}")
+    public ResponseEntity<String> updateProject(@PathVariable Long projectId, @RequestBody ProjectDto projectDTO) {
         projectService.updateProject(projectId, projectDTO);
         return ResponseEntity.status(200).body("Project updated successfully");
     }
+
+
 }
