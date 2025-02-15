@@ -21,8 +21,9 @@ import java.util.Optional;
 public class ProjectService {
     public final ProjectRepository projectRepository;
     public final UserRepository userRepository;
+    public final UserProjectRepository userProjectRepository;
 
-    //프로젝트 생성
+    // 프로젝트 생성
     public void createProject(ProjectDTO projectDTO, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
@@ -30,11 +31,10 @@ public class ProjectService {
         Project project = new Project();
         project.setProjectName(projectDTO.getProjectName());
 
-        // 연관 관계 추가
-        UserProject userProject = new UserProject(user, project, true);
-        project.addUserProject(userProject); // 편의 메서드 활용
+        project = projectRepository.save(project);
 
-        projectRepository.save(project); // CascadeType.ALL 덕분에 UserProject도 자동 저장됨
+        UserProject userProject = new UserProject(user, project, true);
+        userProjectRepository.save(userProject);
     }
 
     //프로젝트 유저추가
@@ -46,9 +46,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
 
         UserProject userProject = new UserProject(user, project, false);
-        project.getUserProjects().add(userProject);
-
-        projectRepository.save(project);
+        userProjectRepository.save(userProject);
     }
 
     //프로젝트 삭제
@@ -56,7 +54,7 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
 
-        List<UserProject> userProjects = project.getUserProjects();
+        List<UserProject> userProjects = userProjectRepository.findByProject(project);
         Optional<Long> leaderUserId = userProjects.stream()
                 .filter(UserProject::getIsProjectLeader)
                 .map(userProject -> userProject.getUser().getUserId())
@@ -68,20 +66,18 @@ public class ProjectService {
             throw new RuntimeException("Project leader not found");
         }
 
-        userProjects.clear();
-
-        projectRepository.delete(project);
+        userProjectRepository.deleteAll(userProjects); // UserProject 삭제
+        projectRepository.delete(project); // 프로젝트 삭제
     }
 
     public List<UserDTO> getUsers(Long projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
+        List<User> users = userProjectRepository.findByProjectProjectId(projectId)
+                .stream()
+                .map(UserProject::getUser)
+                .toList();
 
-        return project.getUserProjects().stream()
-                .map(userProject -> {
-                    User user = userProject.getUser();
-                    return new UserDTO(user.getEmail(), user.getNickname());
-                })
+        return users.stream()
+                .map(user -> new UserDTO(user.getEmail(), user.getNickname()))
                 .toList();
     }
 

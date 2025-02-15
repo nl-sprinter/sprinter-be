@@ -30,14 +30,6 @@ public class Project {
 //    @OneToMany(mappedBy = "project")
 //    private List<Sprint> sprints = new ArrayList<>();
 //
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserProject> userProjects = new ArrayList<>();
-
-    public void addUserProject(UserProject userProject) {
-        this.userProjects.add(userProject);
-        userProject.setProject(this);
-    }
-
 //    @OneToMany(mappedBy = "project")
 //    private List<Todo> todos = new ArrayList<>();
 //

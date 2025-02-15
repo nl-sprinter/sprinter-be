@@ -6,10 +6,12 @@ import com.nl.sprinterbe.dto.ResponseDto;
 import com.nl.sprinterbe.dto.SignUpRequestDto;
 import com.nl.sprinterbe.entity.Project;
 import com.nl.sprinterbe.entity.RefreshToken;
+import com.nl.sprinterbe.entity.UserProject;
 import com.nl.sprinterbe.exception.LoginFormException;
 import com.nl.sprinterbe.repository.RefreshTokenRepository;
 import com.nl.sprinterbe.dto.UserDTO;
 import com.nl.sprinterbe.entity.User;
+import com.nl.sprinterbe.repository.UserProjectRepository;
 import com.nl.sprinterbe.repository.UserRepository;
 import com.nl.sprinterbe.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
@@ -33,6 +35,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenService refreshTokenService;
+    private final UserProjectRepository userProjectRepository;
     private final JwtUtil jwtUtil;
 
     public void updateUser(Long userId, UserDTO userDTO) {
@@ -109,14 +112,13 @@ public class UserService {
     }
 
     public List<ProjectDTO> getProjects(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        List<Project> projects = userProjectRepository.findByUserUserId(userId)
+                .stream()
+                .map(UserProject::getProject)
+                .collect(Collectors.toList());
 
-        return user.getUserProjects().stream()
-                .map(userProject -> {
-                    Project project = userProject.getProject();
-                    return new ProjectDTO(project.getProjectName());
-                })
+        return projects.stream()
+                .map(project -> new ProjectDTO(project.getProjectName()))
                 .collect(Collectors.toList());
     }
 }
