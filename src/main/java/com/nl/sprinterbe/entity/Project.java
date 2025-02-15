@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,15 +22,13 @@ public class Project {
     @Column(name = "project_id")
     private Long projectId;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at",updatable = false)
     private Date createdAt;
 
     @Column(name = "project_name")
     private String projectName;
 
-//    @OneToMany(mappedBy = "project")
-//    private List<Sprint> sprints = new ArrayList<>();
-//
 //    @OneToMany(mappedBy = "project")
 //    private List<Todo> todos = new ArrayList<>();
 //
