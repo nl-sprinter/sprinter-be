@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.controller;
 
 import com.nl.sprinterbe.dto.ProjectDto;
+import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.service.ProjectService;
 import com.nl.sprinterbe.dto.UserDto;
 import com.nl.sprinterbe.util.JwtUtil;
@@ -19,11 +20,12 @@ public class ProjectController {
     private final JwtUtil jwtUtil;
 
     //프로젝트 생성
+    // TODO: 수정필요
     @PostMapping("/create")
-    public ResponseEntity<String> createProject(@RequestBody ProjectDto projectDTO, HttpServletRequest request) {
+    public ResponseEntity<String> createProject(@RequestBody StartingDataDto StartingDataDto, HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
-        projectService.createProject(projectDTO, userId);
-        return ResponseEntity.status(201).body("Project created successfully");
+        projectService.createProject(StartingDataDto, userId);
+        return ResponseEntity.status(201).body("Project created successfully"); // 수정필요.
     }
 
     //프로젝트 유저추가(일단 이메일 받아와서 추가하는식)

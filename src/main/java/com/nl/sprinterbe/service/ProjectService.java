@@ -1,12 +1,10 @@
 package com.nl.sprinterbe.service;
 
-import com.nl.sprinterbe.dto.ProjectDto;
-import com.nl.sprinterbe.dto.SprintDto;
+import com.nl.sprinterbe.dto.*;
 import com.nl.sprinterbe.entity.Project;
 import com.nl.sprinterbe.entity.UserProject;
 import com.nl.sprinterbe.repository.ProjectRepository;
 import com.nl.sprinterbe.repository.UserProjectRepository;
-import com.nl.sprinterbe.dto.UserDto;
 import com.nl.sprinterbe.entity.User;
 import com.nl.sprinterbe.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -24,13 +23,21 @@ public class ProjectService {
     public final UserRepository userRepository;
     public final UserProjectRepository userProjectRepository;
 
-    // 프로젝트 생성
-    public void createProject(ProjectDto projectDTO, Long userId) {
+    // TODO: 프로젝트 생성
+    public void createProject(StartingDataDto startingDataDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         Project project = new Project();
-        project.setProjectName(projectDTO.getProjectName());
+        project.setProjectName(startingDataDto.getProjectName());
+        // TODO : startingDataDto에서 스프린트 개수랑 스프린트별 만들어진 프로덕트백로그 뽑아서 설정해줘야함!!!
+        Integer sprintCount = startingDataDto.getSprintCount(); // 스프린트 개수
+        Map<Integer, List<String>> productBacklogListDtoMap = startingDataDto.getProductBacklogListMap();
+        for (Map.Entry<Integer, List<String>> entry : productBacklogListDtoMap.entrySet()) {
+            Integer sprintNumber = entry.getKey();
+            List<String> productBacklogList = entry.getValue();
+            // TODO: SprintNumber에 맞는 스프린트에 productBacklogList 할당하기
+        }
 
         project = projectRepository.save(project);
 
