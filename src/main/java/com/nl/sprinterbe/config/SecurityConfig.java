@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/logout", "/login", "/error").permitAll()
                         .requestMatchers("/api/v1/auth/signup","/api/v1/auth/refresh", "/login").permitAll()
                         .requestMatchers("/h2-console/**","/api/v1/auth/login", "/oauth2/**", "/login/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
 //                .formLogin(form -> form

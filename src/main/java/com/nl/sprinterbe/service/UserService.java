@@ -82,27 +82,15 @@ public class UserService {
         jwtUtil.isExpired(refreshToken);
 
         String id = jwtUtil.getId(refreshToken);
-        // DB에서 Refresh Token 조회
-        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefreshAndUserIdAndExpiredFalse(refreshToken, id);
-        //
-        Optional<User> userOpt = userRepository.findById(Long.parseLong(id));
+        RefreshToken refreshTokenOpt = refreshTokenRepository.findByRefreshAndUserIdAndExpiredFalse(refreshToken, id)
+                .orElseThrow(() -> new RuntimeException("Refresh Token not found with id: " + id));
+        User userOpt = userRepository.findById(Long.parseLong(id))
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-        if (refreshTokenOpt.isEmpty() || userOpt.isEmpty()) {
-            throw new JwtException("Invalid Refresh Token");
-        }
-
-        RefreshToken refreshTokenEntity = refreshTokenOpt.get();
         String newRefreshToken = jwtUtil.createRefreshJwt(id); // 새 Refresh Token 생성
+        String newAccessToken = jwtUtil.createJwt(id,userOpt.getEmail());
 
-        User user = userOpt.get();
-        String newAccessToken = jwtUtil.createJwt(id,user.getEmail());
-
-        refreshTokenEntity.setExpired(true); // 기존 refreshToken Expire 필드 값 true로 변경
-
-        if(newRefreshToken.equals(refreshToken)){
-            throw new JwtException("Invalid Refresh Token");
-        }
-
+        refreshTokenOpt.setExpired(true); // 기존 refreshToken Expire 필드 값 true로 변경
         refreshTokenService.save(newRefreshToken,id); // 새로운 refreshToken DB에 저장
 
         response.setHeader("Authorization","Bearer "+ newAccessToken);
