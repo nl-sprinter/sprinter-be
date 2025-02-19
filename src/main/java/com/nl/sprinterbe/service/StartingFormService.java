@@ -17,6 +17,12 @@ public class StartingFormService {
     @Value("${openai.api.key}")
     private String apiKey;
 
+    @Value("${openai.api.url}")
+    private String apiUrl;
+
+    @Value("${openai.api.model}")
+    private String model;
+
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -26,20 +32,20 @@ public class StartingFormService {
     }
 
     public StartingDataDto generateProjectPlan(StartingFormDto requestDTO) {
-        String url = "https://api.openai.com/v1/chat/completions";
-        System.out.println("apiKey = " + apiKey);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
         Map<String, Object> payload = new HashMap<>();
-        payload.put("model", "gpt-4o");
+        payload.put("model", model);
         payload.put("messages", buildPrompt(requestDTO));
         payload.put("response_format", Map.of("type", "json_object"));
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
+
         System.out.println("response = " + response);
+        System.out.println("response.getBody() = " + response.getBody());
         return parseGPTResponse(response.getBody());
     }
 
@@ -58,14 +64,14 @@ public class StartingFormService {
                 "- 스프린트 개수 (sprint_count)\n" +
                 "- 스프린트 기간 (sprint_duration)(주 단위가 아닌 일 단위로 리턴)\n" +
                 "- 백로그 항목 (backlog: [{sprint_number,title, weight}])}를 json형식으로 리턴하면 돼.\n" +
-                "(너가 판단하기에 좋은 backlog가 있다면 추가해도 되고 weight는 업무 난이도기 때문에 너가 판단해서 넣으면 돼, sprint_number는 해당 백로그가 몇번쨰 스프린터에 속해있는지를 나타내는 거야.)\n" +
+                "(너가 판단하기에 좋은 backlog가 있다면 추가해도 되고 weight는 업무 난이도기 때문에 너가 판단해서 넣으면 돼, sprint_number는 해당 백로그가 몇번쨰 스프린터에 속해있는지를 나타내는 거야. 예시를 들자면 스프린트가 4개 있을때 4개중에 몇번째 스프린트에서 백로그가 배분 될 건지를 나타내는거지.)\n" +
                 "\n" +
                 "반드시 JSON 형식으로 출력해야 해. 예시는 다음과 같아:\n" +
                 "{\n" +
                 "  \"project\": {\n" +
                 "    \"project_name\": \"업무 시스템\"\n" +
                 "  },\n" +
-                "  \"sprints\": {\n" +
+                "  \"sprint\": {\n" +
                 "    \"sprint_count\": \"4\",\n" +
                 "    \"sprint_duration\": \"14\"\n" +
                 "  },\n" +

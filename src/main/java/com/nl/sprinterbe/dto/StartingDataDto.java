@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,17 +30,21 @@ public class StartingDataDto {
 
     @Data
     public static class ProjectInfo {
+        @JsonProperty("project_name")
         private String projectName;
     }
 
     @Data
     public static class SprintInfo {
+        @JsonProperty("sprint_count")
         private int sprintCount;
+        @JsonProperty("sprint_duration")
         private int sprintDuration;
     }
 
     @Data
     public static class BacklogItem {
+        @JsonProperty("sprint_number")
         private int sprintNumber;
         private String title;
         private int weight;
