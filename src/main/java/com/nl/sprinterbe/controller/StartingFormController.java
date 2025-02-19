@@ -1,10 +1,12 @@
 package com.nl.sprinterbe.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.dto.StartingFormDto;
 import com.nl.sprinterbe.service.StartingFormService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +23,9 @@ public class StartingFormController {
      * @param startingFormDto
      * @return 백로그 리스트
      */
-    public ResponseEntity<StartingDataDto> getBacklogByStartingForm(@RequestBody StartingFormDto startingFormDto) {
-        StartingDataDto startingDataDto = startingFormService.generateBacklog(startingFormDto);
+    @PostMapping("/gptData")
+    public ResponseEntity<StartingDataDto> getBacklogByStartingForm(@RequestBody StartingFormDto startingFormDto) throws JsonProcessingException {
+        StartingDataDto startingDataDto = startingFormService.generateProjectPlan(startingFormDto);
         return ResponseEntity.status(200).body(startingDataDto);
     }
 

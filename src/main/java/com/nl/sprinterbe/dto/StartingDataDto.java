@@ -18,18 +18,31 @@ import java.util.Map;
 @AllArgsConstructor
 public class StartingDataDto {
 
-    // 프로젝트 이름
     @NotEmpty
-    private String projectName;
+    private ProjectInfo project;
 
-    // 스프린트 개수
     @NotEmpty
-    private Integer sprintCount;
+    private SprintInfo sprint;
 
-    // 스프린트별 백로그 리스트
-    // 예시) 스프린트1 -> [백로그a, 백로그b, 백로그c], 스프린트2 -> [백로그d, 백로그e], ...
     @NotEmpty
-    private Map<Integer, List<String>> productBacklogListMap;
+    private List<BacklogItem> backlog;
 
+    @Data
+    public static class ProjectInfo {
+        private String projectName;
+    }
+
+    @Data
+    public static class SprintInfo {
+        private int sprintCount;
+        private int sprintDuration;
+    }
+
+    @Data
+    public static class BacklogItem {
+        private int sprintNumber;
+        private String title;
+        private int weight;
+    }
 
 }

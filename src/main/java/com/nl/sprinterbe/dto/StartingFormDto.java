@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 /**
  * 스타팅폼(설문지)
@@ -20,19 +22,18 @@ public class StartingFormDto {
     private String projectName;
 
     @NotBlank
-    private String field1;
+    private String projectGoal;
 
     @NotBlank
-    private String field2;
+    private String estimatedDuration;
 
     @NotBlank
-    private String field3;
+    private String sprintCycle;
 
     @NotBlank
-    private String field4;
+    private int teamMembers;
 
     @NotBlank
-    private String field5;
+    private String essentialFeatures;
 
-    // 문항 더 추가...
 }

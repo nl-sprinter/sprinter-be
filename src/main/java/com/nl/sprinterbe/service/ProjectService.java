@@ -27,22 +27,22 @@ public class ProjectService {
     public void createProject(StartingDataDto startingDataDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        Project project = new Project();
-        project.setProjectName(startingDataDto.getProjectName());
-        // TODO : startingDataDto에서 스프린트 개수랑 스프린트별 만들어진 프로덕트백로그 뽑아서 설정해줘야함!!!
-        Integer sprintCount = startingDataDto.getSprintCount(); // 스프린트 개수
-        Map<Integer, List<String>> productBacklogListDtoMap = startingDataDto.getProductBacklogListMap();
-        for (Map.Entry<Integer, List<String>> entry : productBacklogListDtoMap.entrySet()) {
-            Integer sprintNumber = entry.getKey();
-            List<String> productBacklogList = entry.getValue();
-            // TODO: SprintNumber에 맞는 스프린트에 productBacklogList 할당하기
-        }
-
-        project = projectRepository.save(project);
-
-        UserProject userProject = new UserProject(user, project, true);
-        userProjectRepository.save(userProject);
+//
+//        Project project = new Project();
+//        project.setProjectName(startingDataDto.getProject().getProjectName());
+//        // TODO : startingDataDto에서 스프린트 개수랑 스프린트별 만들어진 프로덕트백로그 뽑아서 설정해줘야함!!!
+//        Integer sprintCount = startingDataDto.getSprint().getSprintCount(); // 스프린트 개수
+//        Map<Integer, List<String>> productBacklogListDtoMap = startingDataDto.getProductBacklogListMap();
+//        for (Map.Entry<Integer, List<String>> entry : productBacklogListDtoMap.entrySet()) {
+//            Integer sprintNumber = entry.getKey();
+//            List<String> productBacklogList = entry.getValue();
+//            // TODO: SprintNumber에 맞는 스프린트에 productBacklogList 할당하기
+//        }
+//
+//        project = projectRepository.save(project);
+//
+//        UserProject userProject = new UserProject(user, project, true);
+//        userProjectRepository.save(userProject);
     }
 
     //프로젝트 유저추가
