@@ -49,7 +49,7 @@ public class StartingFormService {
         return parseGPTResponse(response.getBody());
     }
 
-    private Object buildPrompt(StartingFormDto requestDTO) {
+    private Object buildPrompt(StartingFormDto startingFormDto) {
         String systemPrompt = "너는 trello나 jira같은 회사의 프로젝트를 관리하고 팀원을 관리하는 AI야.  사용자가 Sprint(애자일 프로그래밍) 관련 데이터를 입력하면, JSON 형식으로 다음 정보를 반환해야 해. \n" +
                 "일단 사용자의 질문 리스트를 보여줄 게\n" +
                 "{-프로젝트 이름을 정해주세요. \n" +
@@ -95,11 +95,11 @@ public class StartingFormService {
                 "}\n.";
         return new Object[]{
                 Map.of("role", "system", "content", systemPrompt),
-                Map.of("role", "user", "content", generateUserPrompt(requestDTO))
+                Map.of("role", "user", "content", generateUserPrompt(startingFormDto))
         };
     }
 
-    private String generateUserPrompt(StartingFormDto requestDTO) {
+    private String generateUserPrompt(StartingFormDto startingFormDto) {
         return String.format("""
             {
                 "project_name": "%s",
@@ -110,12 +110,12 @@ public class StartingFormService {
                 "essential_features": %s
             }
             """,
-                requestDTO.getProjectName(),
-                requestDTO.getProjectGoal(),
-                requestDTO.getEstimatedDuration(),
-                requestDTO.getSprintCycle(),
-                requestDTO.getTeamMembers(),
-                requestDTO.getEssentialFeatures()
+                startingFormDto.getProjectName(),
+                startingFormDto.getProjectGoal(),
+                startingFormDto.getEstimatedDuration(),
+                startingFormDto.getSprintCycle(),
+                startingFormDto.getTeamMembers(),
+                startingFormDto.getEssentialFeatures()
         );
     }
 
