@@ -35,10 +35,10 @@ public class StartingFormService {
     private String model;
 
     @Value("${system.txt.path}")
-    private String systemPrompt;
+    private String systemPromptPath;
 
     @Value("${user.txt.path}")
-    private String userPrompt;
+    private String userPromptPath;
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -68,7 +68,7 @@ public class StartingFormService {
     }
 
     private Object buildPrompt(StartingFormDto startingFormDto) {
-        String systemPrompt = readFile(this.systemPrompt);
+        String systemPrompt = readFile(this.systemPromptPath);
         String userPrompt = generateUserPrompt(startingFormDto);
         return new Object[]{
                 Map.of("role", "system", "content", systemPrompt),
@@ -77,7 +77,7 @@ public class StartingFormService {
     }
 
     private String generateUserPrompt(StartingFormDto startingFormDto) {
-        String userPromptTemplate = readFile(userPrompt);
+        String userPromptTemplate = readFile(userPromptPath);
         return String.format(userPromptTemplate,
                 startingFormDto.getProjectName(),
                 startingFormDto.getProjectGoal(),
