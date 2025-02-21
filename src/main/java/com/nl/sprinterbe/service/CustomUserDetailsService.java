@@ -1,8 +1,8 @@
 package com.nl.sprinterbe.service;
 
 import com.nl.sprinterbe.dto.CustomUserDetails;
-import com.nl.sprinterbe.entity.User;
-import com.nl.sprinterbe.repository.UserRepository;
+import com.nl.sprinterbe.domain.user.entity.User;
+import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

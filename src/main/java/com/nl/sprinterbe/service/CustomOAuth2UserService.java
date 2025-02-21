@@ -1,10 +1,10 @@
 package com.nl.sprinterbe.service;
 
-import com.nl.sprinterbe.dto.GoogleResponse;
-import com.nl.sprinterbe.dto.OAuth2Response;
-import com.nl.sprinterbe.dto.UserDto;
-import com.nl.sprinterbe.entity.User;
-import com.nl.sprinterbe.repository.UserRepository;
+import com.nl.sprinterbe.domain.user.dto.GoogleResponse;
+import com.nl.sprinterbe.domain.user.dto.OAuth2Response;
+import com.nl.sprinterbe.domain.user.dto.UserDto;
+import com.nl.sprinterbe.domain.user.entity.User;
+import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
