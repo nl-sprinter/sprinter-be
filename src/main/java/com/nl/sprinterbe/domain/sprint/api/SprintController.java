@@ -17,13 +17,7 @@ public class SprintController {
     private final SprintService sprintService;
     private final UserService userService;
 
-    //생성
-    @Operation(summary = "스프린트 생성", description = "프로젝트에 스프린트를 생성합니다.")
-    @PostMapping("/create/{projectId}")
-    public ResponseEntity<String> createSprint(@RequestBody SprintDto sprintDto,@PathVariable Long projectId) {
-        sprintService.createSprint(sprintDto, projectId);
-        return ResponseEntity.status(201).body("Sprint created successfully");
-    }
+
     //수정
     @Operation(summary = "스프린트 수정", description = "스프린트를 수정합니다.")
     @PostMapping("/update/{sprintId}")
