@@ -2,7 +2,7 @@ package com.nl.sprinterbe.service;
 
 import com.nl.sprinterbe.domain.user.dto.GoogleResponse;
 import com.nl.sprinterbe.domain.user.dto.OAuth2Response;
-import com.nl.sprinterbe.domain.user.dto.UserDto;
+import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -48,14 +48,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             userRepository.save(user);
 
-            UserDto userDTO = new UserDto();
-            userDTO.setEmail(oAuth2Response.getEmail());
-            userDTO.setUserId(user.getUserId());
-            userDTO.setNickname(oAuth2Response.getNickname());
+            UserDetailResponse userDetailResponse = new UserDetailResponse();
+            userDetailResponse.setEmail(oAuth2Response.getEmail());
+            userDetailResponse.setUserId(user.getUserId());
+            userDetailResponse.setNickname(oAuth2Response.getNickname());
             //userDTO.setProviderName(providerName);
-            userDTO.setRole("ROLE_USER");
+            userDetailResponse.setRole("ROLE_USER");
 
-            return new CustomOAuth2User(userDTO);
+            return new CustomOAuth2User(userDetailResponse);
         }
         else {
 
@@ -64,13 +64,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             userRepository.save(existingUser);
 
-            UserDto userDTO = new UserDto();
-            userDTO.setEmail(oAuth2Response.getEmail());
-            userDTO.setNickname(oAuth2Response.getNickname());
+            UserDetailResponse userDetailResponse = new UserDetailResponse();
+            userDetailResponse.setEmail(oAuth2Response.getEmail());
+            userDetailResponse.setNickname(oAuth2Response.getNickname());
             //userDTO.setProviderName(providerName);
-            userDTO.setRole("ROLE_USER");
+            userDetailResponse.setRole("ROLE_USER");
 
-            return new CustomOAuth2User(userDTO);
+            return new CustomOAuth2User(userDetailResponse);
         }
 
     }

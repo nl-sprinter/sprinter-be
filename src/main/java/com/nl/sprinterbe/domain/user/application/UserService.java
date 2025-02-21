@@ -10,7 +10,7 @@ import com.nl.sprinterbe.domain.refreshToken.entity.RefreshToken;
 import com.nl.sprinterbe.domain.userProject.entity.UserProject;
 import com.nl.sprinterbe.global.exception.LoginFormException;
 import com.nl.sprinterbe.domain.refreshToken.dao.RefreshTokenRepository;
-import com.nl.sprinterbe.domain.user.dto.UserDto;
+import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
@@ -39,13 +39,13 @@ public class UserService {
     private final UserProjectRepository userProjectRepository;
     private final JwtUtil jwtUtil;
 
-    public void updateUser(Long userId, UserDto userDTO) {
+    public void updateUser(Long userId, UserDetailResponse userDetailResponse) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         //시큐리티context에 있는 유저정보를 업데이트
 
-        user.setNickname(userDTO.getNickname());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setNickname(userDetailResponse.getNickname());
+        user.setPassword(passwordEncoder.encode(userDetailResponse.getPassword()));
 
         userRepository.save(user);
     }

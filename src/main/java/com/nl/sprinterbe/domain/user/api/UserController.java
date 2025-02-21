@@ -1,7 +1,7 @@
 package com.nl.sprinterbe.domain.user.api;
 
 import com.nl.sprinterbe.domain.project.dto.ProjectDto;
-import com.nl.sprinterbe.domain.user.dto.UserDto;
+import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.domain.user.application.UserService;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,9 +24,9 @@ public class UserController {
 
     @Operation(summary = "유저 정보 수정", description = "유저 정보를 수정합니다.")
     @PostMapping("/update")
-    public ResponseEntity<String> updateUser(@RequestBody UserDto userDTO, HttpServletRequest request) {
+    public ResponseEntity<String> updateUser(@RequestBody UserDetailResponse userDetailResponse, HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
-        userService.updateUser(userId, userDTO);
+        userService.updateUser(userId, userDetailResponse);
         return ResponseEntity.status(HttpStatus.OK).body("User updated successfully");
     }
     //유저가 속한 프로젝트 가져오기

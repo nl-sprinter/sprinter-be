@@ -1,7 +1,7 @@
 package com.nl.sprinterbe.domain.project.application;
 
 import com.nl.sprinterbe.domain.project.dto.ProjectDto;
-import com.nl.sprinterbe.domain.user.dto.UserDto;
+import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.dto.*;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.userProject.entity.UserProject;
@@ -47,9 +47,9 @@ public class ProjectService {
     }
 
     //프로젝트 유저추가
-    public void addUserToProject(UserDto userDTO, Long projectId) {
-        User user = userRepository.findByEmail(userDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + userDTO.getEmail()));
+    public void addUserToProject(UserDetailResponse userDetailResponse, Long projectId) {
+        User user = userRepository.findByEmail(userDetailResponse.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + userDetailResponse.getEmail()));
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
@@ -79,14 +79,14 @@ public class ProjectService {
         projectRepository.delete(project); // 프로젝트 삭제
     }
 
-    public List<UserDto> getUsers(Long projectId) {
+    public List<UserDetailResponse> getUsers(Long projectId) {
         List<User> users = userProjectRepository.findByProjectProjectId(projectId)
                 .stream()
                 .map(UserProject::getUser)
                 .toList();
 
         return users.stream()
-                .map(user -> new UserDto(user.getEmail(), user.getNickname()))
+                .map(user -> new UserDetailResponse(user.getEmail(), user.getNickname()))
                 .toList();
     }
 

@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserDetailResponse {
     private Long userId;
     private String nickname;
     private String password;
     private String email;
     private String role;
-    public UserDto(String email, String nickname) {
+    public UserDetailResponse(String email, String nickname) {
         this.nickname = nickname;
         this.email = email;
     }
