@@ -4,6 +4,8 @@ import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogDetailResponse;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogInfoResponse;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
+import com.nl.sprinterbe.domain.issue.repositories.IssueRepository;
+import com.nl.sprinterbe.domain.task.dao.TaskRepository;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userBacklog.dao.UserBacklogRepository;
@@ -39,6 +41,6 @@ public class BacklogServiceImpl implements BacklogService {
     public BacklogDetailResponse findBacklogDetailById(Long backlogId) {
         Backlog backlog = backlogRepository.findByBacklogId(backlogId).orElseThrow(() -> new NoDataFoundException("해당 Id로 조회된 데이터가 없습니다."));
         List<User> users = userBacklogRepository.findUsersByBacklogId(backlogId);
-
+        return null;
     }
 }

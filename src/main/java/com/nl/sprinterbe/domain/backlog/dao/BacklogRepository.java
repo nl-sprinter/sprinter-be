@@ -21,4 +21,6 @@ public interface BacklogRepository extends JpaRepository<Backlog, Long> {
     Slice<Backlog> findByProjectIdDesc(@Param("projectId") Long projectId,@Param("userId") Long userId, Pageable pageable);
 
     Optional<Backlog> findByBacklogId(Long backlogId);
+
+    boolean existsByBacklogId(Long backlogId);
 }

@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.backlog.application;
 
 
+import com.nl.sprinterbe.domain.backlog.dto.BacklogDetailResponse;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogInfoResponse;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import org.springframework.data.domain.Page;
