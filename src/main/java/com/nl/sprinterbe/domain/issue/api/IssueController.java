@@ -33,7 +33,7 @@ public class IssueController {
 
     @PatchMapping("update/{issueId}")
     public ResponseEntity<IssueRepsonse> updateIssue(@PathVariable Long issueId, @RequestBody CreateIssueRequest createIssueRequest) {
-        return new ResponseEntity<>(issueService.deleteIssue(issueId, createIssueRequest), HttpStatus.OK);
+        return new ResponseEntity<>(issueService.updateIssue(issueId, createIssueRequest), HttpStatus.OK);
     }
 
     @PostMapping("test")

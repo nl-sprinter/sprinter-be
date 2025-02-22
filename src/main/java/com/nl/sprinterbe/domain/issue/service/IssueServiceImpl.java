@@ -55,7 +55,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public IssueRepsonse deleteIssue(Long issueId, CreateIssueRequest createIssueRequest) {
+    public IssueRepsonse updateIssue(Long issueId, CreateIssueRequest createIssueRequest) {
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new IssueNotFoundException());
 

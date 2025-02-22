@@ -9,7 +9,7 @@ public interface IssueService {
 
     IssueRepsonse deleteIssue(Long issueId);
 
-    IssueRepsonse deleteIssue(Long issueId, CreateIssueRequest createIssueRequest);
+    IssueRepsonse updateIssue(Long issueId, CreateIssueRequest createIssueRequest);
 
     IssueRepsonse modifyCheckedStatus(Long issueId, CreateIssueRequest createIssueRequest);
 }
