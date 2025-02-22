@@ -18,6 +18,7 @@ public class IssueRepsonse {
     private Boolean checked;
     private LocalDateTime createdAt;
     private Long backlogId;
+
     public static IssueRepsonse of(Long issueId) {
         return IssueRepsonse.builder()
                 .issueId(issueId)

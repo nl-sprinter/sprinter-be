@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/issue")
@@ -34,6 +36,16 @@ public class IssueController {
     @PatchMapping("update/{issueId}")
     public ResponseEntity<IssueRepsonse> updateIssue(@PathVariable Long issueId, @RequestBody CreateIssueRequest createIssueRequest) {
         return new ResponseEntity<>(issueService.updateIssue(issueId, createIssueRequest), HttpStatus.OK);
+    }
+
+    @GetMapping("all/{backlogId}")
+    public ResponseEntity<List<IssueRepsonse>> getIssues(@PathVariable Long backlogId) {
+        return new ResponseEntity<>(issueService.getIssues(backlogId), HttpStatus.OK);
+    }
+
+    @GetMapping("{issueId}")
+    public ResponseEntity<IssueRepsonse> getIssue(@PathVariable Long issueId) {
+        return new ResponseEntity<>(issueService.getIssue(issueId), HttpStatus.OK);
     }
 
     @PostMapping("test")

@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -70,6 +70,21 @@ public class IssueServiceImpl implements IssueService {
                 .orElseThrow(() -> new IssueNotFoundException());
 
         issue.modifyChecked(createIssueRequest);
+
+        return IssueRepsonse.of(issue);
+    }
+
+    @Override
+    public List<IssueRepsonse> getIssues(Long backlogId) {
+        List<Issue> issues = issueRepository.findByBacklogBacklogId(backlogId);
+        List<IssueRepsonse> issueRepsonses = issues.stream().map(issue -> IssueRepsonse.of(issue)).toList();
+        return issueRepsonses;
+    }
+
+    @Override
+    public IssueRepsonse getIssue(Long issueId) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new IssueNotFoundException());
 
         return IssueRepsonse.of(issue);
     }
