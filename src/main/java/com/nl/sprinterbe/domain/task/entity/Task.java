@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.task.entity;
 
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
+import com.nl.sprinterbe.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

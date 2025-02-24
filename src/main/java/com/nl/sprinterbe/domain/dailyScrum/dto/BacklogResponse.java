@@ -1,12 +1,10 @@
-package com.nl.sprinterbe.domain.backlog.dto;
+package com.nl.sprinterbe.domain.dailyScrum.dto;
 
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import lombok.Builder;
-import lombok.Getter;
 
 @Builder
-@Getter
-public class BacklogDetailResponse {
+public class BacklogResponse {
     private Long backlogId;
     private Long sprinterId;
     private Boolean isFinished;
@@ -14,8 +12,8 @@ public class BacklogDetailResponse {
     private String title;
 
 
-    public static BacklogDetailResponse of(Backlog backlog) {
-        return BacklogDetailResponse.builder()
+    public static BacklogResponse of(Backlog backlog) {
+        return BacklogResponse.builder()
                 .backlogId(backlog.getBacklogId())
                 .sprinterId(backlog.getSprint().getSprintId())
                 .isFinished(backlog.getIsFinished())
@@ -23,5 +21,4 @@ public class BacklogDetailResponse {
                 .title(backlog.getTitle())
                 .build();
     }
-
 }

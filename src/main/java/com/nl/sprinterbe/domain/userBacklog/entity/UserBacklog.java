@@ -27,6 +27,8 @@ public class UserBacklog {
     @JoinColumn(name = "backlog_id", nullable = false)
     private Backlog backlog;
 
-
-
+    public UserBacklog(User user, Backlog backlog) {
+        this.user = user;
+        this.backlog = backlog;
+    }
 }

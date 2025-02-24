@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 프로젝트를 생성하는데 기초가 되는 데이터
@@ -47,7 +49,17 @@ public class StartingDataDto {
         @JsonProperty("sprint_number")
         private int sprintNumber;
         private String title;
-        private int weight;
+        private Long weight;
     }
+
+    
+    public Map<Integer, List<BacklogItem>> getProductBacklogListMap() {
+        if (backlog == null) {
+            return Collections.emptyMap();
+        }
+        return backlog.stream()
+                .collect(Collectors.groupingBy(BacklogItem::getSprintNumber));
+    }
+
 
 }

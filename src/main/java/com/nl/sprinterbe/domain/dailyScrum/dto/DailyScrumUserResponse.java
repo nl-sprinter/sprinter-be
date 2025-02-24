@@ -1,19 +1,19 @@
-package com.nl.sprinterbe.domain.user.dto;
+package com.nl.sprinterbe.domain.dailyScrum.dto;
 
-import com.nimbusds.openid.connect.sdk.claims.UserInfo;
+import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
-@Getter
 @Builder
-public class UserInfoResponse {
+@Getter
+public class DailyScrumUserResponse {
     private Long userId;
     private String nickname;
     private String email;
 
-    public static UserInfoResponse of(User user) {
-        return UserInfoResponse.builder()
+    public static DailyScrumUserResponse of(User user) {
+        return DailyScrumUserResponse.builder()
                 .userId(user.getUserId())
                 .nickname(user.getNickname())
                 .email(user.getEmail()).build();
