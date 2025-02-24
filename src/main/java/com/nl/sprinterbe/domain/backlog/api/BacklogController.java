@@ -25,7 +25,7 @@ public class BacklogController {
     }
 
     //Backlog 정보
-    @Getter("/projects/{projectId}/{backlogId}/users")
+    @GetMapping("/projects/{projectId}/{backlogId}/users")
     public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId){
         return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
     }

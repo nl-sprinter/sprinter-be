@@ -67,7 +67,7 @@ public class ProjectService {
         //유저와 프로젝트 영속화 / 저장
         UserProject userProject = new UserProject(user, project, true);
         userProjectRepository.save(userProject);
-
+        return project;
     }
 
     //프로젝트 유저추가

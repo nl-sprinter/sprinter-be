@@ -1,6 +1,5 @@
 package com.nl.sprinterbe.domain.sprint.entity;
 
-import com.nl.sprinterbe.domain.dailyScrum.entity.DailyScrum;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.sprint.dto.SprintDto;
 import jakarta.persistence.*;
@@ -10,9 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 
 
 @Entity
@@ -26,9 +23,6 @@ public class Sprint {
     @Column(name = "sprint_id")
     private Long sprintId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
 
     @Column(name = "sprint_name")
     private String sprintName;

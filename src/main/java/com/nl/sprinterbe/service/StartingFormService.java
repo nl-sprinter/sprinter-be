@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -78,42 +76,42 @@ public class StartingFormService {
                         new StartingDataDto.BacklogItem(
                                 1,
                                 "친구 등록 기능 구현",
-                                3
+                                3L
                         ),
                         new StartingDataDto.BacklogItem(
                                 1,
                                 "친구 삭제 기능 구현",
-                                1
+                                1L
                         ),
                         new StartingDataDto.BacklogItem(
                                 1,
                                 "친구 조회 기능 구현",
-                                2
+                                2L
                         ),
                         new StartingDataDto.BacklogItem(
                                 2,
                                 "기본 채팅 기능 구현",
-                                3
+                                3L
                         ),
                         new StartingDataDto.BacklogItem(
                                 2,
                                 "단체 채팅 기능 구현",
-                                3
+                                3L
                         ),
                         new StartingDataDto.BacklogItem(
                                 3,
                                 "사진 및 동영상 보내기 기능 구현",
-                                2
+                                2L
                         ),
                         new StartingDataDto.BacklogItem(
                                 3,
                                 "음성 통화 기능",
-                                2
+                                2L
                         ),
                         new StartingDataDto.BacklogItem(
                                 3,
                                 "최종 테스트",
-                                2
+                                2L
                         )
                 )
         );

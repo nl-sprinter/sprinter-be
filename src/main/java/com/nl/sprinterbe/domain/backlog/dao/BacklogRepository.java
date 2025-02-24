@@ -35,10 +35,8 @@ public interface BacklogRepository extends JpaRepository<Backlog, Long> {
 
 
     Optional<Backlog> findByBacklogId(Long backlogId);
-
-<<<<<<< HEAD
+    
     boolean existsByBacklogId(Long backlogId);
-=======
     @Query("select i from Issue i where i.backlog.backlogId = :backlogId")
     List<Issue> findIssuesByBacklogId(@Param("backlogId") Long backlogId);
 
@@ -54,5 +52,4 @@ public interface BacklogRepository extends JpaRepository<Backlog, Long> {
                                      @Param("backlogId") Long backlogId);
 
 
->>>>>>> 9309944 (FEAT: backlog 관련 API 1차)
 }
