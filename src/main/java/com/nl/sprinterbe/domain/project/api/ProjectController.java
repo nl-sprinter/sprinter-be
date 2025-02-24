@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.project.api;
 
 import com.nl.sprinterbe.domain.project.dto.ProjectDto;
+import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.domain.project.application.ProjectService;
 import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
@@ -28,7 +29,7 @@ public class ProjectController {
     @PostMapping("/create")
     public ResponseEntity<String> createProject(@RequestBody StartingDataDto StartingDataDto, HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
-        projectService.createProject(StartingDataDto, userId);
+        Project project = projectService.createProject(StartingDataDto, userId);
         return ResponseEntity.status(201).body("Project created successfully"); // 수정필요.
     }
 

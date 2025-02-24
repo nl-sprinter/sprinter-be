@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -52,19 +53,72 @@ public class StartingFormService {
     }
 
     public StartingDataDto generateProjectPlan(StartingFormDto requestDTO) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        headers.setBearerAuth(apiKey);
+//
+//        Map<String, Object> payload = new HashMap<>();
+//        payload.put("model", model);
+//        payload.put("messages", buildPrompt(requestDTO));
+//        payload.put("response_format", Map.of("type", "json_object"));
+//
+//        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
+//        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
+//
+//        return parseGPTResponse(response.getBody());
+        StartingDataDto dummyStartingDataDto = new StartingDataDto(
+                new StartingDataDto.ProjectInfo(
+                        "카카오톡"
+                ),
+                new StartingDataDto.SprintInfo(
+                        3,
+                        30
+                ),
+                List.of(
+                        new StartingDataDto.BacklogItem(
+                                1,
+                                "친구 등록 기능 구현",
+                                3
+                        ),
+                        new StartingDataDto.BacklogItem(
+                                1,
+                                "친구 삭제 기능 구현",
+                                1
+                        ),
+                        new StartingDataDto.BacklogItem(
+                                1,
+                                "친구 조회 기능 구현",
+                                2
+                        ),
+                        new StartingDataDto.BacklogItem(
+                                2,
+                                "기본 채팅 기능 구현",
+                                3
+                        ),
+                        new StartingDataDto.BacklogItem(
+                                2,
+                                "단체 채팅 기능 구현",
+                                3
+                        ),
+                        new StartingDataDto.BacklogItem(
+                                3,
+                                "사진 및 동영상 보내기 기능 구현",
+                                2
+                        ),
+                        new StartingDataDto.BacklogItem(
+                                3,
+                                "음성 통화 기능",
+                                2
+                        ),
+                        new StartingDataDto.BacklogItem(
+                                3,
+                                "최종 테스트",
+                                2
+                        )
+                )
+        );
+        return dummyStartingDataDto; // 더미데이터 주입
 
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("model", model);
-        payload.put("messages", buildPrompt(requestDTO));
-        payload.put("response_format", Map.of("type", "json_object"));
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
-        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
-
-        return parseGPTResponse(response.getBody());
     }
 
     private Object buildPrompt(StartingFormDto startingFormDto) {

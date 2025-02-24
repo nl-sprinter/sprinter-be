@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +32,10 @@ public class ProjectService {
     private final UserProjectRepository userProjectRepository;
     private final BacklogRepository backlogRepository;
 
-    // TODO: 프로젝트 생성
-    public void createProject(StartingDataDto startingDataDto, Long userId) {
+    public Project createProject(StartingDataDto startingDataDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
         Project project = new Project();
         project.setProjectName(startingDataDto.getProject().getProjectName());
         // TODO : startingDataDto에서 스프린트 개수랑 스프린트별 만들어진 프로덕트백로그 뽑아서 설정해줘야함!!!
@@ -66,6 +67,7 @@ public class ProjectService {
         //유저와 프로젝트 영속화 / 저장
         UserProject userProject = new UserProject(user, project, true);
         userProjectRepository.save(userProject);
+
     }
 
     //프로젝트 유저추가

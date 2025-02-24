@@ -30,12 +30,14 @@ public class StartingDataDto {
     @NotEmpty
     private List<BacklogItem> backlog;
 
+    @AllArgsConstructor
     @Data
     public static class ProjectInfo {
         @JsonProperty("project_name")
         private String projectName;
     }
 
+    @AllArgsConstructor
     @Data
     public static class SprintInfo {
         @JsonProperty("sprint_count")
@@ -44,6 +46,7 @@ public class StartingDataDto {
         private int sprintDuration;
     }
 
+    @AllArgsConstructor
     @Data
     public static class BacklogItem {
         @JsonProperty("sprint_number")

@@ -9,9 +9,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 
 @Entity
 @AllArgsConstructor
@@ -24,21 +26,27 @@ public class Sprint {
     @Column(name = "sprint_id")
     private Long sprintId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
+
     @Column(name = "sprint_name")
     private String sprintName;
 
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "sprint_order")
     private Long sprintOrder;
 
+
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
+
 
     public static Sprint createSprint(SprintDto sprintDto, Project project) {
         return Sprint.builder()
