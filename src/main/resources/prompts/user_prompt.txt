@@ -1,0 +1,8 @@
+{
+    "project_name": "%s",
+    "project_goal": "%s",
+    "estimated_duration": "%s",
+    "sprint_cycle": "%s",
+    "team_members": %d,
+    "essential_features": %s
+}

@@ -1,5 +1,6 @@
 package com.nl.sprinterbe.dto;
 
+import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -9,10 +10,10 @@ import java.util.Map;
 
 public class CustomOAuth2User implements OAuth2User {
 
-    private final UserDto userDTO;
+    private final UserDetailResponse userDetailResponse;
 
-    public CustomOAuth2User(UserDto userDTO) {
-        this.userDTO = userDTO;
+    public CustomOAuth2User(UserDetailResponse userDetailResponse) {
+        this.userDetailResponse = userDetailResponse;
     }
 
     @Override
@@ -27,7 +28,7 @@ public class CustomOAuth2User implements OAuth2User {
         collection.add(new GrantedAuthority() {
             @Override
             public String getAuthority() {
-                return userDTO.getRole();
+                return userDetailResponse.getRole();
             }
         });
 
@@ -36,14 +37,14 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public String getName() {
-        return userDTO.getUserId().toString();
+        return userDetailResponse.getUserId().toString();
     }
 
     public String getEmail() {
-        return userDTO.getEmail();
+        return userDetailResponse.getEmail();
     }
 
     public String getId() {
-        return userDTO.getUserId().toString();
+        return userDetailResponse.getUserId().toString();
     }
 }
