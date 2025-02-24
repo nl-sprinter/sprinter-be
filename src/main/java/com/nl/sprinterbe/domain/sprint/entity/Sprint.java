@@ -1,5 +1,6 @@
 package com.nl.sprinterbe.domain.sprint.entity;
 
+import com.nl.sprinterbe.domain.dailyScrum.entity.DailyScrum;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.sprint.dto.SprintDto;
 import jakarta.persistence.*;
@@ -8,7 +9,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 
 @Entity
 @AllArgsConstructor
@@ -38,6 +43,10 @@ public class Sprint {
     private Long sprintOrder;
 
 
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
+
 
     public static Sprint createSprint(SprintDto sprintDto, Project project) {
         return Sprint.builder()
@@ -53,7 +62,5 @@ public class Sprint {
 //    @OneToMany(mappedBy = "sprint")
 //    private List<Backlog> backlogs = new ArrayList<>();
 //
-//    @OneToMany(mappedBy = "sprint")
-//    private List<DailyScrum> dailyScrums = new ArrayList();
 
 }

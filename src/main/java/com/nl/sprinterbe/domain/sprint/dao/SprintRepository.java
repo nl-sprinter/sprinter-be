@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface SprintRepository extends JpaRepository<Sprint, Long> {
     List<Sprint> findByProjectProjectId(Long projectId);
+
+    Sprint findBySprintId(Long sprintId);
 }

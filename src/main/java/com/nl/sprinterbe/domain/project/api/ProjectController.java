@@ -4,7 +4,7 @@ import com.nl.sprinterbe.domain.project.dto.ProjectDto;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.domain.project.application.ProjectService;
-import com.nl.sprinterbe.domain.user.dto.UserDto;
+import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,8 +36,8 @@ public class ProjectController {
     //프로젝트 유저추가(일단 이메일 받아와서 추가하는식)
     @Operation(summary = "프로젝트 유저 추가", description = "프로젝트에 유저를 추가합니다.(현재는 이메일로 검색해서 추가)")
     @PostMapping("/addUser/{projectId}")
-    public ResponseEntity<String> addUserToProject(@RequestBody UserDto userDTO, @PathVariable Long projectId) {
-        projectService.addUserToProject(userDTO, projectId);
+    public ResponseEntity<String> addUserToProject(@RequestBody UserDetailResponse userDetailResponse, @PathVariable Long projectId) {
+        projectService.addUserToProject(userDetailResponse, projectId);
         return ResponseEntity.status(201).body("User added to project successfully");
     }
 
@@ -53,8 +53,8 @@ public class ProjectController {
     //유저 조회
     @Operation(summary = "프로젝트 유저 조회", description = "프로젝트에 속한 유저들을 조회합니다.")
     @GetMapping("/users/{projectId}")
-    public ResponseEntity<List<UserDto>> getUsers(@PathVariable Long projectId) {
-        List<UserDto> users = projectService.getUsers(projectId);
+    public ResponseEntity<List<UserDetailResponse>> getUsers(@PathVariable Long projectId) {
+        List<UserDetailResponse> users = projectService.getUsers(projectId);
         return ResponseEntity.status(200).body(users);
     }
 
