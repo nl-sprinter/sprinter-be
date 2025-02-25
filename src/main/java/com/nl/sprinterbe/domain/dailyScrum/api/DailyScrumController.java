@@ -18,28 +18,28 @@ public class DailyScrumController {
     private DailyScrumServiceImpl dailyScrumService;
 
     //스프린트에 걸려있는 DailyScrum 리스트
-    @GetMapping
-    public ResponseEntity<List<DailyScrumInfoResponse>> getDailyScrumInfoList(@PathVariable Long sprintId) {
-        return ResponseEntity.ok(dailyScrumService.findDailyScrumInfoBySprintId(sprintId));
-    }
-
-    //DailyScrum의 User 리스트
-    @GetMapping
-    public ResponseEntity<List<DailyScrumUserResponse>> getUserInfoList(@PathVariable Long dailyScrumId) {
-        return ResponseEntity.ok(dailyScrumService.findDailyScrumUserBySprintId(dailyScrumId));
-    }
-
-    //DailyScrum에 걸려있는 백로그 리스트
-    @GetMapping
-    public ResponseEntity<List<BacklogResponse>> getBacklogList(@PathVariable Long dailyScrumId) {
-        return ResponseEntity.ok(dailyScrumService.findBacklogByDailyScrumId(dailyScrumId));
-    }
-
-    //회의 노트
-    @GetMapping
-    public ResponseEntity<DailyScrumDetailResponse> getDailyScrumDetail(@PathVariable Long dailyScrumId){
-        return ResponseEntity.ok(dailyScrumService.findContentByDailyScrumId(dailyScrumId));
-    }
+//    @GetMapping
+//    public ResponseEntity<List<DailyScrumInfoResponse>> getDailyScrumInfoList(@PathVariable Long sprintId) {
+//        return ResponseEntity.ok(dailyScrumService.findDailyScrumInfoBySprintId(sprintId));
+//    }
+//
+//    //DailyScrum의 User 리스트
+//    @GetMapping
+//    public ResponseEntity<List<DailyScrumUserResponse>> getUserInfoList(@PathVariable Long dailyScrumId) {
+//        return ResponseEntity.ok(dailyScrumService.findDailyScrumUserBySprintId(dailyScrumId));
+//    }
+//
+//    //DailyScrum에 걸려있는 백로그 리스트
+//    @GetMapping
+//    public ResponseEntity<List<BacklogResponse>> getBacklogList(@PathVariable Long dailyScrumId) {
+//        return ResponseEntity.ok(dailyScrumService.findBacklogByDailyScrumId(dailyScrumId));
+//    }
+//
+//    //회의 노트
+//    @GetMapping
+//    public ResponseEntity<DailyScrumDetailResponse> getDailyScrumDetail(@PathVariable Long dailyScrumId){
+//        return ResponseEntity.ok(dailyScrumService.findContentByDailyScrumId(dailyScrumId));
+//    }
 
     @GetMapping
     //Today Scrum , 만약 TodayScrum이 2개 이상이라면 어떻게 할것인가?

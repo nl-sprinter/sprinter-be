@@ -2,10 +2,11 @@ package com.nl.sprinterbe.domain.issue.service;
 
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
+import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
 import com.nl.sprinterbe.domain.issue.dto.CreateIssueRequest;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
-import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
+
 import com.nl.sprinterbe.global.exception.backlog.BacklogNotFoundException;
 import com.nl.sprinterbe.global.exception.issue.IssueNotFoundException;
 import lombok.RequiredArgsConstructor;

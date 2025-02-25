@@ -2,12 +2,8 @@ package com.nl.sprinterbe.domain.backlog.entity;
 
 import com.nl.sprinterbe.domain.dailyScrum.entity.DailyScrum;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
-import com.nl.sprinterbe.domain.userBacklog.entity.UserBacklog;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -27,7 +23,7 @@ public class Backlog {
 
     //25.02.22 이거 왜 있는거였지?
     @Column(name = "assigned_user_id")
-    private Long assingedUserId;
+    private Long assignedUserId;
 
     @Column(name = "is_finish")
     private Boolean isFinished;

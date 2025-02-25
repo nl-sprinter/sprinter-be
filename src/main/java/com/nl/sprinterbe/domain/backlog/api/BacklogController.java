@@ -86,50 +86,50 @@ public class BacklogController {
 
     //---------------------------------- 수정 시 하나씩(현재 채택) -----------------------------------
     //유저 Delete
-    @DeleteMapping
-    public ResponseEntity<Void> deleteUser(@PathVariable Long backlogId,@PathVariable Long userId) {
-        backlogService.deleteUser(backlogId,userId);
-        return ResponseEntity.ok().build();
-    }
-    //유저 add
-    @PostMapping
-    public ResponseEntity<BacklogUserResponse> addUser(@PathVariable Long backlogId , @PathVariable Long userId){
-        return ResponseEntity.ok(backlogService.addBacklogUser(backlogId,userId));
-    }
-
-    //업무 Delete
-    @DeleteMapping
-    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
-        backlogService.deleteTask(taskId);
-        return ResponseEntity.ok().build();
-    }
-    //업무 add
-    @PostMapping
-    public ResponseEntity<BacklogTaskResponse> addTask(@PathVariable Long backlogId ,@RequestBody BacklogTaskRequest request) {
-        return ResponseEntity.ok(backlogService.addTask(backlogId,request));
-    }
+//    @DeleteMapping
+//    public ResponseEntity<Void> deleteUser(@PathVariable Long backlogId,@PathVariable Long userId) {
+//        backlogService.deleteUser(backlogId,userId);
+//        return ResponseEntity.ok().build();
+//    }
+//    //유저 add
+//    @PostMapping
+//    public ResponseEntity<BacklogUserResponse> addUser(@PathVariable Long backlogId , @PathVariable Long userId){
+//        return ResponseEntity.ok(backlogService.addBacklogUser(backlogId,userId));
+//    }
+//
+//    //업무 Delete
+//    @DeleteMapping
+//    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
+//        backlogService.deleteTask(taskId);
+//        return ResponseEntity.ok().build();
+//    }
+//    //업무 add
+//    @PostMapping
+//    public ResponseEntity<BacklogTaskResponse> addTask(@PathVariable Long backlogId ,@RequestBody BacklogTaskRequest request) {
+//        return ResponseEntity.ok(backlogService.addTask(backlogId,request));
+//    }
 
     //---------------------------------- 수정 시 하나씩 -----------------------------------
 
-    //이슈 수정
-    @PatchMapping()
-    public ResponseEntity<BacklogIssueResponse> updateIssue(@PathVariable Long issueId, @RequestBody BacklogIssueRequest request){
-        return ResponseEntity.ok(backlogService.updateIssue(issueId,request));
-    }
-
-    //이슈 add
-    @PostMapping()
-    public ResponseEntity<BacklogIssueResponse> addIssue(@PathVariable Long issueId,@RequestBody BacklogIssueRequest request) {
-        return ResponseEntity.ok(backlogService.addIssue(issueId,request));
-    }
-
-
-    //이슈 delete
-    @DeleteMapping()
-    public ResponseEntity<Void> deleteIssue(@PathVariable Long issueId) {
-        backlogService.deleteIssue(issueId);
-        return ResponseEntity.ok().build();
-    }
+//    //이슈 수정
+//    @PatchMapping()
+//    public ResponseEntity<BacklogIssueResponse> updateIssue(@PathVariable Long issueId, @RequestBody BacklogIssueRequest request){
+//        return ResponseEntity.ok(backlogService.updateIssue(issueId,request));
+//    }
+//
+//    //이슈 add
+//    @PostMapping()
+//    public ResponseEntity<BacklogIssueResponse> addIssue(@PathVariable Long issueId,@RequestBody BacklogIssueRequest request) {
+//        return ResponseEntity.ok(backlogService.addIssue(issueId,request));
+//    }
+//
+//
+//    //이슈 delete
+//    @DeleteMapping()
+//    public ResponseEntity<Void> deleteIssue(@PathVariable Long issueId) {
+//        backlogService.deleteIssue(issueId);
+//        return ResponseEntity.ok().build();
+//    }
 
 
 

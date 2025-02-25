@@ -2,6 +2,7 @@ package com.nl.sprinterbe.domain.issue.entity;
 
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.issue.dto.CreateIssueRequest;
+import com.nl.sprinterbe.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,8 @@ public class Issue {
     private String content;
 
     private Boolean checked;
+
+    // TODO: user랑 연관관계 매핑해야함
 
     @ManyToOne
     @JoinColumn(name = "backlog_id", nullable = false)
