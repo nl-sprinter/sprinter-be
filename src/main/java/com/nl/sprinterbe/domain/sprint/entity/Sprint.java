@@ -1,7 +1,7 @@
 package com.nl.sprinterbe.domain.sprint.entity;
 
+import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.project.entity.Project;
-import com.nl.sprinterbe.domain.sprint.dto.SprintDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -37,24 +39,19 @@ public class Sprint {
     private Long sprintOrder;
 
 
+    // 프로젝트 1 : n 스프린트
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
+    // 스프린트 1 : n 백로그
+    @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Backlog> backlogs = new ArrayList<>();
 
-    public static Sprint createSprint(SprintDto sprintDto, Project project) {
-        return Sprint.builder()
-                .sprintName(sprintDto.getSprintName())
-                .startDate(sprintDto.getStartDate())
-                .endDate(sprintDto.getEndDate())
-                .sprintOrder(sprintDto.getSprintOrder())
-                .project(project)
-                .build();
+    // 연관관계 편의 메서드
+    public void addBacklog(Backlog backlog) {
+        backlogs.add(backlog);
+        backlog.setSprint(this);
     }
-
-
-//    @OneToMany(mappedBy = "sprint")
-//    private List<Backlog> backlogs = new ArrayList<>();
-//
 
 }

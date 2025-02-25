@@ -16,10 +16,6 @@ public class Backlog {
     @Column(name = "backlog_id")
     private Long backlogId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "sprint_id", nullable = false)
-    @Setter
-    private Sprint sprint;
 
     //25.02.22 이거 왜 있는거였지?
     @Column(name = "assigned_user_id")
@@ -35,6 +31,12 @@ public class Backlog {
     @Setter
     private String title;
 
+    // 스프린트 1 : n 백로그
+    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "sprint_id", nullable = false)
+    @Setter
+    private Sprint sprint;
+
 /*    @OneToMany(mappedBy = "backlog")
     private List<UserBacklog> userBacklogs = new ArrayList<>();*/
 
@@ -42,16 +44,5 @@ public class Backlog {
     @JoinColumn(name= "daily_scrum_id")
     @Setter
     private DailyScrum dailyScrum;
-
-
-    /*
-    @OneToMany(mappedBy = "backlog")
-    private List<Task> tasks = new ArrayList<>();
-
-    @OneToMany(mappedBy = "backlog")
-    private List<BacklogComment> backlogComments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "backlog")
-    private List<Issue> issues = new ArrayList<>();*/
 
 }

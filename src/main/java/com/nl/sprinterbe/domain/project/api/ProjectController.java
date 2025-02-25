@@ -24,12 +24,11 @@ public class ProjectController {
     private final JwtUtil jwtUtil;
 
     //프로젝트 생성
-    // TODO: 수정필요
-    @Operation(summary = "프로젝트 생성", description = "gpt 설문지를 받아서 프로젝트를 생성합니다.")
+    @Operation(summary = "프로젝트 생성", description = "StartingDataDto 를 받아서 프로젝트를 생성합니다.")
     @PostMapping("/create")
     public ResponseEntity<String> createProject(@RequestBody StartingDataDto StartingDataDto, HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
-        Project project = projectService.createProject(StartingDataDto, userId);
+        projectService.createProject(StartingDataDto, userId);
         return ResponseEntity.status(201).body("Project created successfully"); // 수정필요.
     }
 

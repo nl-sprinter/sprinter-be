@@ -55,14 +55,4 @@ public class StartingDataDto {
         private Long weight;
     }
 
-    
-    public Map<Integer, List<BacklogItem>> getProductBacklogListMap() {
-        if (backlog == null) {
-            return Collections.emptyMap();
-        }
-        return backlog.stream()
-                .collect(Collectors.groupingBy(BacklogItem::getSprintNumber));
-    }
-
-
 }

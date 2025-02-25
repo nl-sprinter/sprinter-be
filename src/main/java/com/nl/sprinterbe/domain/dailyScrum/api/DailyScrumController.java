@@ -17,7 +17,7 @@ import java.util.List;
 public class DailyScrumController {
     private DailyScrumServiceImpl dailyScrumService;
 
-    //스프린트에 걸려있는 DailyScrum 리스트
+//    //스프린트에 걸려있는 DailyScrum 리스트
 //    @GetMapping
 //    public ResponseEntity<List<DailyScrumInfoResponse>> getDailyScrumInfoList(@PathVariable Long sprintId) {
 //        return ResponseEntity.ok(dailyScrumService.findDailyScrumInfoBySprintId(sprintId));
@@ -40,12 +40,12 @@ public class DailyScrumController {
 //    public ResponseEntity<DailyScrumDetailResponse> getDailyScrumDetail(@PathVariable Long dailyScrumId){
 //        return ResponseEntity.ok(dailyScrumService.findContentByDailyScrumId(dailyScrumId));
 //    }
-
-    @GetMapping
-    //Today Scrum , 만약 TodayScrum이 2개 이상이라면 어떻게 할것인가?
-    public ResponseEntity<List<DailyScrumDetailResponse>> getTodayDailyScrumDetail(){
-        return ResponseEntity.ok(dailyScrumService.findDailyScrumByDate(LocalDateTime.now()));
-    }
+//
+//    @GetMapping
+//    //Today Scrum , 만약 TodayScrum이 2개 이상이라면 어떻게 할것인가?
+//    public ResponseEntity<List<DailyScrumDetailResponse>> getTodayDailyScrumDetail(){
+//        return ResponseEntity.ok(dailyScrumService.findDailyScrumByDate(LocalDateTime.now()));
+//    }
 
 
     //DailyScrum 생성

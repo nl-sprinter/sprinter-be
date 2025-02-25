@@ -2,11 +2,9 @@ package com.nl.sprinterbe.domain.project.entity;
 
 import com.nl.sprinterbe.domain.sprint.dto.SprintDto;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
+import com.nl.sprinterbe.domain.userProject.entity.UserProject;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -16,7 +14,8 @@ import java.util.List;
 
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -27,46 +26,28 @@ public class Project {
     private Long projectId;
 
     @CreationTimestamp
-    @Column(name = "created_at",updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "project_name")
     private String projectName;
 
-    // Project 1 : n Sprint
+    // 프로젝트 1 : n 스프린트
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sprint> sprints = new ArrayList<>();
 
-    /**
-     * 프로젝트 생성 시, 스프린트들을 자동으로 생성하는 메서드
-     */
-    public static Project createProject(String projectName, int sprintCount, int sprintDuration) {
-        Project project = new Project();
-        project.projectName = projectName;
-        project.createdAt = LocalDateTime.now();
+    // 다대다 매핑 (유저,프로젝트)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<UserProject> userProjects = new ArrayList<>();
 
-        // 스프린트 자동 생성
-        LocalDate startDate = LocalDate.now();
-        for (int i = 0; i < sprintCount; i++) {
-            String sprintName = "Sprint " + (i + 1);
-            LocalDate endDate = startDate.plusDays(sprintDuration);
-            SprintDto sprintDto = new SprintDto(
-                    sprintName,
-                    startDate,
-                    endDate,
-                    (long) i
-            );
-            Sprint sprint = Sprint.createSprint(sprintDto, project);
-            project.sprints.add(sprint);
-            startDate = endDate; // 다음 스프린트 시작 날짜 업데이트
-        }
-        return project;
+    /**
+     * 연관관계 편의 메서드
+     * 프로젝트에 스프린트 추가
+     * @param sprint
+     */
+    public void addSprint(Sprint sprint) {
+        sprints.add(sprint);
+        sprint.setProject(this);
     }
 
-//
-//    @OneToMany(mappedBy = "project")
-//    private List<Notification> notifications = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "project")
-//    private List<Schedule> schedules = new ArrayList<>();
 }
