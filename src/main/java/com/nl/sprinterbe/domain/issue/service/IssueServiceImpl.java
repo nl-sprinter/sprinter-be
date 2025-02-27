@@ -24,17 +24,17 @@ public class IssueServiceImpl implements IssueService {
     private final BacklogRepository backlogRepository;
 
     @Override
-    public IssueRepsonse createIssue(CreateIssueRequest request) {
-        if(!backlogRepository.existsByBacklogId(request.getBacklogId())){
+    public IssueRepsonse createIssue(CreateIssueRequest request,Long backlogId) {
+        if(!backlogRepository.existsByBacklogId(backlogId)){
             throw new BacklogNotFoundException();
         }
 
         Issue issue = Issue.of(request);
-        Long backlogId = relateBacklog(request.getBacklogId(), issue);
+        Long bId = relateBacklog(backlogId, issue);
 
         Issue savedIssue = issueRepository.save(issue);
 
-        return IssueRepsonse.of(savedIssue, backlogId);
+        return IssueRepsonse.of(savedIssue, bId);
     }
 
     public Long relateBacklog(Long backlogId, Issue issue){

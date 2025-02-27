@@ -10,6 +10,7 @@ import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,9 +24,9 @@ public class IssueController {
     private final BacklogRepository backlogRepository;
     private final SprintRepository sprintRepository;
 
-    @PostMapping("create")
-    public ResponseEntity<IssueRepsonse> createIssue(@RequestBody CreateIssueRequest request) {
-        return new ResponseEntity<>(issueService.createIssue(request), HttpStatus.CREATED);
+    @PostMapping("create/{backlogId}")
+    public ResponseEntity<IssueRepsonse> createIssue(@RequestBody @Validated CreateIssueRequest request,@PathVariable Long backlogId) {
+        return new ResponseEntity<>(issueService.createIssue(request, backlogId), HttpStatus.CREATED);
     }
 
     @DeleteMapping("delete/{issueId}")

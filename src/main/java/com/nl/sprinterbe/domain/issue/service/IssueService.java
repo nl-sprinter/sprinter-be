@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IssueService {
 
-    IssueRepsonse createIssue(CreateIssueRequest createIssueRequest);
+    IssueRepsonse createIssue(CreateIssueRequest createIssueRequest, Long backlogId);
 
     IssueRepsonse deleteIssue(Long issueId);
 
