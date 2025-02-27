@@ -100,4 +100,8 @@ public class JwtUtil {
         String token=authorization.substring(7);
         return Long.parseLong(Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("id", String.class));
     }
+
+    public Long removeBearer(String token){
+        return Long.parseLong(Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token.substring(7)).getBody().get("id", String.class));
+    }
 }
