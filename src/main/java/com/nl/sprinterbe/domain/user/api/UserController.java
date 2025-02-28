@@ -37,4 +37,11 @@ public class UserController {
         List<ProjectDto> projects = userService.getProjects(userId);
         return ResponseEntity.status(HttpStatus.OK).body(projects);
     }
+
+    // 유저 닉네임 가져오기
+    @GetMapping("/nickname")
+    public ResponseEntity<String> getUserNickname(HttpServletRequest request) {
+        Long userId = jwtUtil.removeBearerAndReturnId(request);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getNickname(userId));
+    }
 }

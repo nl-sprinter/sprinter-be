@@ -18,7 +18,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +39,16 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<UserProject> userProjects = new ArrayList<>();
 
+    // 컬렉션 초기화 문제 때문에 빌더 재정의
+    @Builder
+    public Project(Long projectId, LocalDateTime createdAt, String projectName) {
+        this.projectId = projectId;
+        this.createdAt = createdAt;
+        this.projectName = projectName;
+        this.sprints = new ArrayList<>();
+        this.userProjects = new ArrayList<>();
+    }
+
     /**
      * 연관관계 편의 메서드
      * 프로젝트에 스프린트 추가
@@ -50,4 +59,14 @@ public class Project {
         sprint.setProject(this);
     }
 
+    @Override
+    public String toString() {
+        return "Project{" +
+                "projectId=" + projectId +
+                ", createdAt=" + createdAt +
+                ", projectName='" + projectName + '\'' +
+                ", sprints=" + sprints +
+                ", userProjects=" + userProjects +
+                '}';
+    }
 }

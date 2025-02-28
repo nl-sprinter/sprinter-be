@@ -107,7 +107,14 @@ public class UserService {
                 .collect(Collectors.toList());
 
         return projects.stream()
-                .map(project -> new ProjectDto(project.getProjectName()))
+                .map(project -> new ProjectDto(project.getProjectName(), project.getCreatedAt()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * User 닉네임 가져오기
+     */
+    public String getNickname(Long userId) {
+        return userRepository.findById(userId).orElseThrow().getNickname();
     }
 }

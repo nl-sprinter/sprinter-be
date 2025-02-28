@@ -14,6 +14,7 @@ import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -47,7 +49,12 @@ public class ProjectService {
 
         // 스프린트 생성 및 현재 프로젝트에 연결
         List<Sprint> sprints = createSprintsForProject(project, startingDataDto.getSprint());
-        sprints.forEach(project::addSprint);
+        // 디버그
+        log.debug("project = {}", project);
+        for (Sprint sprint : sprints) {
+            log.debug("sprint = {}", sprint);
+        }
+        sprints.forEach(project::addSprint); // 예외터짐
         // 스프린트 저장
         sprintRepository.saveAll(sprints);
 

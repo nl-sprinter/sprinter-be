@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Builder
 public class Sprint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +36,19 @@ public class Sprint {
 
     @Column(name = "sprint_order")
     private Long sprintOrder;
+
+    // 빌더 재정의
+    @Builder
+    public Sprint(Long sprintId, String sprintName, LocalDate startDate,
+                  LocalDate endDate, Long sprintOrder, Project project) {
+        this.sprintId = sprintId;
+        this.sprintName = sprintName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.sprintOrder = sprintOrder;
+        this.project = project;
+        this.backlogs = new ArrayList<>();
+    }
 
 
     // 프로젝트 1 : n 스프린트
