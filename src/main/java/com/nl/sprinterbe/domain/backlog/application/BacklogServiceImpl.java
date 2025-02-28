@@ -3,6 +3,7 @@ package com.nl.sprinterbe.domain.backlog.application;
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
+import com.nl.sprinterbe.domain.dailyScrum.dto.BacklogResponse;
 import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
@@ -19,12 +20,14 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BacklogServiceImpl implements BacklogService {
 
     private final TaskRepository taskRepository;
@@ -35,17 +38,21 @@ public class BacklogServiceImpl implements BacklogService {
     private final IssueRepository issueRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId,Pageable pageable ) {
         return backlogRepository.findByProjectIdDesc(projectId,userId, pageable).map(BacklogInfoResponse::of);
     }
 
 
     @Override
+    @Transactional(readOnly = true)
     public BacklogDetailResponse findBacklogDetailById(Long backlogId) {
         Backlog backlog = backlogRepository.findByBacklogId(backlogId).orElseThrow(() -> new NoDataFoundException("해당 Id로 조회된 백로그가 없습니다."));
         return BacklogDetailResponse.of(backlog);
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public List<BacklogTaskResponse> findTaskByBacklogId(Long backlogId) {
         List<Task> tasks = backlogRepository.findTasksByBacklogId(backlogId);
         if(tasks.isEmpty()) {
@@ -55,6 +62,7 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BacklogUserResponse> findUserByBacklogId(Long backlogId) {
         List<User> users = userBacklogRepository.findUsersByBacklogId(backlogId);
         if(users.isEmpty()) {
@@ -64,6 +72,7 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BacklogIssueResponse> findIssueByBacklogId(Long backlogId) {
         List<Issue> issues = backlogRepository.findIssuesByBacklogId(backlogId);
         if(issues.isEmpty()) {
@@ -73,6 +82,7 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BacklogUserResponse> findBacklogExceptUsers(Long projectId, Long backlogId) {
         List<User> users = backlogRepository.findUsersNotInBacklog(projectId, backlogId);
         return users.stream().map(BacklogUserResponse::of).collect(Collectors.toList());
@@ -219,6 +229,15 @@ public class BacklogServiceImpl implements BacklogService {
         issueRepository.deleteById(issueId);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<BacklogResponse> getBacklogsExcludeDailyScrum(Long sprintId, Long dailyScrumId) {
+        List<Backlog> backlogs = backlogRepository.findExcludingDailyScrum(sprintId, dailyScrumId);
+        return backlogs.stream()
+                .map(BacklogResponse::of)
+                .collect(Collectors.toList());
+    }
+
     @NotNull
     private List<Task> getTasks(BacklogPostRequest request, Backlog newBacklog) {
         List<Task> savedTasks = request.getTasks().stream()
@@ -244,6 +263,7 @@ public class BacklogServiceImpl implements BacklogService {
                 .collect(Collectors.toList());
         return savedUsers;
     }
+
 
 
 }

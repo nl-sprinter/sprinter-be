@@ -1,5 +1,6 @@
 package com.nl.sprinterbe.domain.user.entity;
 //import com.nl.sprinterbe.entity.*;
+import com.nl.sprinterbe.domain.dailyScrum.entity.UserDailyScrum;
 import com.nl.sprinterbe.domain.userProject.entity.UserProject;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,15 @@ public class User {
     // 다대다 매핑 (유저, 프로젝트)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserProject> userProjects = new ArrayList<>();
+
+
+    //해당 유저가 프로젝트의 Leader인지 확인
+    public boolean isProjectLeader(Long projectId) {
+        return this.getUserProjects().stream()
+                .filter(up -> up.getProject().getProjectId().equals(projectId))
+                .anyMatch(UserProject::getIsProjectLeader);
+    }
+
 
 //    @OneToMany(mappedBy = "user")
 //    private List<Todo> todos = new ArrayList<>();

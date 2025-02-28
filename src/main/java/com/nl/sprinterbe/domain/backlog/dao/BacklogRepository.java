@@ -51,5 +51,12 @@ public interface BacklogRepository extends JpaRepository<Backlog, Long> {
     List<User> findUsersNotInBacklog(@Param("projectId") Long projectId,
                                      @Param("backlogId") Long backlogId);
 
+    // 특정 sprintId에 속한 Backlog 중,
+    // dailyScrumId로 연결된 Backlog를 제외한 목록을 조회
+
+    @Query("SELECT b FROM Backlog b " +
+            "WHERE b.sprint.sprintId = :sprintId " +  // Sprint에 속하는 Backlog 중
+            "AND b.backlogId NOT IN (SELECT dsb.backlog.backlogId FROM DailyScrumBacklog dsb WHERE dsb.dailyScrum.dailyScrumId = :dailyScrumId)") // 특정 DailyScrum에 포함되지 않은 Backlog
+    List<Backlog> findExcludingDailyScrum(@Param("sprintId") Long sprintId, @Param("dailyScrumId") Long dailyScrumId);
 
 }
