@@ -2,6 +2,7 @@ package com.nl.sprinterbe.domain.dailyScrum.application;
 
 import com.nl.sprinterbe.domain.dailyScrum.dto.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,9 +16,9 @@ public interface DailyScrumService {
 
     public DailyScrumDetailResponse findContentByDailyScrumId(Long dailyScrumId);
 
-    public List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDateTime startOfDay);
+    public List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDate startOfDay);
 
-    public DailyScrumPostResponse createDailyScrum(DailyScrumPostRequest request,Long projectId);
+    public DailyScrumPostResponse createDailyScrum(DailyScrumPostRequest request,Long projectId , Long sprintId);
 
     public void removeBacklog(Long dailyScrumId, Long backlogId);
 

@@ -14,16 +14,10 @@ public class SprintDto {
 
     private String sprintName;
 
-    private LocalDate startDate;
-
-    private LocalDate endDate;
-
     private Long sprintOrder;
 
-    public SprintDto(String sprintName, LocalDate startDate, LocalDate endDate, Long sprintOrder) {
+    public SprintDto(String sprintName, Long sprintOrder) {
         this.sprintName = sprintName;
-        this.startDate = startDate;
-        this.endDate = endDate;
         this.sprintOrder = sprintOrder;
     }
 }

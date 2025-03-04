@@ -6,6 +6,7 @@ import com.nl.sprinterbe.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class DailyScrumPostResponse {
     private List<UserDto> users;
     private List<BacklogDto> backlogs;
     private String content;
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
 
     public static DailyScrumPostResponse of(DailyScrum dailyScrum,List<UserDto> user, List<BacklogDto> backlogs) {

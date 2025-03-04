@@ -20,7 +20,7 @@ public class SprintController {
     @Operation(summary = "스프린트 수정", description = "스프린트를 수정합니다.")
     @PostMapping("/update/{sprintId}")
     public ResponseEntity<String> updateSprint(@RequestBody SprintDto sprintDto,@PathVariable Long sprintId) {
-        sprintService.updateSprint(sprintDto);
+        sprintService.updateSprint(sprintDto,sprintId);
         return ResponseEntity.status(200).body("Sprint updated successfully");
     }
     @Operation(summary = "스프린트 삭제", description = "스프린트를 삭제합니다.")

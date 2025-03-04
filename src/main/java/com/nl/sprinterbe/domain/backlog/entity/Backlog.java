@@ -40,9 +40,9 @@ public class Backlog {
 /*    @OneToMany(mappedBy = "backlog")
     private List<UserBacklog> userBacklogs = new ArrayList<>();*/
 
-    @ManyToOne
-    @JoinColumn(name= "daily_scrum_id")
-    @Setter
-    private DailyScrum dailyScrum;
+//    @ManyToOne
+//    @JoinColumn(name= "daily_scrum_id")
+//    @Setter
+//    private DailyScrum dailyScrum;
 
 }

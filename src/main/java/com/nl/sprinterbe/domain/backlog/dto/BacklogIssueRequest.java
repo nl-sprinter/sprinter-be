@@ -4,6 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class BacklogIssueRequest {
-    private String issueId;
     private String content;
 }

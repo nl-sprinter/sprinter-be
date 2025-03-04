@@ -18,18 +18,21 @@ public class BacklogPostResponse {
     private IssueDto issue;
 
 
+    @Getter
     public static class UserDto {
         private Long userId;
         private String nickname;
         private String email;
     }
 
+    @Getter
     public static class TaskDto {
         private String content;
         private Long taskId;
     }
 
 
+    @Getter
     public static class IssueDto {
         private String content;
         private Long issueId;

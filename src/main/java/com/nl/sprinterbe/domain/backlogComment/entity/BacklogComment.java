@@ -45,9 +45,7 @@ public class BacklogComment {
 
     @OneToMany(
             mappedBy = "parentComment",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true)
+            fetch = FetchType.LAZY)
     private List<BacklogComment> childComments = new ArrayList<>();
 
     public void setParent(BacklogComment parent) {

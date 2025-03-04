@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,5 +22,5 @@ public interface DailyScrumRepository extends JpaRepository<DailyScrum, Long> {
     @Query("select b from Backlog b join DailyScrumBacklog dsb on dsb.backlog.backlogId = b.backlogId where dsb.dailyScrum.dailyScrumId = :dailyScrumId")
     List<Backlog> findBacklogsByDailyScrumId(@Param("dailyScrumId") Long dailyScrumId);
 
-    List<DailyScrum> findByStartDate(LocalDateTime startDate);
+    List<DailyScrum> findByStartDate(LocalDate startDate);
 }

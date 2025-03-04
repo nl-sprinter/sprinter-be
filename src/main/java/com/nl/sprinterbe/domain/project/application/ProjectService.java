@@ -114,7 +114,7 @@ public class ProjectService {
                 .toList();
 
         return users.stream()
-                .map(user -> new UserDetailResponse(user.getEmail(), user.getNickname()))
+                .map(user -> new UserDetailResponse(user.getUserId(),user.getRole(),user.getEmail(), user.getNickname()))
                 .toList();
     }
 
