@@ -1,9 +1,6 @@
 package com.nl.sprinterbe.domain.dailyScrum.application;
 
-import com.nl.sprinterbe.domain.dailyScrum.dto.BacklogResponse;
-import com.nl.sprinterbe.domain.dailyScrum.dto.DailyScrumDetailResponse;
-import com.nl.sprinterbe.domain.dailyScrum.dto.DailyScrumInfoResponse;
-import com.nl.sprinterbe.domain.dailyScrum.dto.DailyScrumUserResponse;
+import com.nl.sprinterbe.domain.dailyScrum.dto.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,4 +16,18 @@ public interface DailyScrumService {
     public DailyScrumDetailResponse findContentByDailyScrumId(Long dailyScrumId);
 
     public List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDateTime startOfDay);
+
+    public DailyScrumPostResponse createDailyScrum(DailyScrumPostRequest request,Long projectId);
+
+    public void removeBacklog(Long dailyScrumId, Long backlogId);
+
+    public BacklogResponse addBacklogToDailyScrum(Long dailyScrumId, Long backlogId);
+
+    public List<DailyScrumUserResponse> findUsersNotInDailyScrum(Long projectId, Long dailyScrumId);
+
+    public DailyScrumUserResponse addUserToDailyScrum(Long dailyScrumId, Long userId);
+
+    public void removeUserFromDailyScrum(Long dailyScrumId, Long userId);
+
+    public DailyScrumDetailResponse updateContent(Long dailyScrumId, String content);
 }

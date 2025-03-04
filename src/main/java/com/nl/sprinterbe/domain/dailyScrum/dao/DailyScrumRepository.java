@@ -15,10 +15,10 @@ public interface DailyScrumRepository extends JpaRepository<DailyScrum, Long> {
     @Query("select ud.user from UserDailyScrum ud where ud.dailyScrum.dailyScrumId = :dailyScrumId")
     List<User> findUsersByDailyScrumId(@Param("dailyScrumId") Long dailyScrumId);
 
-    @Query("select distinct b.dailyScrum from Backlog b join b.sprint s where s.sprintId = :sprintId")
+    @Query("select distinct dsb.dailyScrum from DailyScrumBacklog dsb join dsb.backlog b join b.sprint s where s.sprintId = :sprintId")
     List<DailyScrum> findDailyScrumBySprintId(@Param("sprintId") Long sprintId);
 
-    @Query("select b from Backlog b where b.dailyScrum.dailyScrumId = :dailyScrumId")
+    @Query("select b from Backlog b join DailyScrumBacklog dsb on dsb.backlog.backlogId = b.backlogId where dsb.dailyScrum.dailyScrumId = :dailyScrumId")
     List<Backlog> findBacklogsByDailyScrumId(@Param("dailyScrumId") Long dailyScrumId);
 
     List<DailyScrum> findByStartDate(LocalDateTime startDate);
