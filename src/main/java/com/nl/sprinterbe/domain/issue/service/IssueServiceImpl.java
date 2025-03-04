@@ -37,6 +37,11 @@ public class IssueServiceImpl implements IssueService {
         return IssueRepsonse.of(savedIssue, bId);
     }
 
+    /**
+     * 이슈와 백로그 단방향 매핑
+     * @param backlogId 백로그 id
+     * @param issue 백로그에 해당하는 issue
+     */
     public Long relateBacklog(Long backlogId, Issue issue){
         Backlog backlog = backlogRepository.findById(backlogId)
                 .orElseThrow(() -> new BacklogNotFoundException());

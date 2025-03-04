@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,8 @@ public class ProjectController {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
         projectService.createProject(StartingDataDto, userId);
         return ResponseEntity.status(201).body("Project created successfully"); // 수정필요.
+
+//        return new ResponseEntity<>(projectService.createProject(StartingDataDto, userId), HttpStatus.CREATED);
     }
 
     //프로젝트 유저추가(일단 이메일 받아와서 추가하는식)

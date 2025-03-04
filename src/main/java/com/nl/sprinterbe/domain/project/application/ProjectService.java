@@ -13,6 +13,8 @@ import com.nl.sprinterbe.domain.project.dao.ProjectRepository;
 import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
+import com.nl.sprinterbe.global.exception.project.ProjectNotFoundException;
+import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,7 @@ public class ProjectService {
     public void createProject(StartingDataDto startingDataDto, Long userId) {
         // 유저 검증
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new UserNotFoundException());
 
         // 프로젝트 생성
         Project project = Project.builder()
@@ -75,10 +77,10 @@ public class ProjectService {
     //프로젝트 유저추가
     public void addUserToProject(UserDetailResponse userDetailResponse, Long projectId) {
         User user = userRepository.findByEmail(userDetailResponse.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + userDetailResponse.getEmail()));
+                .orElseThrow(() -> new UserNotFoundException());
 
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
+                .orElseThrow(() -> new ProjectNotFoundException());
 
         UserProject userProject = new UserProject(user, project, false);
         userProjectRepository.save(userProject);
@@ -87,7 +89,7 @@ public class ProjectService {
     //프로젝트 삭제
     public void deleteProject(Long projectId, Long userId) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
+                .orElseThrow(() -> new ProjectNotFoundException());
 
         List<UserProject> userProjects = userProjectRepository.findByProject(project);
         Optional<Long> leaderUserId = userProjects.stream()
@@ -118,7 +120,7 @@ public class ProjectService {
 
     public void updateProject(Long projectId, ProjectDto projectDTO) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found with id: " + projectId));
+                .orElseThrow(() -> new ProjectNotFoundException());
 
         project.setProjectName(projectDTO.getProjectName());
         projectRepository.save(project);

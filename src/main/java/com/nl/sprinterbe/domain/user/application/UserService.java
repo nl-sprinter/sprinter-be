@@ -14,6 +14,7 @@ import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
+import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,7 +42,7 @@ public class UserService {
 
     public void updateUser(Long userId, UserDetailResponse userDetailResponse) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new UserNotFoundException());
         //시큐리티context에 있는 유저정보를 업데이트
 
         user.setNickname(userDetailResponse.getNickname());
@@ -86,7 +87,7 @@ public class UserService {
         RefreshToken refreshTokenOpt = refreshTokenRepository.findByRefreshAndUserIdAndExpiredFalse(refreshToken, id)
                 .orElseThrow(() -> new RuntimeException("Refresh Token not found with id: " + id));
         User userOpt = userRepository.findById(Long.parseLong(id))
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException());
 
         String newRefreshToken = jwtUtil.createRefreshJwt(id); // 새 Refresh Token 생성
         String newAccessToken = jwtUtil.createJwt(id,userOpt.getEmail());

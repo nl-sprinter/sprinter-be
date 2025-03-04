@@ -82,6 +82,10 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
         return commentResponses;
     }
 
+    /**
+     * 댓글 리스트를 부모와 자식 관계로 만들어줘서 반환하는 메서드
+     * @param comments 해당 백로그에 달린 댓글 리스트
+     */
     @NotNull
     private static List<BacklogCommentResponse> getBacklogCommentResponses(List<BacklogComment> comments) {
         List<BacklogCommentResponse> commentResponses = new ArrayList<>();
