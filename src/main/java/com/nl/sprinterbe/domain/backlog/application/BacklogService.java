@@ -4,6 +4,7 @@ package com.nl.sprinterbe.domain.backlog.application;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogDetailResponse;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogInfoResponse;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
+import com.nl.sprinterbe.domain.dailyScrum.dto.BacklogResponse;
 import org.springframework.data.domain.Page;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import org.springframework.data.domain.Pageable;
@@ -45,4 +46,6 @@ public interface BacklogService {
     public BacklogIssueResponse updateIssue(Long issueId,BacklogIssueRequest request);
 
     public void deleteIssue(Long issueId);
+
+    public List<BacklogResponse> getBacklogsExcludeDailyScrum(Long sprintId, Long dailyScrumId);
 }

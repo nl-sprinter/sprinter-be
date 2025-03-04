@@ -85,6 +85,8 @@ public class BacklogController {
 
 
     //---------------------------------- 수정 시 하나씩(현재 채택) -----------------------------------
+    //Sprint에는 걸려있지만 Backlog에는 걸려있지 않은 유저 조회
+
     //유저 Delete
 //    @DeleteMapping
 //    public ResponseEntity<Void> deleteUser(@PathVariable Long backlogId,@PathVariable Long userId) {
