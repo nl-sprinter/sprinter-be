@@ -5,7 +5,6 @@ import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.dailyScrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyScrum.dto.*;
 import com.nl.sprinterbe.domain.project.dto.ProjectDto;
-import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.domain.project.application.ProjectService;
 import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
@@ -17,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,29 +76,24 @@ public class ProjectController {
         return ResponseEntity.status(200).body("Project updated successfully");
     }
 
-    //------------------------------------------------------------------------
-
-
-    //Sprint 자리
-
-
-    //------------------------------------------------------------------------
-
 
 //     /api/v1/projects/{projectId}/sprints/{sprintId}/backlogs
     //나의 Backlog + 나의 달성 현황
+    @Operation(summary = "나의 Backlog 조회", description = "User에게 속한 Backlog와 User의 달성현황을 제공합니다.")
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/users/{userId}")
     public ResponseEntity<Slice<BacklogInfoResponse>> getBacklogInfoList(@PathVariable Long projectId, @PathVariable Long userId, @PageableDefault(size=5) Pageable pageable) {
         return ResponseEntity.ok(backlogService.findBacklogListByProjectId(projectId,userId,pageable));
     }
 
     //Backlog 정보
+    @Operation(summary = "Backlog의 상세 정보", description = "backlogId의 Backlog의 상세 정보를 제공합니다.")
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}")
     public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId){
         return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
     }
 
     //Backlog에 걸려있는 유저
+    @Operation(summary = "Backlog의 걸려있는 유저", description = "Backlog의 걸려있는 유저 리스트햐를 제공합니다.")
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users")
     public ResponseEntity<List<BacklogUserResponse>> getBacklogUser(@PathVariable Long backlogId){
         return ResponseEntity.ok(backlogService.findUserByBacklogId(backlogId));
