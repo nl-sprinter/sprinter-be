@@ -18,5 +18,12 @@ public interface DailyScrumBacklogRepository extends JpaRepository<DailyScrumBac
     @Query("select dsb from DailyScrumBacklog dsb where dsb.dailyScrum.dailyScrumId = :dailyScrumId")
     List<DailyScrumBacklog> findByDailyScrumId(@Param("dailyScrumId") Long dailyScrumId);
 
-    Optional<DailyScrumBacklog> findByDailyScrumIdAndBacklogId(Long dailyScrumId, Long backlogId);
+    @Query("SELECT dsb FROM DailyScrumBacklog dsb " +
+            "WHERE dsb.dailyScrum.dailyScrumId = :dailyScrumId " +
+            "AND dsb.backlog.backlogId = :backlogId")
+    Optional<DailyScrumBacklog> findByDailyScrumAndBacklog(
+            @Param("dailyScrumId") Long dailyScrumId,
+            @Param("backlogId") Long backlogId
+    );
+
 }

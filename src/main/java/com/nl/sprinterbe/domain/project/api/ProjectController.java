@@ -7,7 +7,6 @@ import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentResponse;
 import com.nl.sprinterbe.domain.backlogComment.service.BacklogCommentService;
 import com.nl.sprinterbe.domain.dailyScrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyScrum.dto.*;
-import com.nl.sprinterbe.domain.issue.dto.CreateIssueRequest;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
 import com.nl.sprinterbe.domain.project.dto.ProjectDto;
@@ -25,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -99,7 +99,7 @@ public class ProjectController {
     }
 
     //Backlog 정보
-    @Operation(summary = "Backlog의 상세 정보", description = "backlogId의 Backlog의 상세 정보를 제공합니다.")
+    @Operation(summary = "Backlog의 제목 정보", description = "backlogId의 Backlog의 제목 정보를 제공합니다.")
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}")
     public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId) {
         return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
@@ -130,6 +130,25 @@ public class ProjectController {
         return ResponseEntity.ok(backlogService.findUserByBacklogId(backlogId));
     }
 
+    //유저 수정하기 기능 중 현재 백로그에는 할당되어 있지 않지만 프로젝트에는 할당된 유저
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users-excluded")
+    public ResponseEntity<List<BacklogUserResponse>> getBacklogExceptUsers(@PathVariable Long projectId,@PathVariable Long backlogId) {
+        return ResponseEntity.ok(backlogService.findBacklogExceptUsers(projectId, backlogId));
+    }
+
+    //백로그 유저 Delete
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long backlogId,@PathVariable Long userId) {
+        backlogService.deleteUser(backlogId,userId);
+        return ResponseEntity.ok().build();
+    }
+    //백로그 유저 add
+    //Post 쓸 필요가 없음
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users/{userId}")
+    public ResponseEntity<BacklogUserResponse> addUser(@PathVariable Long backlogId , @PathVariable Long userId) {
+        return ResponseEntity.ok(backlogService.addBacklogUser(backlogId, userId));
+    }
+
     //Backlog에 걸려있는 Task
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks")
     public ResponseEntity<List<BacklogTaskResponse>> getBacklogTask(@PathVariable Long backlogId){
@@ -141,11 +160,11 @@ public class ProjectController {
     * issue
     * */
 
-    @Operation(summary = "이슈 생성", description = "백로그에 이슈를 생성합니다.")
+/*    @Operation(summary = "이슈 생성", description = "백로그에 이슈를 생성합니다.")
     @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
     public ResponseEntity<IssueRepsonse> createIssue(@RequestBody @Validated CreateIssueRequest request, @PathVariable Long backlogId) {
         return new ResponseEntity<>(issueService.createIssue(request, backlogId), HttpStatus.CREATED);
-    }
+    }*/
 
 
     @Operation(summary = "이슈 삭제", description = "이슈를 삭제합니다.")
@@ -154,11 +173,11 @@ public class ProjectController {
         return new ResponseEntity<>(issueService.deleteIssue(issueId), HttpStatus.OK);
     }
 
-    @Operation(summary = "이슈 수정", description = "이슈를 수정합니다.")
+/*    @Operation(summary = "이슈 수정", description = "이슈를 수정합니다.")
     @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/{issueId}")
     public ResponseEntity<IssueRepsonse> updateIssue(@PathVariable Long issueId, @RequestBody CreateIssueRequest createIssueRequest) {
         return new ResponseEntity<>(issueService.updateIssue(issueId, createIssueRequest), HttpStatus.OK);
-    }
+    }*/
 
     @Operation(summary = "이슈 전체 조회", description = "이슈를 전체를 조회합니다.")
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
@@ -172,12 +191,6 @@ public class ProjectController {
         return ResponseEntity.ok(backlogService.createBacklog(request,sprintId));
     }
 
-
-    //유저 수정하기 기능 중 현재 백로그에는 할당되어 있지 않지만 프로젝트에는 할당된 유저
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users-excluded")
-    public ResponseEntity<List<BacklogUserResponse>> getBacklogExceptUsers(@PathVariable Long projectId,@PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.findBacklogExceptUsers(projectId, backlogId));
-    }
     /*
     * backlogComment
     * */
@@ -214,17 +227,7 @@ public class ProjectController {
 
 
     //---------------------------------- 수정 시 하나씩(현재 채택) -----------------------------------
-    //유저 Delete
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long backlogId,@PathVariable Long userId) {
-        backlogService.deleteUser(backlogId,userId);
-        return ResponseEntity.ok().build();
-    }
-    //유저 add
-    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users/{userId}")
-    public ResponseEntity<BacklogUserResponse> addUser(@PathVariable Long backlogId , @PathVariable Long userId) {
-        return ResponseEntity.ok(backlogService.addBacklogUser(backlogId, userId));
-    }
+
 
     @Operation(summary = "댓글 삭제", description = "백로그에 댓글을 삭제합니다.")
     @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments/{backlogCommentId}")
@@ -249,10 +252,11 @@ public class ProjectController {
     }
 
     //업무 add
-    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks")
+    @PostMapping(value = "/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BacklogTaskResponse> addTask(@PathVariable Long backlogId ,@RequestBody BacklogTaskRequest request) {
         return ResponseEntity.ok(backlogService.addTask(backlogId,request));
     }
+
 
     //---------------------------------- 수정 시 하나씩 -----------------------------------
 

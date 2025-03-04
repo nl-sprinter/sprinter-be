@@ -126,7 +126,7 @@ public class DailyScrumServiceImpl implements DailyScrumService {
     @Override
     public void removeBacklog(Long dailyScrumId, Long backlogId) {
         // DailyScrumBacklog에서 해당 관계 찾기
-        DailyScrumBacklog dailyScrumBacklog = dailyScrumBacklogRepository.findByDailyScrumIdAndBacklogId(dailyScrumId, backlogId)
+        DailyScrumBacklog dailyScrumBacklog = dailyScrumBacklogRepository.findByDailyScrumAndBacklog(dailyScrumId, backlogId)
                 .orElseThrow(() -> new NoDataFoundException("해당 DailyScrum과 Backlog의 연결이 없습니다."));
 
         // 관계 삭제

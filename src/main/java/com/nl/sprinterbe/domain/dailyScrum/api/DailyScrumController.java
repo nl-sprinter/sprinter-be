@@ -1,3 +1,4 @@
+/*
 package com.nl.sprinterbe.domain.dailyScrum.api;
 
 import com.nl.sprinterbe.domain.backlog.application.BacklogServiceImpl;
@@ -50,7 +51,7 @@ public class DailyScrumController {
 
 
     //DailyScrum 생성
-    @PostMapping
+    @PostMapping("")
     public ResponseEntity<DailyScrumPostResponse> addDailyScrum(@RequestBody DailyScrumPostRequest request, @PathVariable Long projectId) {
         //projectId 파라미터는 User가 project Leader인지 위해서
         return ResponseEntity.ok(dailyScrumService.createDailyScrum(request,projectId));
@@ -59,7 +60,7 @@ public class DailyScrumController {
 
 
     //backlog 중 DailyScrum에 걸려있지 않고 Sprint에는 해당되는 백로그 조회
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<List<BacklogResponse>> getSprintBacklogsWithoutDailyScrum(@PathVariable Long sprintId, @PathVariable Long dailScrumId){
         return ResponseEntity.ok(backlogService.getBacklogsExcludeDailyScrum(sprintId,dailScrumId));
     }
@@ -75,7 +76,7 @@ public class DailyScrumController {
     }
 
     //DailyScrum 중 백로그 추가
-    @PostMapping
+    @PostMapping("")
     public ResponseEntity<BacklogResponse> addBacklogToDailyScrum(@PathVariable Long dailyScrumId,@PathVariable Long backlogId){
         return ResponseEntity.ok(dailyScrumService.addBacklogToDailyScrum(dailyScrumId, backlogId));
     }
@@ -110,3 +111,4 @@ public class DailyScrumController {
 
 
 }
+*/
