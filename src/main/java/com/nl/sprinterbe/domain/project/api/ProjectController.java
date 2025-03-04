@@ -56,7 +56,7 @@ public class ProjectController {
 
     //프로젝트 삭제
     @Operation(summary = "프로젝트 삭제", description = "프로젝트를 삭제합니다.")
-    @DeleteMapping("/delete/{projectId}")
+    @DeleteMapping("/{projectId}")
     public ResponseEntity<String> deleteProject(@PathVariable Long projectId, HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
         projectService.deleteProject(projectId, userId);
@@ -73,7 +73,7 @@ public class ProjectController {
 
     //프로젝트 업데이트
     @Operation(summary = "프로젝트 업데이트", description = "프로젝트를 업데이트합니다.")
-    @PatchMapping("/update/{projectId}")
+    @PatchMapping("/{projectId}")
     public ResponseEntity<String> updateProject(@PathVariable Long projectId, @RequestBody ProjectDto projectDTO) {
         projectService.updateProject(projectId, projectDTO);
         return ResponseEntity.status(200).body("Project updated successfully");
@@ -84,14 +84,14 @@ public class ProjectController {
     * */
     //수정
     @Operation(summary = "스프린트 수정", description = "스프린트를 수정합니다.")
-    @PatchMapping("/{projectId}/sprints/update")
+    @PatchMapping("/{projectId}/sprints")
     public ResponseEntity<String> updateSprint(@RequestBody SprintDto sprintDto) {
         sprintService.updateSprint(sprintDto);
         return ResponseEntity.status(200).body("Sprint updated successfully");
     }
 
     @Operation(summary = "스프린트 삭제", description = "스프린트를 삭제합니다.")
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/delete")
+    @DeleteMapping("/{projectId}/sprints/{sprintId}")
     public ResponseEntity<String> deleteSprint(@PathVariable Long sprintId) {
         sprintService.deleteSprint(sprintId);
         return ResponseEntity.status(200).body("Sprint deleted successfully");
@@ -109,13 +109,13 @@ public class ProjectController {
     * */
 
     @Operation(summary = "이슈 생성", description = "백로그에 이슈를 생성합니다.")
-    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/create")
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
     public ResponseEntity<IssueRepsonse> createIssue(@RequestBody @Validated CreateIssueRequest request, @PathVariable Long backlogId) {
         return new ResponseEntity<>(issueService.createIssue(request, backlogId), HttpStatus.CREATED);
     }
 
     @Operation(summary = "이슈 삭제", description = "이슈를 삭제합니다.")
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/{issueId}/delete")
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/{issueId}")
     public ResponseEntity<IssueRepsonse> deleteIssue(@PathVariable Long issueId) {
         return new ResponseEntity<>(issueService.deleteIssue(issueId), HttpStatus.OK);
     }
@@ -142,7 +142,7 @@ public class ProjectController {
     * backlogComment
     * */
     @Operation(summary = "댓글 생성", description = "백로그에 댓글을 생성합니다.")
-    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments/create")
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments")
     public ResponseEntity<BacklogCommentResponse> createComment(
             @PathVariable Long backlogId,
             @RequestBody @Validated BacklogCommentRequest request,
@@ -160,7 +160,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "댓글 삭제", description = "백로그에 댓글을 삭제합니다.")
-    @DeleteMapping("/{projectId}/sprint/{sprintId}/backlog/{backlogId}/delete/{backlogCommentId}")
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments/{backlogCommentId}")
     public ResponseEntity<BacklogCommentResponse> deleteComment(
             @PathVariable Long backlogCommentId,
             @RequestHeader("Authorization") String token) {
@@ -168,7 +168,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "내 댓글 조회", description = "내가 작성한 댓글을 조회합니다.")
-    @GetMapping("/{projectId}/sprint/{sprintId}/backlog/{backlogId}/backlogComment/user")
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComment/user")
     public ResponseEntity<List<BacklogCommentResponse>> getUserComment(
             @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(backlogCommentService.getUserComment(jwtUtil.removeBearer(token)));
