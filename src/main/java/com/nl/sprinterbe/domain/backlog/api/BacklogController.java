@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+//Controller
+// get, post > add , patch, put >> update
+//      post > create
+
 @RestController
 @RequestMapping("/backlogs")
 @RequiredArgsConstructor
