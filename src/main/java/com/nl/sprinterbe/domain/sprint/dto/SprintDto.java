@@ -9,6 +9,9 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class SprintDto {
+
+    private Long sprintId;
+
     private String sprintName;
 
     private LocalDate startDate;

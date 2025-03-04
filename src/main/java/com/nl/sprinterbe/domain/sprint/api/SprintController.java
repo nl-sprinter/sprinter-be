@@ -15,14 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Sprint API", description = "스프린트 관련 API 입니다.")
 public class SprintController {
     private final SprintService sprintService;
-    private final UserService userService;
-
 
     //수정
     @Operation(summary = "스프린트 수정", description = "스프린트를 수정합니다.")
     @PostMapping("/update/{sprintId}")
     public ResponseEntity<String> updateSprint(@RequestBody SprintDto sprintDto,@PathVariable Long sprintId) {
-        sprintService.updateSprint(sprintDto, sprintId);
+        sprintService.updateSprint(sprintDto);
         return ResponseEntity.status(200).body("Sprint updated successfully");
     }
     @Operation(summary = "스프린트 삭제", description = "스프린트를 삭제합니다.")
