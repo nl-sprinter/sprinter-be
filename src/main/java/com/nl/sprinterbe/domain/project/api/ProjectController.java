@@ -2,6 +2,8 @@ package com.nl.sprinterbe.domain.project.api;
 
 import com.nl.sprinterbe.domain.backlog.application.BacklogService;
 import com.nl.sprinterbe.domain.backlog.dto.*;
+import com.nl.sprinterbe.domain.dailyScrum.application.DailyScrumService;
+import com.nl.sprinterbe.domain.dailyScrum.dto.*;
 import com.nl.sprinterbe.domain.project.dto.ProjectDto;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.dto.StartingDataDto;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,6 +31,7 @@ import java.util.List;
 public class ProjectController {
     private final ProjectService projectService;
     private final BacklogService backlogService;
+    private final DailyScrumService dailyScrumService;
     private final JwtUtil jwtUtil;
 
     //프로젝트 생성
@@ -195,6 +199,94 @@ public class ProjectController {
     public ResponseEntity<Void> deleteIssue(@PathVariable Long issueId) {
         backlogService.deleteIssue(issueId);
         return ResponseEntity.ok().build();
+    }
+
+    //---------------------------------------------------------------------
+
+    //스프린트에 걸려있는 DailyScrum 리스트
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums")
+    public ResponseEntity<List<DailyScrumInfoResponse>> getDailyScrumInfoList(@PathVariable Long sprintId) {
+        return ResponseEntity.ok(dailyScrumService.findDailyScrumInfoBySprintId(sprintId));
+    }
+
+    //DailyScrum의 User 리스트
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/users")
+    public ResponseEntity<List<DailyScrumUserResponse>> getUserInfoList(@PathVariable Long dailyScrumId) {
+        return ResponseEntity.ok(dailyScrumService.findDailyScrumUserBySprintId(dailyScrumId));
+    }
+
+    //DailyScrum에 걸려있는 백로그 리스트
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/backlogs")
+    public ResponseEntity<List<BacklogResponse>> getBacklogList(@PathVariable Long dailyScrumId) {
+        return ResponseEntity.ok(dailyScrumService.findBacklogByDailyScrumId(dailyScrumId));
+    }
+
+    //회의 노트
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/content")
+    public ResponseEntity<DailyScrumDetailResponse> getDailyScrumDetail(@PathVariable Long dailyScrumId){
+        return ResponseEntity.ok(dailyScrumService.findContentByDailyScrumId(dailyScrumId));
+    }
+
+    @GetMapping("/{projectId}/sprints/{sprintId}/today-dailyScrums")
+    //Today Scrum , 만약 TodayScrum이 2개 이상이라면 어떻게 할것인가?
+    public ResponseEntity<List<DailyScrumDetailResponse>> getTodayDailyScrumDetail(){
+        return ResponseEntity.ok(dailyScrumService.findDailyScrumByDate(LocalDateTime.now()));
+    }
+
+    //DailyScrum 생성
+    @PostMapping("/{projectId}/sprints/{sprintId}/dailyScrums")
+    public ResponseEntity<DailyScrumPostResponse> addDailyScrum(@RequestBody DailyScrumPostRequest request, @PathVariable Long projectId) {
+        //projectId 파라미터는 User가 project Leader인지 위해서
+        return ResponseEntity.ok(dailyScrumService.createDailyScrum(request,projectId));
+
+    }
+
+
+    //backlog 중 DailyScrum에 걸려있지 않고 Sprint에는 해당되는 백로그 조회
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/backlogs/backlog-excluded")
+    public ResponseEntity<List<BacklogResponse>> getSprintBacklogsWithoutDailyScrum(@PathVariable Long sprintId, @PathVariable Long dailScrumId){
+        return ResponseEntity.ok(backlogService.getBacklogsExcludeDailyScrum(sprintId,dailScrumId));
+    }
+
+
+    //DailyScrum 중 백로그 삭제 , 단일 연관관계 삭제 (하나씩 )
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/backlogs/{backlogId}")
+    public ResponseEntity<Void> removeBacklogFromDailyScrum(
+            @PathVariable Long dailyScrumId,
+            @PathVariable Long backlogId) {
+        dailyScrumService.removeBacklog(dailyScrumId, backlogId);
+        return ResponseEntity.noContent().build();
+    }
+
+    //DailyScrum 중 백로그 추가
+    @PostMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/backlogs")
+    public ResponseEntity<BacklogResponse> addBacklogToDailyScrum(@PathVariable Long dailyScrumId,@RequestParam Long backlogId){
+        return ResponseEntity.ok(dailyScrumService.addBacklogToDailyScrum(dailyScrumId, backlogId));
+    }
+
+    //유저 중 DailyScrum에 걸려있지 않고 project에는 해당되는 유저 조회
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/users/dailyScrum-excluded")
+    public ResponseEntity<List<DailyScrumUserResponse>> getProjectUsersNotInDailyScrum(@PathVariable Long dailyScrumId, @PathVariable Long projectId) {
+        return ResponseEntity.ok(dailyScrumService.findUsersNotInDailyScrum(projectId, dailyScrumId));
+    }
+
+    //DailyScrum 유저 추가
+    @PostMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/users/{userId}")
+    public ResponseEntity<DailyScrumUserResponse> addUserToDailyScrum(@PathVariable Long dailyScrumId, @RequestBody DailyScrumUserRequest request) {
+        return ResponseEntity.ok(dailyScrumService.addUserToDailyScrum(dailyScrumId, request.getUserId()));
+    }
+
+    //DailyScrum 유저 삭제
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/users/{userId}")
+    public ResponseEntity<Void> removeUserFromDailyScrum(@PathVariable Long dailyScrumId, @RequestBody DailyScrumUserRequest request) {
+        dailyScrumService.removeUserFromDailyScrum(dailyScrumId, request.getUserId());
+        return ResponseEntity.noContent().build();
+    }
+
+    //DailyScrum 중 회의노트 수정
+    @PatchMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/content")
+    public ResponseEntity<DailyScrumDetailResponse> updateDailyScrumContent(@PathVariable Long dailyScrumId, @RequestBody DailyScrumContentUpdateRequest request) {
+        return ResponseEntity.ok(dailyScrumService.updateContent(dailyScrumId, request.getContent()));
     }
 
 
