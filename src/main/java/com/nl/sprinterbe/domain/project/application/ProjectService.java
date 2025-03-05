@@ -2,7 +2,8 @@ package com.nl.sprinterbe.domain.project.application;
 
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
-import com.nl.sprinterbe.domain.project.dto.ProjectDto;
+import com.nl.sprinterbe.domain.project.dto.ProjectNameDto;
+import com.nl.sprinterbe.domain.project.dto.ProjectUserRequest;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
@@ -75,8 +76,8 @@ public class ProjectService {
 
 
     //프로젝트 유저추가
-    public void addUserToProject(UserDetailResponse userDetailResponse, Long projectId) {
-        User user = userRepository.findByEmail(userDetailResponse.getEmail())
+    public void addUserToProject(UserDetailResponse request, Long projectId) {
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserNotFoundException());
 
         Project project = projectRepository.findById(projectId)
@@ -99,26 +100,26 @@ public class ProjectService {
 
         Long leaderId = leaderUserId.orElseThrow(() -> new RuntimeException("프로젝트 리더를 찾을 수 없습니다."));
 
-        if (!leaderId.equals(userId)) {
-            throw new RuntimeException("Project leader not found");
-        }
+//        if (!leaderId.equals(userId)) {
+//            throw new RuntimeException("Project leader not found");
+//        }
 
         userProjectRepository.deleteAll(userProjects); // UserProject 삭제
         projectRepository.delete(project); // 프로젝트 삭제
     }
 
-    public List<UserDetailResponse> getUsers(Long projectId) {
+    public List<ProjectUserRequest> getUsers(Long projectId) {
         List<User> users = userProjectRepository.findByProjectProjectId(projectId)
                 .stream()
                 .map(UserProject::getUser)
                 .toList();
 
         return users.stream()
-                .map(user -> new UserDetailResponse(user.getUserId(),user.getRole(),user.getEmail(), user.getNickname()))
+                .map(user -> new ProjectUserRequest(user.getUserId(),user.getRole(),user.getEmail(), user.getNickname()))
                 .toList();
     }
 
-    public void updateProject(Long projectId, ProjectDto projectDTO) {
+    public void updateProject(Long projectId, ProjectNameDto projectDTO) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException());
 

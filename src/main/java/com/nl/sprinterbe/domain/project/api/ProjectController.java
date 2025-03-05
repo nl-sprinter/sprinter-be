@@ -4,21 +4,24 @@ import com.nl.sprinterbe.domain.backlog.application.BacklogService;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentRequest;
 import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentResponse;
+import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentUpdateContent;
 import com.nl.sprinterbe.domain.backlogComment.service.BacklogCommentService;
 import com.nl.sprinterbe.domain.dailyScrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyScrum.dto.*;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
-import com.nl.sprinterbe.domain.project.dto.ProjectDto;
+import com.nl.sprinterbe.domain.project.dto.ProjectNameDto;
+import com.nl.sprinterbe.domain.project.dto.ProjectUserRequest;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
-import com.nl.sprinterbe.domain.sprint.dto.SprintDto;
+import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
+import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
+import com.nl.sprinterbe.domain.sprint.dto.SprintUpdateRequest;
+import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.domain.project.application.ProjectService;
-import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -30,7 +33,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -49,9 +51,8 @@ public class ProjectController {
     //프로젝트 생성
     @Operation(summary = "프로젝트 생성", description = "StartingDataDto 를 받아서 프로젝트를 생성합니다.")
     @PostMapping("/create")
-    public ResponseEntity<String> createProject(@RequestBody StartingDataDto StartingDataDto, HttpServletRequest request) {
-        Long userId = jwtUtil.removeBearerAndReturnId(request);
-        projectService.createProject(StartingDataDto, userId);
+    public ResponseEntity<String> createProject(@RequestBody StartingDataDto StartingDataDto, @RequestHeader("Authorization") String token) {
+        projectService.createProject(StartingDataDto, jwtUtil.removeBearer(token));
         return ResponseEntity.status(201).body("Project created successfully"); // 수정필요.
 
 //        return new ResponseEntity<>(projectService.createProject(StartingDataDto, userId), HttpStatus.CREATED);
@@ -60,8 +61,8 @@ public class ProjectController {
     //프로젝트 유저추가(일단 이메일 받아와서 추가하는식)
     @Operation(summary = "프로젝트 유저 추가", description = "프로젝트에 유저를 추가합니다.(현재는 이메일로 검색해서 추가)")
     @PostMapping("/addUser/{projectId}")
-    public ResponseEntity<String> addUserToProject(@RequestBody UserDetailResponse userDetailResponse, @PathVariable Long projectId) {
-        projectService.addUserToProject(userDetailResponse, projectId);
+    public ResponseEntity<String> addUserToProject(@RequestBody UserDetailResponse request, @PathVariable Long projectId) {
+        projectService.addUserToProject(request, projectId);
         return ResponseEntity.status(201).body("User added to project successfully");
     }
 
@@ -69,25 +70,24 @@ public class ProjectController {
     //프로젝트 삭제
     @Operation(summary = "프로젝트 삭제", description = "프로젝트를 삭제합니다.")
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<String> deleteProject(@PathVariable Long projectId, HttpServletRequest request) {
-        Long userId = jwtUtil.removeBearerAndReturnId(request);
-        projectService.deleteProject(projectId, userId);
-        return ResponseEntity.status(200).body("Project deleted successfully");
+    public ResponseEntity<Void> deleteProject(@PathVariable Long projectId, @RequestHeader("Authorization") String token) {
+        projectService.deleteProject(projectId, jwtUtil.removeBearer(token));
+        return ResponseEntity.ok().build();
     }
 
     //유저 조회
     // 3.4 User 엔티티의 Role 필요
     @Operation(summary = "프로젝트 유저 조회", description = "프로젝트에 속한 유저들을 조회합니다.")
     @GetMapping("/{projectId}/users")
-    public ResponseEntity<List<UserDetailResponse>> getUsers(@PathVariable Long projectId) {
-        List<UserDetailResponse> users = projectService.getUsers(projectId);
+    public ResponseEntity<List<ProjectUserRequest>> getUsers(@PathVariable Long projectId) {
+        List<ProjectUserRequest> users = projectService.getUsers(projectId);
         return ResponseEntity.status(200).body(users);
     }
 
     //프로젝트 업데이트
     @Operation(summary = "프로젝트 이름 업데이트", description = "프로젝트를 이름 업데이트합니다.")
     @PatchMapping("/{projectId}")
-    public ResponseEntity<String> updateProject(@PathVariable Long projectId, @RequestBody ProjectDto projectDTO) {
+    public ResponseEntity<String> updateProject(@PathVariable Long projectId, @RequestBody ProjectNameDto projectDTO) {
         projectService.updateProject(projectId, projectDTO);
         return ResponseEntity.status(200).body("Project updated successfully");
     }
@@ -122,25 +122,32 @@ public class ProjectController {
     * */
 
     //3.4 Sprint 생성
+    @Operation(summary = "스프린트 생성", description = "스프린트를 생성합니다.")
+    @PostMapping("/{projectId}/sprints")
+    public ResponseEntity<SprintResponse> createSprint(@RequestBody SprintRequest request, @PathVariable Long projectId) {
+        return ResponseEntity.ok(sprintService.createSprint(request, projectId));
+    }
 
-
-
-
+    @Operation(summary = "프로젝트 스프린트 조회", description = "프로젝트에 속한 스프린트들을 조회합니다.")
+    @GetMapping("/{projectId}/sprints")
+    public ResponseEntity<?> getSprints(@PathVariable Long projectId) {
+        return ResponseEntity.status(200).body(sprintService.getSprints(projectId));
+    }
     //수정
     //3.4 Sprint Order 저장 여부
     @Operation(summary = "스프린트 수정", description = "스프린트를 수정합니다.")
     @PatchMapping("/{projectId}/sprints/{sprintId}")
-    public ResponseEntity<String> updateSprint(@RequestBody SprintDto sprintDto,@PathVariable Long sprintId) {
-        sprintService.updateSprint(sprintDto,sprintId);
+    public ResponseEntity<String> updateSprint(@RequestBody SprintUpdateRequest request, @PathVariable Long sprintId) {
+        sprintService.updateSprint(request,sprintId);
         return ResponseEntity.status(200).body("Sprint updated successfully");
     }
 
     //3.4 Sprint 삭제 시 하단 모두 삭제
     @Operation(summary = "스프린트 삭제", description = "스프린트를 삭제합니다.")
     @DeleteMapping("/{projectId}/sprints/{sprintId}")
-    public ResponseEntity<String> deleteSprint(@PathVariable Long sprintId) {
+    public ResponseEntity<Void> deleteSprint(@PathVariable Long sprintId) {
         sprintService.deleteSprint(sprintId);
-        return ResponseEntity.status(200).body("Sprint deleted successfully");
+        return ResponseEntity.ok().build();
     }
 
     //Backlog에 걸려있는 유저
@@ -270,7 +277,7 @@ public class ProjectController {
     @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments/{backlogCommentsId}")
     public ResponseEntity<BacklogCommentResponse> updateComment(
             @PathVariable Long backlogCommentsId,
-            @RequestBody @Validated BacklogCommentRequest request,
+            @RequestBody @Validated BacklogCommentUpdateContent request,
             @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(backlogCommentService.updateComment(jwtUtil.removeBearer(token),backlogCommentsId,request));
     }

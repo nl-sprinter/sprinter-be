@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class ProjectDto {
+public class ProjectNameDto {
     public String projectName;
 
-    public ProjectDto(String projectName, LocalDateTime createdAt) {
+    public ProjectNameDto(String projectName, LocalDateTime createdAt) {
         this.projectName = projectName;
     }
 }
