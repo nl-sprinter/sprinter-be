@@ -14,6 +14,8 @@ import java.util.List;
 @Builder
 public class DailyScrumPostResponse {
     private Long dailyScrumId;
+    private Long sprinterId;
+    private Long sprintOrder;
     private List<UserDto> users;
     private List<BacklogDto> backlogs;
     private String content;
@@ -22,6 +24,8 @@ public class DailyScrumPostResponse {
 
     public static DailyScrumPostResponse of(DailyScrum dailyScrum,List<UserDto> user, List<BacklogDto> backlogs) {
         return DailyScrumPostResponse.builder()
+                .sprinterId(dailyScrum.getSprint().getSprintId())
+                .sprintOrder(dailyScrum.getSprint().getSprintOrder())
                 .dailyScrumId(dailyScrum.getDailyScrumId())
                 .content(dailyScrum.getContent())
                 .createdAt(dailyScrum.getCreatedAt())

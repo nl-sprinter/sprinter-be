@@ -59,4 +59,7 @@ public interface BacklogRepository extends JpaRepository<Backlog, Long> {
             "AND b.backlogId NOT IN (SELECT dsb.backlog.backlogId FROM DailyScrumBacklog dsb WHERE dsb.dailyScrum.dailyScrumId = :dailyScrumId)") // 특정 DailyScrum에 포함되지 않은 Backlog
     List<Backlog> findExcludingDailyScrum(@Param("sprintId") Long sprintId, @Param("dailyScrumId") Long dailyScrumId);
 
+    @Query("SELECT b FROM Backlog b join fetch b.sprint s join fetch s.project p WHERE p.projectId = :projectId")
+    List<Backlog> findBacklogsByProjectId(@Param("projectId") Long projectId);
+
 }

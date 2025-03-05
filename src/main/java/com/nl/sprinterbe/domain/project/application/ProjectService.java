@@ -180,6 +180,7 @@ public class ProjectService {
             Backlog backlog = Backlog.builder()
                     .title(item.getTitle())
                     .weight(item.getWeight())
+                    .isFinished(false)
                     .build();
             
             sprint.addBacklog(backlog); // 스프린트에 백로그 할당

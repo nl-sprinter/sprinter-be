@@ -77,7 +77,7 @@ public class DailyScrumServiceImpl implements DailyScrumService {
     @Override
     @Transactional(readOnly = true)
     public List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDate startOfDay) {
-        List<DailyScrum> dailyScrums = dailyScrumRepository.findByStartDate(startOfDay);
+        List<DailyScrum> dailyScrums = dailyScrumRepository.findByCreatedAt(startOfDay);
         return dailyScrums.stream().map(DailyScrumDetailResponse::of).collect(Collectors.toList());
     }
 

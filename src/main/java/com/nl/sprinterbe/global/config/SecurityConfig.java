@@ -28,7 +28,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity(debug =true)
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
