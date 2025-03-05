@@ -52,10 +52,13 @@ public class Sprint {
 
 
     // 프로젝트 1 : n 스프린트
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "project_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id",
+                nullable = false,
+                foreignKey = @ForeignKey(name = "fk_sprint_project",
+                        foreignKeyDefinition = "FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE"))
     private Project project;
-
+//
     // 스프린트 1 : n 백로그
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Backlog> backlogs = new ArrayList<>();

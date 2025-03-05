@@ -5,6 +5,7 @@ import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.backlogComment.dao.BacklogCommentRepository;
 import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentRequest;
 import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentResponse;
+import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentUpdateContent;
 import com.nl.sprinterbe.domain.backlogComment.entity.BacklogComment;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
@@ -46,7 +47,7 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
 
 
     @Override
-    public BacklogCommentResponse updateComment(Long userId, Long commentId, BacklogCommentRequest request) {
+    public BacklogCommentResponse updateComment(Long userId, Long commentId, BacklogCommentUpdateContent request) {
         BacklogComment comment = backlogCommentRepository.findById(commentId).orElseThrow(() -> new BacklogCommentNotFoundException());
         if(comment.getUser().getUserId() != userId) {throw new ForbiddenCommentAccessException();}
 

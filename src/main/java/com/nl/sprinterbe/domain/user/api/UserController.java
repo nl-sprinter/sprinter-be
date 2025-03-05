@@ -1,8 +1,8 @@
 package com.nl.sprinterbe.domain.user.api;
 
-import com.nl.sprinterbe.domain.project.dto.ProjectDto;
-import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
+import com.nl.sprinterbe.domain.project.dto.ProjectNameDto;
 import com.nl.sprinterbe.domain.user.application.UserService;
+import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,9 +32,9 @@ public class UserController {
     //유저가 속한 프로젝트 가져오기
     @Operation(summary = "유저 프로젝트 조회", description = "유저가 속한 프로젝트들을 조회합니다.")
     @GetMapping("/projects")
-    public ResponseEntity<List<ProjectDto>> getUserProjects(HttpServletRequest request) {
+    public ResponseEntity<List<ProjectNameDto>> getUserProjects(HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
-        List<ProjectDto> projects = userService.getProjects(userId);
+        List<ProjectNameDto> projects = userService.getProjects(userId);
         return ResponseEntity.status(HttpStatus.OK).body(projects);
     }
 
