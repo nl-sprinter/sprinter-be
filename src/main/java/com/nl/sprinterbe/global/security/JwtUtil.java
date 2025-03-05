@@ -16,11 +16,11 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     private final Key key;
-    public static final int ACCESS_TOKEN_MINUTE = 10;
+    public static final int ACCESS_TOKEN_MINUTE = 180;
     public static final int REFRESH_TOKEN_HOURS = 72;
 
 
-    public JwtUtil(@Value("${spring.jwt.secret}")String secret) {
+    public JwtUtil(@Value("${spring.jwt.secret}") String secret) {
         byte[] byteSecretKey = Decoders.BASE64.decode(secret);
         key = Keys.hmacShaKeyFor(byteSecretKey);
     }

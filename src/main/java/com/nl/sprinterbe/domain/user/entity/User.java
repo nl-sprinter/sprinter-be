@@ -31,6 +31,8 @@ public class User {
 
     private String provider;
 
+    private String role;
+
     // 다대다 매핑 (유저, 프로젝트)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserProject> userProjects = new ArrayList<>();

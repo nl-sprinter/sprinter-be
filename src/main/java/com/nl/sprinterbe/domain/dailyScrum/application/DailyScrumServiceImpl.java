@@ -9,6 +9,8 @@ import com.nl.sprinterbe.domain.dailyScrum.dto.*;
 import com.nl.sprinterbe.domain.dailyScrum.entity.DailyScrum;
 import com.nl.sprinterbe.domain.dailyScrum.entity.DailyScrumBacklog;
 import com.nl.sprinterbe.domain.dailyScrum.entity.UserDailyScrum;
+import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
+import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,7 @@ public class DailyScrumServiceImpl implements DailyScrumService {
     private final BacklogRepository backlogRepository;
     private final UserDailyScrumRepository userDailyScrumRepository;
     private final DailyScrumBacklogRepository dailyScrumBacklogRepository;
+    private final SprintRepository sprintRepository;
     private final UserProjectRepository userProjectRepository;
 
     @Override
@@ -72,16 +76,18 @@ public class DailyScrumServiceImpl implements DailyScrumService {
     //02.23) 해당 요일에 걸려있는 DailyScrum이 2개일 수 있어서 일단 List로 해놓음
     @Override
     @Transactional(readOnly = true)
-    public List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDateTime startOfDay) {
+    public List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDate startOfDay) {
         List<DailyScrum> dailyScrums = dailyScrumRepository.findByStartDate(startOfDay);
         return dailyScrums.stream().map(DailyScrumDetailResponse::of).collect(Collectors.toList());
     }
 
     @Override
-    public DailyScrumPostResponse createDailyScrum(DailyScrumPostRequest request, Long projectId) {
+    public DailyScrumPostResponse createDailyScrum(DailyScrumPostRequest request, Long projectId , Long sprintId) {
+        Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(() -> new NoDataFoundException("sprintId not found"));
         // 1. DailyScrum 엔티티 생성
         DailyScrum dailyScrum = DailyScrum.builder()
                 .title(request.getTitle())
+                .sprint(sprint)
                 .content(request.getContent())
                 .build();
         dailyScrumRepository.save(dailyScrum);
@@ -126,7 +132,7 @@ public class DailyScrumServiceImpl implements DailyScrumService {
     @Override
     public void removeBacklog(Long dailyScrumId, Long backlogId) {
         // DailyScrumBacklog에서 해당 관계 찾기
-        DailyScrumBacklog dailyScrumBacklog = dailyScrumBacklogRepository.findByDailyScrumIdAndBacklogId(dailyScrumId, backlogId)
+        DailyScrumBacklog dailyScrumBacklog = dailyScrumBacklogRepository.findByDailyScrumAndBacklog(dailyScrumId, backlogId)
                 .orElseThrow(() -> new NoDataFoundException("해당 DailyScrum과 Backlog의 연결이 없습니다."));
 
         // 관계 삭제

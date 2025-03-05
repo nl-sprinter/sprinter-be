@@ -20,8 +20,6 @@ public class SprintService {
         Sprint sprint = sprintRepository.findById(sprintId)
                 .orElseThrow(() -> new RuntimeException("Sprint not found with id: " + sprintId));
         sprint.setSprintName(sprintDto.getSprintName());
-        sprint.setStartDate(sprintDto.getStartDate());
-        sprint.setEndDate(sprintDto.getEndDate());
         sprint.setSprintOrder(sprintDto.getSprintOrder());
         sprintRepository.save(sprint);
     }
@@ -35,9 +33,17 @@ public class SprintService {
     public List<SprintDto> getSprints(Long projectId) {
         List<Sprint> sprints = sprintRepository.findByProjectProjectId(projectId);
         List<SprintDto> sprintDto = sprints.stream()
-                .map(e -> new SprintDto(e.getSprintName(), e.getStartDate(), e.getEndDate(), e.getSprintOrder()))
+                .map(e -> new SprintDto(e.getSprintName(), e.getSprintOrder()))
                 .toList();
         return sprintDto;
+    }
+
+    public void createSprint(SprintDto sprintDto) {
+        Sprint sprint = Sprint.builder()
+                .sprintName(sprintDto.getSprintName())
+                .sprintOrder(sprintDto.getSprintOrder())
+                .build();
+        sprintRepository.save(sprint);
     }
 
 }

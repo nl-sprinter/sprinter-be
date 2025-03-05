@@ -44,4 +44,5 @@ public class UserController {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
         return ResponseEntity.status(HttpStatus.OK).body(userService.getNickname(userId));
     }
+
 }

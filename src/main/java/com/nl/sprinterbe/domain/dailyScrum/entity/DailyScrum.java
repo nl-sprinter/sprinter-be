@@ -28,8 +28,8 @@ public class DailyScrum extends JpaBaseEntity {
     @JoinColumn(name = "sprint_id", nullable = false)
     private Sprint sprint;
 
-    @OneToMany(mappedBy = "dailyScrum")
-    private List<Backlog> backlogs = new ArrayList<>();
+//    @OneToMany(mappedBy = "dailyScrum")
+//    private List<Backlog> backlogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "dailyScrum", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserDailyScrum> userDailyScrums = new ArrayList<>();
@@ -40,12 +40,12 @@ public class DailyScrum extends JpaBaseEntity {
 
     private String content;
 
-    // 편의 메서드
-    public void addBacklog(Backlog backlog) {
-        if(backlogs.contains(backlog)) {
-            backlogs.remove(backlog);
-        }
-        backlogs.add(backlog);
-        backlog.setDailyScrum(this);
-    }
+//    // 편의 메서드
+//    public void addBacklog(Backlog backlog) {
+//        if(backlogs.contains(backlog)) {
+//            backlogs.remove(backlog);
+//        }
+//        backlogs.add(backlog);
+//        backlog.setDailyScrum(this);
+//    }
 }
