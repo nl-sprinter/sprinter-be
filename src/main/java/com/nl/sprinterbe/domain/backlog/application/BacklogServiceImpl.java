@@ -96,14 +96,14 @@ public class BacklogServiceImpl implements BacklogService {
     @Override
     public BacklogPostResponse createBacklog(BacklogPostRequest request,Long sprintId) {
         Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(() -> new NoDataFoundException("해당 Id로 조회된 Sprint가 없습니다."));
-        Backlog newBacklog = Backlog.builder().title(request.getTitle()).sprint(sprint).build();
+        Backlog newBacklog = Backlog.builder().title(request.getTitle()).sprint(sprint).isFinished(false).weight(request.getWeight()).build();
         backlogRepository.save(newBacklog);
         List<User> savedUsers = getUsers(request, newBacklog);
         List<Task> savedTasks = getTasks(request, newBacklog);
         Issue newIssue = Issue.builder().backlog(newBacklog).checked(false).content(request.getIssue().getContent()).build();
         issueRepository.save(newIssue);
 
-        return BacklogPostResponse.of(newBacklog,savedUsers,savedTasks,newIssue);
+        return BacklogPostResponse.of(newBacklog,request.getWeight(),savedUsers,savedTasks,newIssue);
     }
 
     @Override
@@ -212,7 +212,7 @@ public class BacklogServiceImpl implements BacklogService {
     @Override
     public BacklogIssueResponse addIssue(Long backlogId, BacklogIssueRequest request) {
         Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new NoDataFoundException("해당 Id의 Backlog가 없습니다."));
-        Issue issue = Issue.builder().backlog(backlog).content(request.getContent()).build();
+        Issue issue = Issue.builder().backlog(backlog).checked(false).content(request.getContent()).build();
         issueRepository.save(issue);
         return BacklogIssueResponse.of(issue);
     }
@@ -236,6 +236,12 @@ public class BacklogServiceImpl implements BacklogService {
         return backlogs.stream()
                 .map(BacklogResponse::of)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductBacklogResponse> getBacklogsByProject(Long projectId) {
+        List<Backlog> backlogs = backlogRepository.findBacklogsByProjectId(projectId);
+        return backlogs.stream().map(ProductBacklogResponse::of).collect(Collectors.toList());
     }
 
     @NotNull

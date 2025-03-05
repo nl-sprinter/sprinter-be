@@ -16,11 +16,6 @@ public class Backlog {
     @Column(name = "backlog_id")
     private Long backlogId;
 
-
-    //25.02.22 이거 왜 있는거였지?
-    @Column(name = "assigned_user_id")
-    private Long assignedUserId;
-
     @Column(name = "is_finish")
     private Boolean isFinished;
 

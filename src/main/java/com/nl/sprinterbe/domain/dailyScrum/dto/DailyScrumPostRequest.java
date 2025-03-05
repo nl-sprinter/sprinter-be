@@ -7,6 +7,7 @@ import java.util.List;
 @Getter
 public class DailyScrumPostRequest {
     private String title;
+    private Long sprintId;
     private List<UserDto> users;
     private List<BacklogDto> backlogs;
     private String content;

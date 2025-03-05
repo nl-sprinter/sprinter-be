@@ -127,7 +127,7 @@ public class ProjectController {
 
 
     //수정
-    //3.4 Sprint Order 저장 여부
+    //3.4 Sprint Order 저장 여부 // Ok
     @Operation(summary = "스프린트 수정", description = "스프린트를 수정합니다.")
     @PatchMapping("/{projectId}/sprints/{sprintId}")
     public ResponseEntity<String> updateSprint(@RequestBody SprintDto sprintDto,@PathVariable Long sprintId) {
@@ -173,6 +173,12 @@ public class ProjectController {
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks")
     public ResponseEntity<List<BacklogTaskResponse>> getBacklogTask(@PathVariable Long backlogId){
         return ResponseEntity.ok(backlogService.findTaskByBacklogId(backlogId));
+    }
+
+    //Product Backlog 리스트 조회
+    @GetMapping("/{projectId}//backlogs")
+    public ResponseEntity<List<ProductBacklogResponse>> getProductBacklogList(@PathVariable Long projectId){
+        return ResponseEntity.ok(backlogService.getBacklogsByProject(projectId));
     }
 
     //Backlog에 걸려있는 이슈
@@ -298,7 +304,6 @@ public class ProjectController {
     }
 
     //이슈 add
-    //checked 확인 필요
     @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
     public ResponseEntity<BacklogIssueResponse> addIssue(@PathVariable Long backlogId,@RequestBody BacklogIssueRequest request) {
         return ResponseEntity.ok(backlogService.addIssue(backlogId,request));

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public class BacklogPostResponse {
     private Long backlogId;
     private String title;
+    private Long weight;
     private List<UserDto> users;
     private List<TaskDto> tasks;
     private IssueDto issue;
@@ -38,7 +39,7 @@ public class BacklogPostResponse {
         private Long issueId;
     }
 
-    public static BacklogPostResponse of(Backlog backlog, List<User> users, List<Task> tasks , Issue issue) {
+    public static BacklogPostResponse of(Backlog backlog, Long weight,List<User> users, List<Task> tasks , Issue issue) {
         BacklogPostResponse response = new BacklogPostResponse();
 
         // Backlog 정보 매핑
@@ -73,6 +74,8 @@ public class BacklogPostResponse {
             issueDto.content = issue.getContent();
             response.issue = issueDto;
         }
+
+        response.weight = weight;
 
         return response;
 

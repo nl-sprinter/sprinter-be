@@ -48,4 +48,6 @@ public interface BacklogService {
     public void deleteIssue(Long issueId);
 
     public List<BacklogResponse> getBacklogsExcludeDailyScrum(Long sprintId, Long dailyScrumId);
+
+    public List<ProductBacklogResponse> getBacklogsByProject(Long projectId);
 }
