@@ -1,7 +1,6 @@
 package com.nl.sprinterbe.global.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
 
 public abstract class ApplicationException extends RuntimeException {
 
@@ -12,5 +11,13 @@ public abstract class ApplicationException extends RuntimeException {
         super(message);
         this.errorCode = errorCode;
         this.httpStatus = httpStatus;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
     }
 }

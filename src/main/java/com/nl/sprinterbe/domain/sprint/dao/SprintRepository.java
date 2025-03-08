@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface SprintRepository extends JpaRepository<Sprint, Long> {
-    List<Sprint> findByProjectProjectId(Long projectId);
+    List<Sprint> findAllByProjectProjectId(Long projectId);
 
     Sprint findBySprintId(Long sprintId);
 }

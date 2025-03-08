@@ -2,7 +2,7 @@ package com.nl.sprinterbe.domain.project.application;
 
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
-import com.nl.sprinterbe.domain.project.dto.ProjectNameDto;
+import com.nl.sprinterbe.domain.project.dto.ProjectResponse;
 import com.nl.sprinterbe.domain.project.dto.ProjectUserRequest;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
@@ -14,6 +14,7 @@ import com.nl.sprinterbe.domain.project.dao.ProjectRepository;
 import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
+import com.nl.sprinterbe.global.exception.project.DuplicateProjectNameException;
 import com.nl.sprinterbe.global.exception.project.ProjectNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -52,12 +53,11 @@ public class ProjectService {
 
         // 스프린트 생성 및 현재 프로젝트에 연결
         List<Sprint> sprints = createSprintsForProject(project, startingDataDto.getSprint());
-        // 디버그
-        log.debug("project = {}", project);
-        for (Sprint sprint : sprints) {
-            log.debug("sprint = {}", sprint);
-        }
-        sprints.forEach(project::addSprint); // 예외터짐
+        sprints.forEach(project::addSprint);
+
+        // 프로젝트 저장 (transient상태인 project 엔티티를 참조하려고 해서 발생하는 문제를 해결하기 위함)
+        project = projectRepository.save(project);
+
         // 스프린트 저장
         sprintRepository.saveAll(sprints);
 
@@ -73,6 +73,9 @@ public class ProjectService {
         UserProject userProject = new UserProject(user, project, true);
         userProjectRepository.save(userProject);
     }
+
+
+
 
 
     //프로젝트 유저추가
@@ -119,11 +122,18 @@ public class ProjectService {
                 .toList();
     }
 
-    public void updateProject(Long projectId, ProjectNameDto projectDTO) {
+    // 프로젝트 이름 변경
+    public void updateProjectName(Long projectId, String newProjectName) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException());
+                .orElseThrow(ProjectNotFoundException::new);
 
-        project.setProjectName(projectDTO.getProjectName());
+        // 중복 검사
+        boolean exists = projectRepository.existsByProjectName(newProjectName);
+        if (exists) {
+            throw new DuplicateProjectNameException("Project name already exists: " + newProjectName);
+        }
+
+        project.setProjectName(newProjectName);
         projectRepository.save(project);
     }
 
@@ -146,6 +156,7 @@ public class ProjectService {
                     .sprintName("Sprint " + i)
                     .startDate(startDate)
                     .endDate(endDate)
+                    .sprintOrder((long) i)
                     .project(project)
                     .build();
 

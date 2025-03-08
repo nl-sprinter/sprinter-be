@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
+
+    // 프로젝트 이름 중복 여부
+    boolean existsByProjectName(String name);
 }

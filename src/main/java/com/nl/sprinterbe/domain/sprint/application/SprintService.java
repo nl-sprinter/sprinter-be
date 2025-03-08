@@ -2,13 +2,13 @@ package com.nl.sprinterbe.domain.sprint.application;
 
 import com.nl.sprinterbe.domain.project.dao.ProjectRepository;
 import com.nl.sprinterbe.domain.project.entity.Project;
-import com.nl.sprinterbe.domain.sprint.dto.SprintDto;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
 import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
 import com.nl.sprinterbe.domain.sprint.dto.SprintUpdateRequest;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +17,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class SprintService {
     private final SprintRepository sprintRepository;
     private final ProjectRepository projectRepository;
@@ -36,12 +37,10 @@ public class SprintService {
         sprintRepository.delete(sprint);
     }
 
-    public List<SprintDto> getSprints(Long projectId) {
-        List<Sprint> sprints = sprintRepository.findByProjectProjectId(projectId);
-        List<SprintDto> sprintDto = sprints.stream()
-                .map(e -> new SprintDto(e.getSprintName(), e.getSprintOrder()))
+    public List<SprintResponse> getSprintsByProjectId(Long projectId) {
+        return sprintRepository.findAllByProjectProjectId(projectId).stream()
+                .map(SprintResponse::of)
                 .toList();
-        return sprintDto;
     }
 
     public SprintResponse createSprint(SprintRequest request, Long projectId) {

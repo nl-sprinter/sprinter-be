@@ -1,6 +1,6 @@
 package com.nl.sprinterbe.domain.user.api;
 
-import com.nl.sprinterbe.domain.project.dto.ProjectNameDto;
+import com.nl.sprinterbe.domain.project.dto.ProjectResponse;
 import com.nl.sprinterbe.domain.user.application.UserService;
 import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
 import com.nl.sprinterbe.global.security.JwtUtil;
@@ -29,12 +29,13 @@ public class UserController {
         userService.updateUser(userId, userDetailResponse);
         return ResponseEntity.status(HttpStatus.OK).body("User updated successfully");
     }
-    //유저가 속한 프로젝트 가져오기
-    @Operation(summary = "유저 프로젝트 조회", description = "유저가 속한 프로젝트들을 조회합니다.")
+
+
+    @Operation(summary = "프로젝트 조회", description = "유저가 속한 프로젝트들을 조회합니다.") // 프론트 연동 OK
     @GetMapping("/projects")
-    public ResponseEntity<List<ProjectNameDto>> getUserProjects(HttpServletRequest request) {
+    public ResponseEntity<List<ProjectResponse>> getUserProjects(HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
-        List<ProjectNameDto> projects = userService.getProjects(userId);
+        List<ProjectResponse> projects = userService.getUserProjects(userId);
         return ResponseEntity.status(HttpStatus.OK).body(projects);
     }
 

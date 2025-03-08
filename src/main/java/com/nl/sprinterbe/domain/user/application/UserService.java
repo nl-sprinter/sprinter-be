@@ -1,14 +1,14 @@
 package com.nl.sprinterbe.domain.user.application;
 
+import com.nl.sprinterbe.domain.project.dto.ProjectResponse;
+import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
+import com.nl.sprinterbe.domain.userProject.entity.UserProject;
 import com.nl.sprinterbe.global.common.code.ResponseStatus;
 import com.nl.sprinterbe.domain.refreshToken.application.RefreshTokenService;
-import com.nl.sprinterbe.domain.project.dto.ProjectNameDto;
 import com.nl.sprinterbe.global.common.ResponseDto;
 import com.nl.sprinterbe.domain.user.dao.SignUpRequestDto;
-import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.refreshToken.entity.RefreshToken;
-import com.nl.sprinterbe.domain.userProject.entity.UserProject;
 import com.nl.sprinterbe.global.exception.LoginFormException;
 import com.nl.sprinterbe.domain.refreshToken.dao.RefreshTokenRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
@@ -101,16 +101,7 @@ public class UserService {
         return ResponseDto.settingResponse(HttpStatus.CREATED, ResponseStatus.TOKEN_CREATED);
     }
 
-    public List<ProjectNameDto> getProjects(Long userId) {
-        List<Project> projects = userProjectRepository.findByUserUserId(userId)
-                .stream()
-                .map(UserProject::getProject)
-                .collect(Collectors.toList());
 
-        return projects.stream()
-                .map(project -> new ProjectNameDto(project.getProjectName(), project.getCreatedAt()))
-                .collect(Collectors.toList());
-    }
 
     /**
      * User 닉네임 가져오기
@@ -118,4 +109,20 @@ public class UserService {
     public String getNickname(Long userId) {
         return userRepository.findById(userId).orElseThrow().getNickname();
     }
+
+
+    /**
+     * User 가 속한 프로젝트 가져오기
+     */
+    public List<ProjectResponse> getUserProjects(Long userId) {
+        List<Project> projects = userProjectRepository.findByUserUserId(userId)
+                .stream()
+                .map(UserProject::getProject)
+                .collect(Collectors.toList());
+
+        return projects.stream()
+                .map(project -> new ProjectResponse(project.getProjectId(), project.getProjectName(), project.getCreatedAt()))
+                .collect(Collectors.toList());
+    }
+
 }
