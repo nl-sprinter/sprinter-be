@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class SprintRequest {
     private String sprintName;
-    private Long sprintOrder;
 }

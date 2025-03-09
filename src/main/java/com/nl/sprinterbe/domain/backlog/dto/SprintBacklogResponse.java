@@ -6,24 +6,22 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ProductBacklogResponse {
+public class SprintBacklogResponse {
 
     private Long backlogId;
     private String title;
     private Long weight;
     private Boolean isFinished;
     private Long sprintId;
-    private String sprintName;
     private Long sprintOrder;
 
-    public static ProductBacklogResponse of(Backlog backlog) {
-        return ProductBacklogResponse.builder()
+    public static SprintBacklogResponse of(Backlog backlog) {
+        return SprintBacklogResponse.builder()
                 .backlogId(backlog.getBacklogId())
                 .title(backlog.getTitle())
                 .weight(backlog.getWeight())
                 .isFinished(backlog.getIsFinished())
                 .sprintId(backlog.getSprint().getSprintId())
-                .sprintName(backlog.getSprint().getSprintName())
                 .sprintOrder(backlog.getSprint().getSprintOrder())
                 .build();
     }

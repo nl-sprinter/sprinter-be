@@ -10,8 +10,8 @@ import com.nl.sprinterbe.domain.dailyScrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyScrum.dto.*;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
-import com.nl.sprinterbe.domain.project.dto.ProjectResponse;
 import com.nl.sprinterbe.domain.project.dto.ProjectUserRequest;
+import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
 import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
@@ -50,6 +50,12 @@ public class ProjectController {
     private final BacklogCommentService backlogCommentService;
     private final JwtUtil jwtUtil;
 
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Projects ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
     @Operation(summary = "프로젝트 생성", description = "StartingDataDto 를 받아서 프로젝트를 생성합니다.") // 프론트 연동 OK
     @PostMapping("/create")
     public ResponseEntity<String> createProject(@RequestBody StartingDataDto StartingDataDto, @RequestHeader("Authorization") String token) {
@@ -66,7 +72,6 @@ public class ProjectController {
         return ResponseEntity.status(201).body("User added to project successfully");
     }
 
-    //3.4 프로젝트 하단 종속성 없애기
     //프로젝트 삭제
     @Operation(summary = "프로젝트 삭제", description = "프로젝트를 삭제합니다.") // 프론트 연동 OK
     @DeleteMapping("/{projectId}")
@@ -86,7 +91,7 @@ public class ProjectController {
 
     @Operation(summary = "프로젝트 이름 업데이트", description = "프로젝트 이름을 업데이트합니다.") // 프론트 연동 OK
     @PatchMapping("/{projectId}")
-    public ResponseEntity<Void> updateProjectName(@PathVariable Long projectId, @RequestBody Map<String,String> newProjectNameMap) {
+    public ResponseEntity<Void> updateProjectName(@PathVariable Long projectId, @RequestBody Map<String, String> newProjectNameMap) {
         projectService.updateProjectName(projectId, newProjectNameMap.get("projectName"));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -115,38 +120,63 @@ public class ProjectController {
     public ResponseEntity<BacklogTitleResponse> updateBacklogTitle(@RequestBody BacklogTitleRequest request, @PathVariable Long backlogId) {
         return ResponseEntity.ok(backlogService.updateBacklogTitle(request, backlogId));
     }
-    // api/v1/project/{projectId}/
 
 
-    // -----------Sprint------------------------
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Product Backlogs ::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+    @Operation(summary = "Product Backlog 조회", description = "Product Backlog 리스트를 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/productbacklogs")
+    public ResponseEntity<List<ProductBacklogResponse>> getProductBacklogList(@PathVariable Long projectId) {
+        return ResponseEntity.ok(backlogService.getProductBacklogsByProjectId(projectId));
+    }
 
-    @Operation(summary = "스프린트 생성", description = "스프린트를 생성합니다.")
+
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Sprints :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "스프린트 생성", description = "스프린트를 생성합니다.") // 프론트 연동 OK
     @PostMapping("/{projectId}/sprints")
     public ResponseEntity<SprintResponse> createSprint(@RequestBody SprintRequest request, @PathVariable Long projectId) {
         return ResponseEntity.ok(sprintService.createSprint(request, projectId));
     }
 
-    @Operation(summary = "프로젝트 스프린트 조회", description = "프로젝트에 속한 스프린트들을 projectId 로 조회합니다.") // 프론트 연동 OK
+    @Operation(summary = "프로젝트에 속한 스프린트 조회", description = "프로젝트에 속한 스프린트들을 projectId 로 조회합니다.") // 프론트 연동 OK
     @GetMapping("/{projectId}/sprints")
     public ResponseEntity<List<SprintResponse>> getSprintsByProjectId(@PathVariable Long projectId) {
         return ResponseEntity.status(HttpStatus.OK).body(sprintService.getSprintsByProjectId(projectId));
     }
 
-    //수정
-    //3.4 Sprint Order 저장 여부 // Ok
-    @Operation(summary = "스프린트 수정", description = "스프린트를 수정합니다.")
-    @PatchMapping("/{projectId}/sprints/{sprintId}")
-    public ResponseEntity<String> updateSprint(@RequestBody SprintUpdateRequest request, @PathVariable Long sprintId) {
-        sprintService.updateSprint(request, sprintId);
-        return ResponseEntity.status(200).body("Sprint updated successfully");
+    @Operation(summary = "스프린트에 속한 백로그 조회", description = "스프린트에 속한 백로그들을 projectId와 sprintId 로 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs")
+    public ResponseEntity<List<SprintBacklogResponse>> getSprintBacklogs(@PathVariable Long projectId, @PathVariable Long sprintId) {
+        return ResponseEntity.status(HttpStatus.OK).body(backlogService.getSprintBacklogsByProjectIdAndSprintId(projectId, sprintId));
     }
 
-    //3.4 Sprint 삭제 시 하단 모두 삭제
-    @Operation(summary = "스프린트 삭제", description = "스프린트를 삭제합니다.")
-    @DeleteMapping("/{projectId}/sprints/{sprintId}")
-    public ResponseEntity<Void> deleteSprint(@PathVariable Long sprintId) {
-        sprintService.deleteSprint(sprintId);
-        return ResponseEntity.ok().build();
+    @Operation(summary = "스프린트 이름 수정", description = "스프린트 이름을 수정합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/sprints/{sprintId}")
+    public ResponseEntity<Void> updateSprintName(@RequestBody SprintUpdateRequest request, @PathVariable Long sprintId) {
+        sprintService.updateSprintName(request, sprintId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "스프린트 주기 조회", description = "스프린트 주기를 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprintperiod")
+    public ResponseEntity<Integer> getProjectsSprintPeriod(@PathVariable Long projectId) {
+        int sprintPeriod = projectService.getSprintPeriod(projectId);
+        return ResponseEntity.status(HttpStatus.OK).body(sprintPeriod);
+    }
+
+    @Operation(summary = "스프린트 주기 수정", description = "스프린트 주기를 수정합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/sprintperiod")
+    public ResponseEntity<Void> updateProjectsSprintPeriod(@RequestBody SprintPeriodUpdateRequest request, @PathVariable Long projectId) {
+        projectService.updateSprintPeriod(projectId, request.getSprintPeriod());
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //Backlog에 걸려있는 유저
@@ -182,11 +212,6 @@ public class ProjectController {
         return ResponseEntity.ok(backlogService.findTaskByBacklogId(backlogId));
     }
 
-    //Product Backlog 리스트 조회
-    @GetMapping("/{projectId}//backlogs")
-    public ResponseEntity<List<ProductBacklogResponse>> getProductBacklogList(@PathVariable Long projectId) {
-        return ResponseEntity.ok(backlogService.getBacklogsByProject(projectId));
-    }
 
     //Backlog에 걸려있는 이슈
     /*
@@ -219,7 +244,7 @@ public class ProjectController {
     }
 
     //Backlog 추가 (한번에)
-    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs")
+//    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs")
     public ResponseEntity<BacklogPostResponse> addBacklog(@RequestBody BacklogPostRequest request, @PathVariable Long sprintId) {
         return ResponseEntity.ok(backlogService.createBacklog(request, sprintId));
     }

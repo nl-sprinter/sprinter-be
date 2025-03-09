@@ -43,12 +43,13 @@ public class ProjectService {
     public void createProject(StartingDataDto startingDataDto, Long userId) {
         // 유저 검증
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException());
+                .orElseThrow(UserNotFoundException::new);
 
         // 프로젝트 생성
         Project project = Project.builder()
                 .createdAt(LocalDateTime.now())
                 .projectName(startingDataDto.getProject().getProjectName())
+                .sprintPeriod(startingDataDto.getSprint().getSprintPeriod())
                 .build();
 
         // 스프린트 생성 및 현재 프로젝트에 연결
@@ -134,7 +135,6 @@ public class ProjectService {
         }
 
         project.setProjectName(newProjectName);
-        projectRepository.save(project);
     }
 
 
@@ -150,7 +150,7 @@ public class ProjectService {
         LocalDate startDate = LocalDate.now();
 
         for (int i = 1; i <= sprintInfo.getSprintCount(); i++) {
-            LocalDate endDate = startDate.plusDays(sprintInfo.getSprintDuration());
+            LocalDate endDate = startDate.plusDays(sprintInfo.getSprintPeriod());
 
             Sprint sprint = Sprint.builder()
                     .sprintName("Sprint " + i)
@@ -201,4 +201,15 @@ public class ProjectService {
         return backlogs;
     }
 
+    public int getSprintPeriod(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(ProjectNotFoundException::new);
+        return project.getSprintPeriod();
+    }
+
+    public void updateSprintPeriod(Long projectId, int sprintPeriod) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(ProjectNotFoundException::new);
+        project.setSprintPeriod(sprintPeriod);
+    }
 }

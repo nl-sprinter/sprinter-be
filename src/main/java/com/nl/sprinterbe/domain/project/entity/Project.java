@@ -31,6 +31,9 @@ public class Project {
     @Column(name = "project_name")
     private String projectName;
 
+    @Column(name = "sprint_period")
+    private Integer sprintPeriod;
+
     // 프로젝트 1 : n 스프린트
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sprint> sprints = new ArrayList<>();
@@ -41,10 +44,11 @@ public class Project {
 
     // 컬렉션 초기화 문제 때문에 빌더 재정의
     @Builder
-    public Project(Long projectId, LocalDateTime createdAt, String projectName) {
+    public Project(Long projectId, LocalDateTime createdAt, String projectName, Integer sprintPeriod) {
         this.projectId = projectId;
         this.createdAt = createdAt;
         this.projectName = projectName;
+        this.sprintPeriod = sprintPeriod;
         this.sprints = new ArrayList<>();
         this.userProjects = new ArrayList<>();
     }
@@ -65,6 +69,7 @@ public class Project {
                 "projectId=" + projectId +
                 ", createdAt=" + createdAt +
                 ", projectName='" + projectName + '\'' +
+                ", sprintPeriod='" + sprintPeriod + '\'' +
                 ", sprints=" + sprints +
                 ", userProjects=" + userProjects +
                 '}';
