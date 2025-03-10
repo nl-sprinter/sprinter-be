@@ -15,6 +15,7 @@ import com.nl.sprinterbe.domain.refreshToken.dao.RefreshTokenRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
+import com.nl.sprinterbe.global.exception.user.DuplicateUserNicknameException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserPasswordNotEqualsException;
 import com.nl.sprinterbe.global.security.JwtUtil;
@@ -43,16 +44,23 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     public void updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
-        User user = userRepository.findById(userId)
+        User findUser = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        //시큐리티context에 있는 유저정보를 업데이트
-        String password = user.getPassword();
-        String userPassword = userUpdateRequest.getCurrentPassword();
-        if (!passwordEncoder.matches(userPassword, password)) {
+
+        // 비밀번호 검사
+        // 비밀번호 비교할땐 .matches 써야함
+        if (!passwordEncoder.matches(userUpdateRequest.getCurrentPassword(), findUser.getPassword())) {
             throw new UserPasswordNotEqualsException();
         }
-        user.setNickname(userUpdateRequest.getNickname());
-        user.setPassword(passwordEncoder.encode(userUpdateRequest.getNewPassword()));
+
+        // 닉네임 중복검사
+        boolean exists = userRepository.existsByNickname(findUser.getNickname());
+        if (!userUpdateRequest.getNickname().equals(findUser.getNickname()) && exists) {
+            throw new DuplicateUserNicknameException();
+        }
+
+        findUser.setNickname(userUpdateRequest.getNickname());
+        findUser.setPassword(passwordEncoder.encode(userUpdateRequest.getNewPassword()));
     }
 
     //jwt로 회원가입
