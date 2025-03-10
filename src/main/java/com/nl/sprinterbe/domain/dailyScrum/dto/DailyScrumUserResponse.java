@@ -1,6 +1,5 @@
 package com.nl.sprinterbe.domain.dailyScrum.dto;
 
-import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;

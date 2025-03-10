@@ -4,9 +4,11 @@ import org.springframework.http.HttpStatus;
 
 public class ForbiddenCommentAccessException extends BacklogCommentException {
 
-    private static final String ERROR_CODE = "BACKLOG-COMMENT-403";
-    private static final String MESSAGE = "댓글에 대한 권한이 없습니다.";
+    private static final String ERROR_CODE = "backlogcomment-403";
+    private static final HttpStatus STATUS = HttpStatus.FORBIDDEN;
+    private static final String MESSAGE = "Backlogcomment forbidden";
+
     public ForbiddenCommentAccessException() {
-        super(ERROR_CODE, HttpStatus.FORBIDDEN, MESSAGE);
+        super(ERROR_CODE, STATUS, MESSAGE);
     }
 }

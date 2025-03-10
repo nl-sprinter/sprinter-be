@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class SprintUpdateRequest {
+
     private String sprintName;
-    private Long sprintOrder;
+
 }

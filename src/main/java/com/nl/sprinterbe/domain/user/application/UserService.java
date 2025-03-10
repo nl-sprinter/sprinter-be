@@ -1,20 +1,22 @@
 package com.nl.sprinterbe.domain.user.application;
 
-import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
+import com.nl.sprinterbe.domain.project.dto.ProjectResponse;
+import com.nl.sprinterbe.domain.project.entity.Project;
+import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
+import com.nl.sprinterbe.domain.user.dto.UserUpdateRequest;
+import com.nl.sprinterbe.domain.userProject.entity.UserProject;
 import com.nl.sprinterbe.global.common.code.ResponseStatus;
 import com.nl.sprinterbe.domain.refreshToken.application.RefreshTokenService;
-import com.nl.sprinterbe.domain.project.dto.ProjectNameDto;
 import com.nl.sprinterbe.global.common.ResponseDto;
 import com.nl.sprinterbe.domain.user.dao.SignUpRequestDto;
-import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.refreshToken.entity.RefreshToken;
-import com.nl.sprinterbe.domain.userProject.entity.UserProject;
 import com.nl.sprinterbe.global.exception.LoginFormException;
 import com.nl.sprinterbe.domain.refreshToken.dao.RefreshTokenRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
+import com.nl.sprinterbe.global.exception.user.UserPasswordNotEqualsException;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,8 +32,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -40,15 +42,17 @@ public class UserService {
     private final UserProjectRepository userProjectRepository;
     private final JwtUtil jwtUtil;
 
-    public void updateUser(Long userId, UserDetailResponse userDetailResponse) {
+    public void updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException());
+                .orElseThrow(UserNotFoundException::new);
         //시큐리티context에 있는 유저정보를 업데이트
-
-        user.setNickname(userDetailResponse.getNickname());
-        user.setPassword(passwordEncoder.encode(userDetailResponse.getPassword()));
-
-        userRepository.save(user);
+        String password = user.getPassword();
+        String userPassword = userUpdateRequest.getCurrentPassword();
+        if (!passwordEncoder.matches(userPassword, password)) {
+            throw new UserPasswordNotEqualsException();
+        }
+        user.setNickname(userUpdateRequest.getNickname());
+        user.setPassword(passwordEncoder.encode(userUpdateRequest.getNewPassword()));
     }
 
     //jwt로 회원가입
@@ -101,21 +105,26 @@ public class UserService {
         return ResponseDto.settingResponse(HttpStatus.CREATED, ResponseStatus.TOKEN_CREATED);
     }
 
-    public List<ProjectNameDto> getProjects(Long userId) {
+    /**
+     * User 가 속한 프로젝트 가져오기
+     */
+    public List<ProjectResponse> getUserProjects(Long userId) {
         List<Project> projects = userProjectRepository.findByUserUserId(userId)
                 .stream()
                 .map(UserProject::getProject)
                 .collect(Collectors.toList());
 
         return projects.stream()
-                .map(project -> new ProjectNameDto(project.getProjectName(), project.getCreatedAt()))
+                .map(project -> new ProjectResponse(project.getProjectId(), project.getProjectName(), project.getCreatedAt()))
                 .collect(Collectors.toList());
     }
 
     /**
-     * User 닉네임 가져오기
+     * 유저 정보 가져오기
      */
-    public String getNickname(Long userId) {
-        return userRepository.findById(userId).orElseThrow().getNickname();
+    public UserInfoResponse getUserInfo(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        return UserInfoResponse.of(user);
     }
+
 }

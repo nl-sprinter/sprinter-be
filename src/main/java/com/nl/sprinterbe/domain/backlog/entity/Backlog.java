@@ -15,20 +15,23 @@ import java.util.List;
 @Getter
 @Builder
 public class Backlog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "backlog_id")
     private Long backlogId;
 
-    @Column(name = "is_finish")
-    private Boolean isFinished;
+    @Column(name = "title")
+    @Setter
+    private String title;
 
     @Column(name = "weight")
     private Long weight;
 
-    @Column(name = "title")
-    @Setter
-    private String title;
+    @Column(name = "is_finish")
+    private Boolean isFinished;
+
+
 
     // 스프린트 1 : n 백로그
     @ManyToOne(fetch=FetchType.LAZY)

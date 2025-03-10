@@ -24,7 +24,6 @@ public class Sprint {
     @Column(name = "sprint_id")
     private Long sprintId;
 
-
     @Column(name = "sprint_name")
     private String sprintName;
 
