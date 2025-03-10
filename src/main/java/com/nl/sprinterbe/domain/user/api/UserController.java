@@ -49,4 +49,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userInfo);
     }
 
+    @Operation(summary = "회원탈퇴", description = "회원을 탈퇴합니다.")
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> delete(HttpServletRequest request) {
+        Long userId = jwtUtil.removeBearerAndReturnId(request);
+        userService.deleteUser(userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }

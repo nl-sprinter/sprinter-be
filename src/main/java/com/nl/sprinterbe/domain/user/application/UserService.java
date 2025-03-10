@@ -135,4 +135,14 @@ public class UserService {
         return UserInfoResponse.of(user);
     }
 
+    /**
+     * 유저 삭제
+     * 유령 유저 로직 등 도입 필요 TODO
+     */
+    public void deleteUser(Long userId) {
+        // 다른 리포지토리에서 유저를 유령유저로 치환
+        // 댓글..
+        // 채팅..
+        userRepository.deleteById(userId);
+    }
 }
