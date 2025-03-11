@@ -2,7 +2,7 @@ package com.nl.sprinterbe.global.security.handler.oauth2;
 
 import com.nl.sprinterbe.global.common.code.ResponseStatus;
 import com.nl.sprinterbe.dto.CustomOAuth2User;
-import com.nl.sprinterbe.domain.refreshToken.application.RefreshTokenService;
+import com.nl.sprinterbe.domain.refreshtoken.application.RefreshTokenService;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import jakarta.servlet.ServletException;

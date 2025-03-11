@@ -3,7 +3,7 @@ package com.nl.sprinterbe.global.security.handler;
 import com.nl.sprinterbe.global.common.code.ResponseStatus;
 import com.nl.sprinterbe.dto.CustomUserDetails;
 import com.nl.sprinterbe.global.common.ResponseDto;
-import com.nl.sprinterbe.domain.refreshToken.application.RefreshTokenService;
+import com.nl.sprinterbe.domain.refreshtoken.application.RefreshTokenService;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
