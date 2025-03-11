@@ -1,14 +1,17 @@
 package com.nl.sprinterbe.domain.dailyScrum.entity;
 
+import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
+@Getter
 public class UserDailyScrum {
 
     @Id
@@ -23,4 +26,15 @@ public class UserDailyScrum {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="dailyscrum_id", nullable=false)
     private DailyScrum dailyScrum;
+
+    private Boolean scrumMaster;
+
+    public void setDailyScrum(DailyScrum dailyScrum) {
+        if(dailyScrum.getUserDailyScrums()!=null) {
+            dailyScrum.getUserDailyScrums().remove(this);
+        }
+        this.dailyScrum = dailyScrum;
+        dailyScrum.getUserDailyScrums().add(this);
+    }
+
 }

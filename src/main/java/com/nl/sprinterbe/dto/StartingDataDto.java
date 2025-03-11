@@ -42,8 +42,8 @@ public class StartingDataDto {
     public static class SprintInfo {
         @JsonProperty("sprint_count")
         private int sprintCount;
-        @JsonProperty("sprint_duration")
-        private int sprintDuration;
+        @JsonProperty("sprint_period")
+        private int sprintPeriod;
     }
 
     @AllArgsConstructor
@@ -54,15 +54,5 @@ public class StartingDataDto {
         private String title;
         private Long weight;
     }
-
-    
-    public Map<Integer, List<BacklogItem>> getProductBacklogListMap() {
-        if (backlog == null) {
-            return Collections.emptyMap();
-        }
-        return backlog.stream()
-                .collect(Collectors.groupingBy(BacklogItem::getSprintNumber));
-    }
-
 
 }

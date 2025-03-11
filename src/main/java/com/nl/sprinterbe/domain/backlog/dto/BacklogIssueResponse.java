@@ -1,11 +1,13 @@
 package com.nl.sprinterbe.domain.backlog.dto;
 
 import com.nl.sprinterbe.domain.issue.entity.Issue;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
+@AllArgsConstructor
 public class BacklogIssueResponse {
     private Long issueId;
 

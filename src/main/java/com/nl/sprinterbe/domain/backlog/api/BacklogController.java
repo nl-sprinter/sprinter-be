@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+//Controller
+// get, post > add , patch, put >> update
+//      post > create
+
 @RestController
 @RequestMapping("/backlogs")
 @RequiredArgsConstructor
@@ -25,7 +30,7 @@ public class BacklogController {
     }
 
     //Backlog 정보
-    @Getter("/projects/{projectId}/{backlogId}/users")
+    @GetMapping("/projects/{projectId}/{backlogId}/users")
     public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId){
         return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
     }
@@ -85,51 +90,53 @@ public class BacklogController {
 
 
     //---------------------------------- 수정 시 하나씩(현재 채택) -----------------------------------
-    //유저 Delete
-    @DeleteMapping
-    public ResponseEntity<Void> deleteUser(@PathVariable Long backlogId,@PathVariable Long userId) {
-        backlogService.deleteUser(backlogId,userId);
-        return ResponseEntity.ok().build();
-    }
-    //유저 add
-    @PostMapping
-    public ResponseEntity<BacklogUserResponse> addUser(@PathVariable Long backlogId , @PathVariable Long userId){
-        return ResponseEntity.ok(backlogService.addBacklogUser(backlogId,userId));
-    }
+    //Sprint에는 걸려있지만 Backlog에는 걸려있지 않은 유저 조회
 
-    //업무 Delete
-    @DeleteMapping
-    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
-        backlogService.deleteTask(taskId);
-        return ResponseEntity.ok().build();
-    }
-    //업무 add
-    @PostMapping
-    public ResponseEntity<BacklogTaskResponse> addTask(@PathVariable Long backlogId ,@RequestBody BacklogTaskRequest request) {
-        return ResponseEntity.ok(backlogService.addTask(backlogId,request));
-    }
+    //유저 Delete
+//    @DeleteMapping
+//    public ResponseEntity<Void> deleteUser(@PathVariable Long backlogId,@PathVariable Long userId) {
+//        backlogService.deleteUser(backlogId,userId);
+//        return ResponseEntity.ok().build();
+//    }
+//    //유저 add
+//    @PostMapping
+//    public ResponseEntity<BacklogUserResponse> addUser(@PathVariable Long backlogId , @PathVariable Long userId){
+//        return ResponseEntity.ok(backlogService.addBacklogUser(backlogId,userId));
+//    }
+//
+//    //업무 Delete
+//    @DeleteMapping
+//    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
+//        backlogService.deleteTask(taskId);
+//        return ResponseEntity.ok().build();
+//    }
+//    //업무 add
+//    @PostMapping
+//    public ResponseEntity<BacklogTaskResponse> addTask(@PathVariable Long backlogId ,@RequestBody BacklogTaskRequest request) {
+//        return ResponseEntity.ok(backlogService.addTask(backlogId,request));
+//    }
 
     //---------------------------------- 수정 시 하나씩 -----------------------------------
 
-    //이슈 수정
-    @PatchMapping()
-    public ResponseEntity<BacklogIssueResponse> updateIssue(@PathVariable Long issueId, @RequestBody BacklogIssueRequest request){
-        return ResponseEntity.ok(backlogService.updateIssue(issueId,request));
-    }
-
-    //이슈 add
-    @PostMapping()
-    public ResponseEntity<BacklogIssueResponse> addIssue(@PathVariable Long issueId,@RequestBody BacklogIssueRequest request) {
-        return ResponseEntity.ok(backlogService.addIssue(issueId,request));
-    }
-
-
-    //이슈 delete
-    @DeleteMapping()
-    public ResponseEntity<Void> deleteIssue(@PathVariable Long issueId) {
-        backlogService.deleteIssue(issueId);
-        return ResponseEntity.ok().build();
-    }
+//    //이슈 수정
+//    @PatchMapping()
+//    public ResponseEntity<BacklogIssueResponse> updateIssue(@PathVariable Long issueId, @RequestBody BacklogIssueRequest request){
+//        return ResponseEntity.ok(backlogService.updateIssue(issueId,request));
+//    }
+//
+//    //이슈 add
+//    @PostMapping()
+//    public ResponseEntity<BacklogIssueResponse> addIssue(@PathVariable Long issueId,@RequestBody BacklogIssueRequest request) {
+//        return ResponseEntity.ok(backlogService.addIssue(issueId,request));
+//    }
+//
+//
+//    //이슈 delete
+//    @DeleteMapping()
+//    public ResponseEntity<Void> deleteIssue(@PathVariable Long issueId) {
+//        backlogService.deleteIssue(issueId);
+//        return ResponseEntity.ok().build();
+//    }
 
 
 

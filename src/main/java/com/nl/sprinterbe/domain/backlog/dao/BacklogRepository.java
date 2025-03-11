@@ -35,10 +35,8 @@ public interface BacklogRepository extends JpaRepository<Backlog, Long> {
 
 
     Optional<Backlog> findByBacklogId(Long backlogId);
-
-<<<<<<< HEAD
+    
     boolean existsByBacklogId(Long backlogId);
-=======
     @Query("select i from Issue i where i.backlog.backlogId = :backlogId")
     List<Issue> findIssuesByBacklogId(@Param("backlogId") Long backlogId);
 
@@ -53,6 +51,24 @@ public interface BacklogRepository extends JpaRepository<Backlog, Long> {
     List<User> findUsersNotInBacklog(@Param("projectId") Long projectId,
                                      @Param("backlogId") Long backlogId);
 
+    // 특정 sprintId에 속한 Backlog 중,
+    // dailyScrumId로 연결된 Backlog를 제외한 목록을 조회
 
->>>>>>> 9309944 (FEAT: backlog 관련 API 1차)
+    @Query("SELECT b FROM Backlog b " +
+            "WHERE b.sprint.sprintId = :sprintId " +  // Sprint에 속하는 Backlog 중
+            "AND b.backlogId NOT IN (SELECT dsb.backlog.backlogId FROM DailyScrumBacklog dsb WHERE dsb.dailyScrum.dailyScrumId = :dailyScrumId)") // 특정 DailyScrum에 포함되지 않은 Backlog
+    List<Backlog> findExcludingDailyScrum(@Param("sprintId") Long sprintId, @Param("dailyScrumId") Long dailyScrumId);
+
+    @Query("SELECT b FROM Backlog b" +
+            " join fetch b.sprint s" +
+            " join fetch s.project p" +
+            " WHERE p.projectId = :projectId")
+    List<Backlog> findBacklogsByProjectId(@Param("projectId") Long projectId);
+
+    @Query("SELECT b FROM Backlog b" +
+            " JOIN FETCH b.sprint s" +
+            " JOIN FETCH s.project p" +
+            " WHERE p.projectId=:projectId AND s.sprintId=:sprintId")
+    List<Backlog> findBacklogsByProjectIdAndSprintId(@Param("projectId") Long projectId, @Param("sprintId") Long sprintId);
+
 }

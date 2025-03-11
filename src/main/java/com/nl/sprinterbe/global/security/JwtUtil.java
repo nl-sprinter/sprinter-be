@@ -16,11 +16,11 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     private final Key key;
-    public static final int ACCESS_TOKEN_MINUTE = 10;
+    public static final int ACCESS_TOKEN_MINUTE = 180;
     public static final int REFRESH_TOKEN_HOURS = 72;
 
 
-    public JwtUtil(@Value("${spring.jwt.secret}")String secret) {
+    public JwtUtil(@Value("${spring.jwt.secret}") String secret) {
         byte[] byteSecretKey = Decoders.BASE64.decode(secret);
         key = Keys.hmacShaKeyFor(byteSecretKey);
     }
@@ -99,5 +99,9 @@ public class JwtUtil {
         String authorization = request.getHeader("Authorization");
         String token=authorization.substring(7);
         return Long.parseLong(Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("id", String.class));
+    }
+
+    public Long removeBearer(String token){
+        return Long.parseLong(Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token.substring(7)).getBody().get("id", String.class));
     }
 }

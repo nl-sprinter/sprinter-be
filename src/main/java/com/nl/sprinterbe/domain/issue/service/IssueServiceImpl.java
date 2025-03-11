@@ -2,10 +2,11 @@ package com.nl.sprinterbe.domain.issue.service;
 
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
+import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
 import com.nl.sprinterbe.domain.issue.dto.CreateIssueRequest;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
-import com.nl.sprinterbe.domain.issue.repositories.IssueRepository;
+
 import com.nl.sprinterbe.global.exception.backlog.BacklogNotFoundException;
 import com.nl.sprinterbe.global.exception.issue.IssueNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,19 +24,24 @@ public class IssueServiceImpl implements IssueService {
     private final BacklogRepository backlogRepository;
 
     @Override
-    public IssueRepsonse createIssue(CreateIssueRequest request) {
-        if(!backlogRepository.existsByBacklogId(request.getBacklogId())){
+    public IssueRepsonse createIssue(CreateIssueRequest request,Long backlogId) {
+        if(!backlogRepository.existsByBacklogId(backlogId)){
             throw new BacklogNotFoundException();
         }
 
         Issue issue = Issue.of(request);
-        Long backlogId = relateBacklog(request.getBacklogId(), issue);
+        Long bId = relateBacklog(backlogId, issue);
 
         Issue savedIssue = issueRepository.save(issue);
 
-        return IssueRepsonse.of(savedIssue, backlogId);
+        return IssueRepsonse.of(savedIssue, bId);
     }
 
+    /**
+     * 이슈와 백로그 단방향 매핑
+     * @param backlogId 백로그 id
+     * @param issue 백로그에 해당하는 issue
+     */
     public Long relateBacklog(Long backlogId, Issue issue){
         Backlog backlog = backlogRepository.findById(backlogId)
                 .orElseThrow(() -> new BacklogNotFoundException());

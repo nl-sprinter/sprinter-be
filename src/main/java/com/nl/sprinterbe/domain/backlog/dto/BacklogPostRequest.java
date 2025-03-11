@@ -7,6 +7,7 @@ import java.util.List;
 @Getter
 public class BacklogPostRequest {
     private String title;
+    private Long weight;
     private List<UserDto> users;
     private List<TaskDto> tasks;
     private IssueDto issue;

@@ -1,12 +1,11 @@
 package com.nl.sprinterbe.domain.backlog.entity;
 
-import com.nl.sprinterbe.domain.dailyScrum.entity.DailyScrum;
+import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
+import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
-import com.nl.sprinterbe.domain.userBacklog.entity.UserBacklog;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,47 +14,41 @@ import java.util.List;
 @Getter
 @Builder
 public class Backlog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "backlog_id")
     private Long backlogId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "sprint_id", nullable = false)
-    @Setter
-    private Sprint sprint;
-
-    //25.02.22 이거 왜 있는거였지?
-    @Column(name = "assigned_user_id")
-    private Long assingedUserId;
-
-    @Column(name = "is_finish")
-    private Boolean isFinished;
-
-    @Column(name = "weight")
-    private Long weight;
-
     @Column(name = "title")
     @Setter
     private String title;
 
+    @Column(name = "weight")
+    private Long weight;
+
+    @Column(name = "is_finish")
+    private Boolean isFinished;
+
+
+
+    // 스프린트 1 : n 백로그
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "sprint_id", nullable = false)
+    @Setter
+    private Sprint sprint;
+
+    @OneToMany(mappedBy = "backlog", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Issue> issue;
+
+    @OneToMany(mappedBy = "backlog", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<BacklogComment> backlogComments;
 /*    @OneToMany(mappedBy = "backlog")
     private List<UserBacklog> userBacklogs = new ArrayList<>();*/
 
-    @ManyToOne
-    @JoinColumn(name= "daily_scrum_id")
-    @Setter
-    private DailyScrum dailyScrum;
-
-
-    /*
-    @OneToMany(mappedBy = "backlog")
-    private List<Task> tasks = new ArrayList<>();
-
-    @OneToMany(mappedBy = "backlog")
-    private List<BacklogComment> backlogComments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "backlog")
-    private List<Issue> issues = new ArrayList<>();*/
+//    @ManyToOne
+//    @JoinColumn(name= "daily_scrum_id")
+//    @Setter
+//    private DailyScrum dailyScrum;
 
 }
