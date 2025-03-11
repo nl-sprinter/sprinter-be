@@ -13,15 +13,14 @@ import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
-import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
-import com.nl.sprinterbe.domain.userProject.entity.UserProject;
+import com.nl.sprinterbe.domain.userproject.dao.UserProjectRepository;
+import com.nl.sprinterbe.domain.userproject.entity.UserProject;
 import com.nl.sprinterbe.global.exception.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

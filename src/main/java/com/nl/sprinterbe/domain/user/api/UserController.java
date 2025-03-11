@@ -23,7 +23,7 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    @Operation(summary = "유저 정보 수정", description = "유저 닉네임과 비밀번호를 수정합니다.")
+    @Operation(summary = "유저 정보 수정", description = "유저 닉네임과 비밀번호를 수정합니다.") // 프론트 연동 OK
     @PatchMapping("/update")
     public ResponseEntity<String> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
@@ -41,12 +41,20 @@ public class UserController {
     }
 
 
-    @Operation(summary = "유저 정보 조회", description = "클라이언트에서 유저의 상태 관리를 위해 유저 정보를 조회합니다.")
+    @Operation(summary = "유저 정보 조회", description = "클라이언트에서 유저의 상태 관리를 위해 유저 정보를 조회합니다.") // 프론트 연동 OK
     @GetMapping("/info")
     public ResponseEntity<UserInfoResponse> getUserInfo(HttpServletRequest request) {
         Long userId = jwtUtil.removeBearerAndReturnId(request);
         UserInfoResponse userInfo = userService.getUserInfo(userId);
         return ResponseEntity.status(HttpStatus.OK).body(userInfo);
+    }
+
+    @Operation(summary = "회원탈퇴", description = "회원을 탈퇴합니다.") // 프론트 연동 OK
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> delete(HttpServletRequest request) {
+        Long userId = jwtUtil.removeBearerAndReturnId(request);
+        userService.deleteUser(userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

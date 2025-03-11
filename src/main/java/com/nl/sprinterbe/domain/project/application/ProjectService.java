@@ -2,21 +2,21 @@ package com.nl.sprinterbe.domain.project.application;
 
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
-import com.nl.sprinterbe.domain.project.dto.ProjectResponse;
-import com.nl.sprinterbe.domain.project.dto.ProjectUserRequest;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
-import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
+import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
+import com.nl.sprinterbe.domain.user.dto.UserInfoWithTeamLeaderResponse;
 import com.nl.sprinterbe.dto.*;
 import com.nl.sprinterbe.domain.project.entity.Project;
-import com.nl.sprinterbe.domain.userProject.entity.UserProject;
+import com.nl.sprinterbe.domain.userproject.entity.UserProject;
 import com.nl.sprinterbe.domain.project.dao.ProjectRepository;
-import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
+import com.nl.sprinterbe.domain.userproject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.global.exception.project.DuplicateProjectNameException;
 import com.nl.sprinterbe.global.exception.project.ProjectNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
+import com.nl.sprinterbe.global.exception.userproject.UserIsNotProjectLeaderException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,16 +76,13 @@ public class ProjectService {
     }
 
 
-
-
-
-    //프로젝트 유저추가
-    public void addUserToProject(UserDetailResponse request, Long projectId) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserNotFoundException());
+    // 프로젝트 유저추가
+    public void addUserToProject(Long userId, Long projectId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
 
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException());
+                .orElseThrow(ProjectNotFoundException::new);
 
         UserProject userProject = new UserProject(user, project, false);
         userProjectRepository.save(userProject);
@@ -93,8 +90,12 @@ public class ProjectService {
 
     //프로젝트 삭제
     public void deleteProject(Long projectId, Long userId) {
+        if (!checkUserIsProjectLeader(userId, projectId)) {
+            throw new UserIsNotProjectLeaderException();
+        }
+
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException());
+                .orElseThrow(ProjectNotFoundException::new);
 
         List<UserProject> userProjects = userProjectRepository.findByProject(project);
         Optional<Long> leaderUserId = userProjects.stream()
@@ -104,23 +105,13 @@ public class ProjectService {
 
         Long leaderId = leaderUserId.orElseThrow(() -> new RuntimeException("프로젝트 리더를 찾을 수 없습니다."));
 
-//        if (!leaderId.equals(userId)) {
-//            throw new RuntimeException("Project leader not found");
-//        }
-
         userProjectRepository.deleteAll(userProjects); // UserProject 삭제
         projectRepository.delete(project); // 프로젝트 삭제
     }
 
-    public List<ProjectUserRequest> getUsers(Long projectId) {
-        List<User> users = userProjectRepository.findByProjectProjectId(projectId)
-                .stream()
-                .map(UserProject::getUser)
-                .toList();
-
-        return users.stream()
-                .map(user -> new ProjectUserRequest(user.getUserId(),user.getRole(),user.getEmail(), user.getNickname()))
-                .toList();
+    // 프로젝트에 속한 유저 정보 가져오기
+    public List<UserInfoWithTeamLeaderResponse> getUsersInProject(Long projectId) {
+        return userProjectRepository.findProjectUsersByProjectId(projectId);
     }
 
     // 프로젝트 이름 변경
@@ -185,7 +176,7 @@ public class ProjectService {
                 ));
 
         List<Backlog> backlogs = new ArrayList<>();
-        
+
         backlogItems.forEach(item -> {
             Sprint sprint = sprintMap.get(item.getSprintNumber());
             Backlog backlog = Backlog.builder()
@@ -193,7 +184,7 @@ public class ProjectService {
                     .weight(item.getWeight())
                     .isFinished(false)
                     .build();
-            
+
             sprint.addBacklog(backlog); // 스프린트에 백로그 할당
             backlogs.add(backlog);
         });
@@ -211,5 +202,23 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(ProjectNotFoundException::new);
         project.setSprintPeriod(sprintPeriod);
+    }
+
+    public List<UserInfoResponse> searchUserToAddProject(String keyword, Long projectId) {
+        return projectRepository.searchUsersNotInProject(keyword, projectId);
+    }
+
+    public void deleteUserInProject(Long projectId, Long userId, Long targetUserId) {
+        if (!checkUserIsProjectLeader(projectId, userId)) {
+            throw new UserIsNotProjectLeaderException();
+        }
+        userProjectRepository.deleteByProjectIdAndUserId(projectId, targetUserId);
+        log.info("projectId={}, userId={}, nickname = {}", projectId, userId, userRepository.findById(userId).get().getNickname());
+    }
+
+    public boolean checkUserIsProjectLeader(Long projectId, Long userId) {
+        return userProjectRepository.findByProjectProjectIdAndUserUserId(projectId, userId)
+                .orElseThrow(UserNotFoundException::new)
+                .getIsProjectLeader();
     }
 }

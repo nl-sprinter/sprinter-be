@@ -1,7 +1,6 @@
 package com.nl.sprinterbe.domain.user.entity;
 //import com.nl.sprinterbe.entity.*;
-import com.nl.sprinterbe.domain.dailyScrum.entity.UserDailyScrum;
-import com.nl.sprinterbe.domain.userProject.entity.UserProject;
+import com.nl.sprinterbe.domain.userproject.entity.UserProject;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
