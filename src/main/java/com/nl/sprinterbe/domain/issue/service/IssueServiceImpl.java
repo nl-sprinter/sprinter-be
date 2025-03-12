@@ -52,6 +52,7 @@ public class IssueServiceImpl implements IssueService {
         return backlog.getBacklogId();
     }
 
+
     @Override
     public IssueRepsonse deleteIssue(Long issueId) {
         Issue issue = issueRepository.findById(issueId)

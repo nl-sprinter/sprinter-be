@@ -5,9 +5,7 @@ import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.dto.UserUpdateRequest;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
-import com.nl.sprinterbe.global.common.code.ResponseStatus;
 import com.nl.sprinterbe.domain.refreshtoken.application.RefreshTokenService;
-import com.nl.sprinterbe.global.common.ResponseDto;
 import com.nl.sprinterbe.domain.user.dao.SignUpRequestDto;
 import com.nl.sprinterbe.domain.refreshtoken.entity.RefreshToken;
 import com.nl.sprinterbe.global.exception.user.LoginFormException;
@@ -15,7 +13,6 @@ import com.nl.sprinterbe.domain.refreshtoken.dao.RefreshTokenRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userproject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
-import com.nl.sprinterbe.global.exception.user.DuplicateUserNicknameException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserPasswordNotEqualsException;
 import com.nl.sprinterbe.global.security.JwtUtil;
@@ -44,23 +41,16 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     public void updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
-        User findUser = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-
-        // 비밀번호 검사
-        // 비밀번호 비교할땐 .matches 써야함
-        if (!passwordEncoder.matches(userUpdateRequest.getCurrentPassword(), findUser.getPassword())) {
+        //시큐리티context에 있는 유저정보를 업데이트
+        String password = user.getPassword();
+        String userPassword = userUpdateRequest.getCurrentPassword();
+        if (!passwordEncoder.matches(userPassword, password)) {
             throw new UserPasswordNotEqualsException();
         }
-
-        // 닉네임 중복검사
-        boolean exists = userRepository.existsByNickname(findUser.getNickname());
-        if (!userUpdateRequest.getNickname().equals(findUser.getNickname()) && exists) {
-            throw new DuplicateUserNicknameException();
-        }
-
-        findUser.setNickname(userUpdateRequest.getNickname());
-        findUser.setPassword(passwordEncoder.encode(userUpdateRequest.getNewPassword()));
+        user.setNickname(userUpdateRequest.getNickname());
+        user.setPassword(passwordEncoder.encode(userUpdateRequest.getNewPassword()));
     }
 
     //jwt로 회원가입
@@ -74,22 +64,23 @@ public class UserService {
         user.setEmail(dto.getEmail());
         user.setNickname(dto.getNickname());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole("ROLE_USER");
         userRepository.save(user);
     }
 
     //jwt로그아웃
-    public ResponseEntity<ResponseDto<?>> logout(String refreshToken) throws LoginFormException {
+    public ResponseEntity<Void> logout(String refreshToken) throws LoginFormException {
         Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefresh(refreshToken);
 
         if (refreshTokenOpt.isPresent() && refreshToken!=null && !refreshTokenOpt.get().getExpired()) {
             refreshTokenService.updateExpiredTokens(jwtUtil.getId(refreshToken));
-            return ResponseDto.settingResponse(HttpStatus.OK, ResponseStatus.LOGOUT_SUCCESS);
+            return ResponseEntity.ok().build();
         } else {
             throw new LoginFormException();
         }
     }
 
-    public ResponseEntity<ResponseDto<?>> refresh(String refreshToken, HttpServletResponse response){
+    public ResponseEntity<Void> refresh(String refreshToken, HttpServletResponse response){
         if(refreshToken==null){
             throw new JwtException("Refresh Null");
         }
@@ -110,7 +101,7 @@ public class UserService {
         response.setHeader("Authorization","Bearer "+ newAccessToken);
         response.addCookie(jwtUtil.createCookie("Refresh",newRefreshToken));
 
-        return ResponseDto.settingResponse(HttpStatus.CREATED, ResponseStatus.TOKEN_CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
     /**
@@ -135,14 +126,8 @@ public class UserService {
         return UserInfoResponse.of(user);
     }
 
-    /**
-     * 유저 삭제
-     * 유령 유저 로직 등 도입 필요 TODO
-     */
     public void deleteUser(Long userId) {
-        // 다른 리포지토리에서 유저를 유령유저로 치환
-        // 댓글..
-        // 채팅..
-        userRepository.deleteById(userId);
+
     }
+
 }
