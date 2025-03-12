@@ -115,29 +115,7 @@ public class ProjectController {
     }
 
 
-    //     /api/v1/projects/{projectId}/sprints/{sprintId}/backlogs
-    //나의 Backlog + 나의 달성 현황
-    // 3.4 프론트랑 연결 하고 다시 봐야할듯
-    @Operation(summary = "내 Backlog 조회", description = "User에게 속한 Backlog 정보 제공")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/users/{userId}")
-    public ResponseEntity<Slice<BacklogInfoResponse>> getBacklogInfoList(@PathVariable Long projectId, @PathVariable Long userId, @PageableDefault(size = 5) Pageable pageable) {
-        return ResponseEntity.ok(backlogService.findBacklogListByProjectId(projectId, userId, pageable));
-    }
 
-
-    //Backlog 정보
-    @Operation(summary = "Backlog ", description = "backlogId의 Backlog의 제목 정보를 제공합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}")
-    public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
-    }
-
-    //백로그 제목 수정
-    @Operation(summary = "")
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/title")
-    public ResponseEntity<BacklogTitleResponse> updateBacklogTitle(@RequestBody BacklogTitleRequest request, @PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.updateBacklogTitle(request, backlogId));
-    }
 
 
     /**
@@ -196,6 +174,45 @@ public class ProjectController {
         projectService.updateSprintPeriod(projectId, request.getSprintPeriod());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Backlogs ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "스프린트 백로그 추가", description = "스프린트에 백로그를 title 과 weight 로 추가합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs")
+    public ResponseEntity<Void> addBacklogToSprint(@RequestBody SimpleBacklogRequest request, @PathVariable Long sprintId) {
+        backlogService.createBacklog(request, sprintId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    //     /api/v1/projects/{projectId}/sprints/{sprintId}/backlogs
+    //나의 Backlog + 나의 달성 현황
+    // 3.4 프론트랑 연결 하고 다시 봐야할듯
+    @Operation(summary = "내 Backlog 조회", description = "User에게 속한 Backlog 정보 제공")
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/users/{userId}")
+    public ResponseEntity<Slice<BacklogInfoResponse>> getBacklogInfoList(@PathVariable Long projectId, @PathVariable Long userId, @PageableDefault(size = 5) Pageable pageable) {
+        return ResponseEntity.ok(backlogService.findBacklogListByProjectId(projectId, userId, pageable));
+    }
+
+
+    //Backlog 정보
+    @Operation(summary = "Backlog ", description = "backlogId의 Backlog의 제목 정보를 제공합니다.")
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}")
+    public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId) {
+        return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
+    }
+
+    //백로그 제목 수정
+    @Operation(summary = "")
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/title")
+    public ResponseEntity<BacklogTitleResponse> updateBacklogTitle(@RequestBody BacklogTitleRequest request, @PathVariable Long backlogId) {
+        return ResponseEntity.ok(backlogService.updateBacklogTitle(request, backlogId));
+    }
+
 
     //Backlog에 걸려있는 유저
     @Operation(summary = "Backlog의 걸려있는 유저", description = "Backlog의 걸려있는 유저 리스트를 제공합니다.")
@@ -261,11 +278,6 @@ public class ProjectController {
         return ResponseEntity.ok(backlogService.findIssueByBacklogId(backlogId));
     }
 
-    //Backlog 추가 (한번에)
-//    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs")
-    public ResponseEntity<BacklogPostResponse> addBacklog(@RequestBody BacklogPostRequest request, @PathVariable Long sprintId) {
-        return ResponseEntity.ok(backlogService.createBacklog(request, sprintId));
-    }
 
     //---------------------------------- 수정 시 한번에 -----------------------------------
     //백로그 유저 수정 (삭제 , 삽입)

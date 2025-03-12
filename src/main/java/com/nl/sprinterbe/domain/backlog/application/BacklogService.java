@@ -23,7 +23,7 @@ public interface BacklogService {
 
     List<BacklogUserResponse> findBacklogExceptUsers(Long projectId, Long backlogId);
 
-    BacklogPostResponse createBacklog(BacklogPostRequest request,Long sprintId);
+    void createBacklog(SimpleBacklogRequest request, Long sprintId);
 
     BacklogTitleResponse updateBacklogTitle(BacklogTitleRequest request,Long backlogId);
 
