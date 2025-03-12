@@ -1,6 +1,5 @@
 package com.nl.sprinterbe.domain.user.api;
 
-import com.nl.sprinterbe.global.common.ResponseDto;
 import com.nl.sprinterbe.domain.user.dao.SignUpRequestDto;
 import com.nl.sprinterbe.domain.user.dao.SignUpResponseDto;
 import com.nl.sprinterbe.global.exception.LoginFormException;
@@ -33,8 +32,7 @@ public class JoinController {
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponseDto> join(@RequestBody @Validated SignUpRequestDto request){
         userService.join(request);
-        SignUpResponseDto response = new SignUpResponseDto("Success");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //AccessToken은 프론트쪽에서 지워버리고 RefreshToken만 받아 DB에서 삭제
@@ -47,9 +45,8 @@ public class JoinController {
 
     @Operation(summary = "토큰 재발급", description = "토큰을 재발급합니다.")
     @GetMapping("/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response){
+    public ResponseEntity<Void> refresh(HttpServletRequest request, HttpServletResponse response){
         String refresh= jwtUtil.getRefreshToken(request);
-        ResponseEntity<ResponseDto<?>> refresh1 = userService.refresh(refresh, response);
-        return refresh1;
+        return userService.refresh(refresh, response);
     }
 }

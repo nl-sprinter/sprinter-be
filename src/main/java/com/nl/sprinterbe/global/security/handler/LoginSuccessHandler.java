@@ -1,8 +1,6 @@
 package com.nl.sprinterbe.global.security.handler;
 
-import com.nl.sprinterbe.global.common.code.ResponseStatus;
 import com.nl.sprinterbe.dto.CustomUserDetails;
-import com.nl.sprinterbe.global.common.ResponseDto;
 import com.nl.sprinterbe.domain.refreshToken.application.RefreshTokenService;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import jakarta.servlet.ServletException;
@@ -16,6 +14,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
 
 @Slf4j
 @Component
@@ -37,7 +36,19 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         refreshTokenService.updateExpiredTokens(id);
         refreshTokenService.addRefresh(id,refreshToken);
 
-        ResponseDto.settingResponse(response, HttpStatus.OK, ResponseStatus.LOCAL_LOGIN_SUCCESS,accessToken,refreshToken);
+        settingResponse(response, HttpStatus.OK,accessToken,refreshToken);
 
+    }
+
+    //필터단: data 필드 없는 Json
+    public static void settingResponse(HttpServletResponse response, HttpStatus httpStatus, String accessToken , String refreshToken) throws IOException {
+        // 응답 헤더 및 쿠키 설정
+        if (accessToken != null) {
+            response.addHeader("Authorization", "Bearer " + accessToken);
+        }
+        response.setHeader("Set-Cookie","Refresh="+refreshToken+"; Path=/; Max-Age=259200; HttpOnly");
+        response.setStatus(httpStatus.value());
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
     }
 }

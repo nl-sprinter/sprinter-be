@@ -5,9 +5,7 @@ import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.dto.UserUpdateRequest;
 import com.nl.sprinterbe.domain.userProject.entity.UserProject;
-import com.nl.sprinterbe.global.common.code.ResponseStatus;
 import com.nl.sprinterbe.domain.refreshToken.application.RefreshTokenService;
-import com.nl.sprinterbe.global.common.ResponseDto;
 import com.nl.sprinterbe.domain.user.dao.SignUpRequestDto;
 import com.nl.sprinterbe.domain.refreshToken.entity.RefreshToken;
 import com.nl.sprinterbe.global.exception.LoginFormException;
@@ -66,22 +64,23 @@ public class UserService {
         user.setEmail(dto.getEmail());
         user.setNickname(dto.getNickname());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole("ROLE_USER");
         userRepository.save(user);
     }
 
     //jwt로그아웃
-    public ResponseEntity<ResponseDto<?>> logout(String refreshToken) throws LoginFormException {
+    public ResponseEntity<Void> logout(String refreshToken) throws LoginFormException {
         Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefresh(refreshToken);
 
         if (refreshTokenOpt.isPresent() && refreshToken!=null && !refreshTokenOpt.get().getExpired()) {
             refreshTokenService.updateExpiredTokens(jwtUtil.getId(refreshToken));
-            return ResponseDto.settingResponse(HttpStatus.OK, ResponseStatus.LOGOUT_SUCCESS);
+            return ResponseEntity.ok().build();
         } else {
             throw new LoginFormException("Invalid Refresh Token");
         }
     }
 
-    public ResponseEntity<ResponseDto<?>> refresh(String refreshToken, HttpServletResponse response){
+    public ResponseEntity<Void> refresh(String refreshToken, HttpServletResponse response){
         if(refreshToken==null){
             throw new JwtException("Refresh Null");
         }
@@ -102,7 +101,7 @@ public class UserService {
         response.setHeader("Authorization","Bearer "+ newAccessToken);
         response.addCookie(jwtUtil.createCookie("Refresh",newRefreshToken));
 
-        return ResponseDto.settingResponse(HttpStatus.CREATED, ResponseStatus.TOKEN_CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
     /**

@@ -344,7 +344,7 @@ public class ProjectController {
     //---------------------------------------------------------------------
 
     //스프린트에 걸려있는 DailyScrum 리스트
-    //3.4 DailyScrum에 Sprint 관계 매핑 안되어있음
+    //3.4 DailyScrum 에 Sprint 관계 매핑 안되어있음
     @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums")
     public ResponseEntity<List<DailyScrumInfoResponse>> getDailyScrumInfoList(@PathVariable Long sprintId) {
         return ResponseEntity.ok(dailyScrumService.findDailyScrumInfoBySprintId(sprintId));
@@ -374,7 +374,6 @@ public class ProjectController {
     public ResponseEntity<DailyScrumPostResponse> addDailyScrum(@RequestBody DailyScrumPostRequest request, @PathVariable Long projectId, @PathVariable Long sprintId) {
         //projectId 파라미터는 User가 project Leader인지 위해서
         return ResponseEntity.ok(dailyScrumService.createDailyScrum(request, projectId, sprintId));
-
     }
 
 

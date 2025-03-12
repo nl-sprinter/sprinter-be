@@ -24,14 +24,14 @@ import java.util.Map;
 @Service
 @Transactional
 public class StartingFormService {
-    @Value("${openai.api.key}")
-    private String apiKey;
-
-    @Value("${openai.api.url}")
-    private String apiUrl;
-
-    @Value("${openai.api.model}")
-    private String model;
+//    @Value("${openai.api.key}")
+//    private String apiKey;
+//
+//    @Value("${openai.api.url}")
+//    private String apiUrl;
+//
+//    @Value("${openai.api.model}")
+//    private String model;
 
     @Value("${system.txt.path}")
     private String systemPromptPath;

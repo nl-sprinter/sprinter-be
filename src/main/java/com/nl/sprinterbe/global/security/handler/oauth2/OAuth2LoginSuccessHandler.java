@@ -1,6 +1,5 @@
 package com.nl.sprinterbe.global.security.handler.oauth2;
 
-import com.nl.sprinterbe.global.common.code.ResponseStatus;
 import com.nl.sprinterbe.dto.CustomOAuth2User;
 import com.nl.sprinterbe.domain.refreshToken.application.RefreshTokenService;
 import com.nl.sprinterbe.global.security.JwtUtil;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import com.nl.sprinterbe.global.common.ResponseDto;
 
 import java.io.IOException;
 
@@ -33,7 +31,19 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler{
         refreshTokenService.updateExpiredTokens(id);
         refreshTokenService.addRefresh(id, refreshToken);
 
-        ResponseDto.settingResponse(response,HttpStatus.OK, ResponseStatus.OAUTH_LOGIN_SUCCESS,null,refreshToken);
+        settingResponse(response,HttpStatus.OK,null,refreshToken);
         response.sendRedirect("http://localhost:3000/refresh");
+    }
+
+    //필터단: data 필드 없는 Json
+    public static void settingResponse(HttpServletResponse response, HttpStatus httpStatus, String accessToken , String refreshToken) throws IOException {
+        // 응답 헤더 및 쿠키 설정
+        if (accessToken != null) {
+            response.addHeader("Authorization", "Bearer " + accessToken);
+        }
+        response.setHeader("Set-Cookie","Refresh="+refreshToken+"; Path=/; Max-Age=259200; HttpOnly");
+        response.setStatus(httpStatus.value());
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
     }
 }
