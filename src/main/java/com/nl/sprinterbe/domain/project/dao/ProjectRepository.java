@@ -23,4 +23,5 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             " AND" +
             " u.userId NOT IN (SELECT up.user.userId FROM UserProject up WHERE up.project.projectId = :projectId)")
     List<UserInfoResponse> searchUsersNotInProject(@Param("keyword") String keyword, @Param("projectId") Long projectId);
+
 }

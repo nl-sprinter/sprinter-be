@@ -5,22 +5,19 @@ import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonPropertyOrder({"backlogCommentId", "content", "nickname", "parentCommentId", "createdDate", "childComments"})
 public class BacklogCommentResponse {
     private Long BacklogCommentId;
     private String content;
-    private LocalDate createdDate;
+    private LocalDateTime createdDate;
     private String nickname;
     private Long parentCommentId;
-    private List<BacklogCommentResponse> childComments;
 
     public static BacklogCommentResponse of(BacklogComment backlogComment) {
         return BacklogCommentResponse.builder()
@@ -28,8 +25,7 @@ public class BacklogCommentResponse {
                 .content(backlogComment.getContent())
                 .createdDate(backlogComment.getCreatedAt())
                 .nickname(backlogComment.getUser().getNickname())
-                .parentCommentId(backlogComment.getParentComment() == null ? -999L : backlogComment.getParentComment().getBacklogCommentId())
-                .childComments(new ArrayList<>())
+                .parentCommentId(backlogComment.getParentComment() == null ? 0 : backlogComment.getParentComment().getBacklogCommentId())
                 .build();
     }
 }

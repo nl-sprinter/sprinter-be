@@ -1,6 +1,8 @@
 package com.nl.sprinterbe.domain.issue.service;
 
 import com.nl.sprinterbe.domain.issue.dto.CreateIssueRequest;
+import com.nl.sprinterbe.domain.issue.dto.IssueCheckStatusRequest;
+import com.nl.sprinterbe.domain.issue.dto.IssueCheckStatusResponse;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 
 import java.util.List;
@@ -18,4 +20,6 @@ public interface IssueService {
     List<IssueRepsonse> getIssues(Long backlogId);
 
     IssueRepsonse getIssue(Long issueId);
+
+    IssueCheckStatusResponse updateIssueCheckStatus(Long issueId, IssueCheckStatusRequest issueCheckStatusRequest);
 }

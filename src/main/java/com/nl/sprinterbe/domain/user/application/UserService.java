@@ -10,7 +10,7 @@ import com.nl.sprinterbe.domain.refreshtoken.application.RefreshTokenService;
 import com.nl.sprinterbe.global.common.ResponseDto;
 import com.nl.sprinterbe.domain.user.dao.SignUpRequestDto;
 import com.nl.sprinterbe.domain.refreshtoken.entity.RefreshToken;
-import com.nl.sprinterbe.global.exception.LoginFormException;
+import com.nl.sprinterbe.global.exception.user.LoginFormException;
 import com.nl.sprinterbe.domain.refreshtoken.dao.RefreshTokenRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userproject.dao.UserProjectRepository;
@@ -85,7 +85,7 @@ public class UserService {
             refreshTokenService.updateExpiredTokens(jwtUtil.getId(refreshToken));
             return ResponseDto.settingResponse(HttpStatus.OK, ResponseStatus.LOGOUT_SUCCESS);
         } else {
-            throw new LoginFormException("Invalid Refresh Token");
+            throw new LoginFormException();
         }
     }
 

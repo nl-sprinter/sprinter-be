@@ -3,8 +3,10 @@ package com.nl.sprinterbe.domain.backlog.application;
 
 import com.nl.sprinterbe.domain.backlog.dto.BacklogDetailResponse;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogInfoResponse;
-import com.nl.sprinterbe.domain.dailyScrum.dto.BacklogResponse;
+import com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse;
 import com.nl.sprinterbe.domain.backlog.dto.*;
+import com.nl.sprinterbe.domain.task.dto.TaskCheckStatusRequest;
+import com.nl.sprinterbe.domain.task.dto.TaskCheckStatusResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -37,7 +39,7 @@ public interface BacklogService {
 
     void deleteTask(Long taskId);
 
-    BacklogTaskResponse addTask(Long backlogId,BacklogTaskRequest request);
+    void addTask(Long backlogId, TaskConentRequest request);
 
     BacklogIssueResponse addIssue(Long backlogId,BacklogIssueRequest request);
 
@@ -50,4 +52,12 @@ public interface BacklogService {
     List<ProductBacklogResponse> getProductBacklogsByProjectId(Long projectId);
 
     List<SprintBacklogResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId);
+
+    TaskCheckStatusResponse updateTaskCheckStatus(Long taskId, TaskCheckStatusRequest request);
+
+    void updateTaskContent(Long taskId, TaskConentRequest request);
+
+    void updateTaskUser(Long taskId, Long userId);
+
+    BacklogTaskCompleteRateResponse getBacklogTaskCompleteRate(Long backlogId);
 }

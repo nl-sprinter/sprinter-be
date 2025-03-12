@@ -4,6 +4,7 @@ import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.backlogcomment.dao.BacklogCommentRepository;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
+import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentFromResponse;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentUpdateContent;
 import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
@@ -29,7 +30,7 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
     private final BacklogRepository backlogRepository;
 
     @Override
-    public BacklogCommentResponse createComment(Long backlogId, Long userId, BacklogCommentRequest request) {
+    public BacklogCommentFromResponse createComment(Long backlogId, Long userId, BacklogCommentRequest request) {
         Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new BacklogNotFoundException());
         Optional<User> user = userRepository.findById(userId);
         BacklogComment parent = null;
@@ -41,36 +42,36 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
         }
 
         BacklogComment savedComment = backlogCommentRepository.save(newComment);
-        return BacklogCommentResponse.of(savedComment);
+        return BacklogCommentFromResponse.of(savedComment);
     }
 
 
 
     @Override
-    public BacklogCommentResponse updateComment(Long userId, Long commentId, BacklogCommentUpdateContent request) {
+    public BacklogCommentFromResponse updateComment(Long userId, Long commentId, BacklogCommentUpdateContent request) {
         BacklogComment comment = backlogCommentRepository.findById(commentId).orElseThrow(() -> new BacklogCommentNotFoundException());
         if(comment.getUser().getUserId() != userId) {throw new ForbiddenCommentAccessException();}
 
         comment.setContent(request.getContent());
         BacklogComment savedComment = backlogCommentRepository.save(comment);
-        return BacklogCommentResponse.of(savedComment);
+        return BacklogCommentFromResponse.of(savedComment);
 
     }
 
     @Override
-    public BacklogCommentResponse deleteComment(Long userId, Long commentId) {
+    public BacklogCommentFromResponse deleteComment(Long userId, Long commentId) {
         BacklogComment comment = backlogCommentRepository.findById(commentId).orElseThrow(() -> new BacklogCommentNotFoundException());
         if(comment.getUser().getUserId() != userId) {throw new ForbiddenCommentAccessException();}
 
         backlogCommentRepository.delete(comment);
-        return BacklogCommentResponse.of(comment);
+        return BacklogCommentFromResponse.of(comment);
     }
 
     @Override
-    public List<BacklogCommentResponse> getUserComment(Long userId) {
+    public List<BacklogCommentFromResponse> getUserComment(Long userId) {
         List<BacklogComment> comments = backlogCommentRepository.findByUserUserId(userId);
-        List<BacklogCommentResponse> commentResponses = comments.stream()
-                .map(BacklogCommentResponse::of)
+        List<BacklogCommentFromResponse> commentResponses = comments.stream()
+                .map(BacklogCommentFromResponse::of)
                 .toList();
         return commentResponses;
     }
@@ -79,7 +80,16 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
     @Override
     public List<BacklogCommentResponse> getComments(Long backlogId) {
         List<BacklogComment> comments = backlogCommentRepository.findCommentsByBacklogId(backlogId);
-        List<BacklogCommentResponse> commentResponses = getBacklogCommentResponses(comments);
+        List<BacklogCommentResponse> commentResponses = comments.stream()
+                .map(BacklogCommentResponse::of)
+                .toList();
+        return commentResponses;
+    }
+
+    @Override
+    public List<BacklogCommentFromResponse> getStructComments(Long backlogId) {
+        List<BacklogComment> comments = backlogCommentRepository.findCommentsByBacklogId(backlogId);
+        List<BacklogCommentFromResponse> commentResponses = getBacklogCommentResponses(comments);
         return commentResponses;
     }
 
@@ -88,11 +98,11 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
      * @param comments 해당 백로그에 달린 댓글 리스트
      */
     @NotNull
-    private static List<BacklogCommentResponse> getBacklogCommentResponses(List<BacklogComment> comments) {
-        List<BacklogCommentResponse> commentResponses = new ArrayList<>();
-        Map<Long, BacklogCommentResponse> map = new HashMap<>();
+    private static List<BacklogCommentFromResponse> getBacklogCommentResponses(List<BacklogComment> comments) {
+        List<BacklogCommentFromResponse> commentResponses = new ArrayList<>();
+        Map<Long, BacklogCommentFromResponse> map = new HashMap<>();
         for(BacklogComment comment : comments) {
-            BacklogCommentResponse commentResponse = BacklogCommentResponse.of(comment);
+            BacklogCommentFromResponse commentResponse = BacklogCommentFromResponse.of(comment);
 
             map.put(commentResponse.getBacklogCommentId(), commentResponse);
             if (comment.getParentComment() != null) {

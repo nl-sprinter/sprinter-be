@@ -3,7 +3,7 @@ package com.nl.sprinterbe.domain.user.api;
 import com.nl.sprinterbe.global.common.ResponseDto;
 import com.nl.sprinterbe.domain.user.dao.SignUpRequestDto;
 import com.nl.sprinterbe.domain.user.dao.SignUpResponseDto;
-import com.nl.sprinterbe.global.exception.LoginFormException;
+import com.nl.sprinterbe.global.exception.user.LoginFormException;
 import com.nl.sprinterbe.domain.user.application.UserService;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;

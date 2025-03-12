@@ -4,6 +4,8 @@ import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
 import com.nl.sprinterbe.domain.issue.dto.CreateIssueRequest;
+import com.nl.sprinterbe.domain.issue.dto.IssueCheckStatusRequest;
+import com.nl.sprinterbe.domain.issue.dto.IssueCheckStatusResponse;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 
@@ -93,6 +95,16 @@ public class IssueServiceImpl implements IssueService {
                 .orElseThrow(() -> new IssueNotFoundException());
 
         return IssueRepsonse.of(issue);
+    }
+
+    @Override
+    public IssueCheckStatusResponse updateIssueCheckStatus(Long issueId, IssueCheckStatusRequest issueCheckStatusRequest) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new IssueNotFoundException());
+
+        issue.setChecked(issueCheckStatusRequest.isChecked());
+
+        return new IssueCheckStatusResponse(issue.getChecked());
     }
 
 

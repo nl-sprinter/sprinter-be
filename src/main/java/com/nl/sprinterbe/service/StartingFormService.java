@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.dto.StartingFormDto;
-import com.nl.sprinterbe.global.exception.FileReadException;
-import com.nl.sprinterbe.global.exception.JsonParseException;
+import com.nl.sprinterbe.global.exception.form.FileReadException;
+import com.nl.sprinterbe.global.exception.form.JsonParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.Resource;
@@ -145,7 +145,7 @@ public class StartingFormService {
             Resource resource = resourceLoader.getResource(filePath);
             return new String(Files.readAllBytes(resource.getFile().toPath()), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new FileReadException("Failed to read file: " + filePath, e);
+            throw new FileReadException();
         }
     }
 
@@ -155,7 +155,7 @@ public class StartingFormService {
             JsonNode contentNode = root.path("choices").get(0).path("message").path("content");
             return objectMapper.readValue(contentNode.asText(), StartingDataDto.class);
         } catch (Exception e) {
-            throw new JsonParseException("Failed to parse GPT response", e);
+            throw new JsonParseException();
         }
     }
 }

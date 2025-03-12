@@ -23,6 +23,11 @@ public class Task {
     @JoinColumn(name = "backlog_id", nullable = false)
     private Backlog backlog;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     private String content;
 
+    private Boolean checked;
 }

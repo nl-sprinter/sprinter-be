@@ -3,12 +3,14 @@ package com.nl.sprinterbe.domain.backlog.application;
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
-import com.nl.sprinterbe.domain.dailyScrum.dto.BacklogResponse;
+import com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse;
 import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.task.dao.TaskRepository;
+import com.nl.sprinterbe.domain.task.dto.TaskCheckStatusRequest;
+import com.nl.sprinterbe.domain.task.dto.TaskCheckStatusResponse;
 import com.nl.sprinterbe.domain.task.entity.Task;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
@@ -16,6 +18,10 @@ import com.nl.sprinterbe.domain.userbacklog.dao.UserBacklogRepository;
 import com.nl.sprinterbe.domain.userbacklog.entity.UserBacklog;
 import com.nl.sprinterbe.global.exception.NoDataFoundException;
 import com.nl.sprinterbe.global.exception.backlog.BacklogNotFoundException;
+import com.nl.sprinterbe.global.exception.task.TaskNotFoundException;
+import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
+import com.nl.sprinterbe.global.exception.user.UserNotHereException;
+import com.nl.sprinterbe.global.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +44,7 @@ public class BacklogServiceImpl implements BacklogService {
     private final SprintRepository sprintRepository;
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
+    private final SecurityUtil securityUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -202,11 +210,18 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public BacklogTaskResponse addTask(Long backlogId, BacklogTaskRequest request) {
-        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new NoDataFoundException("해당 Id의 Backlog가 없습니다."));
-        Task task = Task.builder().backlog(backlog).content(request.getContent()).build();
+    public void addTask(Long backlogId, TaskConentRequest request) {
+        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new BacklogNotFoundException());
+        Long currentUserId = Long.parseLong(securityUtil.getCurrentUserId().orElseThrow(() -> new UserNotHereException()));
+        User user = userRepository.findById(currentUserId).orElseThrow(() -> new UserNotFoundException());
+        Task task = Task.builder()
+                .backlog(backlog)
+                .content(request.getContent())
+                .user(user)
+                .checked(false)
+                .build();
+
         taskRepository.save(task);
-        return BacklogTaskResponse.of(task);
     }
 
     @Override
@@ -248,6 +263,38 @@ public class BacklogServiceImpl implements BacklogService {
     public List<SprintBacklogResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId) {
         List<Backlog> backlogs = backlogRepository.findBacklogsByProjectIdAndSprintId(projectId, sprintId);
         return backlogs.stream().map(SprintBacklogResponse::of).collect(Collectors.toList());
+    }
+
+    @Override
+    public TaskCheckStatusResponse updateTaskCheckStatus(Long taskId, TaskCheckStatusRequest request) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
+        task.setChecked(request.isChecked());
+        return new TaskCheckStatusResponse(task.getChecked());
+    }
+
+    @Override
+    public void updateTaskContent(Long taskId, TaskConentRequest request) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
+        task.setContent(request.getContent());
+    }
+
+    @Override
+    public void updateTaskUser(Long taskId, Long userId) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        task.setUser(user);
+    }
+
+    @Override
+    public BacklogTaskCompleteRateResponse getBacklogTaskCompleteRate(Long backlogId) {
+        backlogRepository.findById(backlogId).orElseThrow(() -> new BacklogNotFoundException());
+        List<Task> tasks = taskRepository.findByBacklogId(backlogId);
+        if(tasks.isEmpty()){
+            throw new TaskNotFoundException();
+        }
+        long totalTaskCount = tasks.size();
+        long completeTaskCount = tasks.stream().filter(Task::getChecked).count();
+        return new BacklogTaskCompleteRateResponse(completeTaskCount*100/totalTaskCount);
     }
 
     @NotNull
