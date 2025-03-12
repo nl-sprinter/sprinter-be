@@ -1,7 +1,6 @@
 package com.nl.sprinterbe.domain.backlog.entity;
 
-import com.nl.sprinterbe.domain.backlogComment.entity.BacklogComment;
-import com.nl.sprinterbe.domain.dailyScrum.entity.DailyScrum;
+import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import jakarta.persistence.*;

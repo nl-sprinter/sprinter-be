@@ -1,6 +1,6 @@
 package com.nl.sprinterbe.domain.like.entity;
 
-import com.nl.sprinterbe.domain.backlogComment.entity.BacklogComment;
+import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
 import com.nl.sprinterbe.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

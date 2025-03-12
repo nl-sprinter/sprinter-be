@@ -3,7 +3,7 @@ package com.nl.sprinterbe.domain.backlog.application;
 
 import com.nl.sprinterbe.domain.backlog.dto.BacklogDetailResponse;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogInfoResponse;
-import com.nl.sprinterbe.domain.dailyScrum.dto.BacklogResponse;
+import com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -23,7 +23,7 @@ public interface BacklogService {
 
     List<BacklogUserResponse> findBacklogExceptUsers(Long projectId, Long backlogId);
 
-    BacklogPostResponse createBacklog(BacklogPostRequest request,Long sprintId);
+    void createBacklog(SimpleBacklogRequest request, Long sprintId);
 
     BacklogTitleResponse updateBacklogTitle(BacklogTitleRequest request,Long backlogId);
 

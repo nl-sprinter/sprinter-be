@@ -2,21 +2,21 @@ package com.nl.sprinterbe.domain.project.api;
 
 import com.nl.sprinterbe.domain.backlog.application.BacklogService;
 import com.nl.sprinterbe.domain.backlog.dto.*;
-import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentRequest;
-import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentResponse;
-import com.nl.sprinterbe.domain.backlogComment.dto.BacklogCommentUpdateContent;
-import com.nl.sprinterbe.domain.backlogComment.service.BacklogCommentService;
-import com.nl.sprinterbe.domain.dailyScrum.application.DailyScrumService;
-import com.nl.sprinterbe.domain.dailyScrum.dto.*;
+import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
+import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
+import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentUpdateContent;
+import com.nl.sprinterbe.domain.backlogcomment.service.BacklogCommentService;
+import com.nl.sprinterbe.domain.dailyscrum.application.DailyScrumService;
+import com.nl.sprinterbe.domain.dailyscrum.dto.*;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
-import com.nl.sprinterbe.domain.project.dto.ProjectUserRequest;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
 import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
 import com.nl.sprinterbe.domain.sprint.dto.SprintUpdateRequest;
-import com.nl.sprinterbe.domain.user.dto.UserDetailResponse;
+import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
+import com.nl.sprinterbe.domain.user.dto.UserInfoWithTeamLeaderResponse;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.domain.project.application.ProjectService;
 import com.nl.sprinterbe.global.security.JwtUtil;
@@ -63,13 +63,19 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(summary = "프로젝트에 추가할 유저 검색", description = "프로젝트에 추가할 유저를 이메일 또는 닉네임으로 검색합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/users/search")
+    public ResponseEntity<List<UserInfoResponse>> searchUserToAddProject(@RequestParam String keyword, @PathVariable Long projectId) {
+        List<UserInfoResponse> userInfoResponse = projectService.searchUserToAddProject(keyword, projectId);
+        return ResponseEntity.status(HttpStatus.OK).body(userInfoResponse);
+    }
 
-    //프로젝트 유저추가(일단 이메일 받아와서 추가하는식)
-    @Operation(summary = "프로젝트 유저 추가", description = "프로젝트에 유저를 추가합니다.(현재는 이메일로 검색해서 추가)")
-    @PostMapping("/addUser/{projectId}")
-    public ResponseEntity<String> addUserToProject(@RequestBody UserDetailResponse request, @PathVariable Long projectId) {
-        projectService.addUserToProject(request, projectId);
-        return ResponseEntity.status(201).body("User added to project successfully");
+    // 프로젝트에 유저 추가
+    @Operation(summary = "프로젝트 유저 추가", description = "프로젝트에 userId로 유저를 추가합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/users")
+    public ResponseEntity<Void> addUserToProject(@RequestBody Map<String, Long> userIdMap, @PathVariable Long projectId) {
+        projectService.addUserToProject(userIdMap.get("userId"), projectId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     //프로젝트 삭제
@@ -80,13 +86,25 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    //유저 조회
-    // 3.4 User 엔티티의 Role 필요
-    @Operation(summary = "프로젝트 유저 조회", description = "프로젝트에 속한 유저들을 조회합니다.")
+    @Operation(summary = "프로젝트 유저 조회", description = "프로젝트에 속한 유저들을 조회합니다.") // 프론트 연동 OK
     @GetMapping("/{projectId}/users")
-    public ResponseEntity<List<ProjectUserRequest>> getUsers(@PathVariable Long projectId) {
-        List<ProjectUserRequest> users = projectService.getUsers(projectId);
-        return ResponseEntity.status(200).body(users);
+    public ResponseEntity<List<UserInfoWithTeamLeaderResponse>> getUsersInProject(@PathVariable Long projectId) {
+        List<UserInfoWithTeamLeaderResponse> users = projectService.getUsersInProject(projectId);
+        return ResponseEntity.status(HttpStatus.OK).body(users);
+    }
+
+    @Operation(summary = "유저가 팀장인지 확인", description = "유저가 팀장인지 확인합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/users/isleader")
+    public ResponseEntity<Boolean> checkUserIsProjectLeader(@PathVariable Long projectId, @RequestHeader("Authorization") String token) {
+        boolean isProjectLeader = projectService.checkUserIsProjectLeader(projectId, jwtUtil.removeBearer(token));
+        return ResponseEntity.status(HttpStatus.OK).body(isProjectLeader);
+    }
+
+    @Operation(summary = "프로젝트 유저 삭제", description = "프로젝트에 속한 유저를 삭제합니다.") // 프론트 연동 OK
+    @DeleteMapping("/{projectId}/users")
+    public ResponseEntity<Void> deleteUserInProject(@PathVariable Long projectId, @RequestHeader("Authorization") String token, @RequestParam Long targetUserId) {
+        projectService.deleteUserInProject(projectId, jwtUtil.removeBearer(token), targetUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @Operation(summary = "프로젝트 이름 업데이트", description = "프로젝트 이름을 업데이트합니다.") // 프론트 연동 OK
@@ -97,29 +115,7 @@ public class ProjectController {
     }
 
 
-    //     /api/v1/projects/{projectId}/sprints/{sprintId}/backlogs
-    //나의 Backlog + 나의 달성 현황
-    // 3.4 프론트랑 연결 하고 다시 봐야할듯
-    @Operation(summary = "내 Backlog 조회", description = "User에게 속한 Backlog 정보 제공")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/users/{userId}")
-    public ResponseEntity<Slice<BacklogInfoResponse>> getBacklogInfoList(@PathVariable Long projectId, @PathVariable Long userId, @PageableDefault(size = 5) Pageable pageable) {
-        return ResponseEntity.ok(backlogService.findBacklogListByProjectId(projectId, userId, pageable));
-    }
 
-
-    //Backlog 정보
-    @Operation(summary = "Backlog ", description = "backlogId의 Backlog의 제목 정보를 제공합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}")
-    public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
-    }
-
-    //백로그 제목 수정
-    @Operation(summary = "")
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/title")
-    public ResponseEntity<BacklogTitleResponse> updateBacklogTitle(@RequestBody BacklogTitleRequest request, @PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.updateBacklogTitle(request, backlogId));
-    }
 
 
     /**
@@ -178,6 +174,45 @@ public class ProjectController {
         projectService.updateSprintPeriod(projectId, request.getSprintPeriod());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Backlogs ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "스프린트 백로그 추가", description = "스프린트에 백로그를 title 과 weight 로 추가합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs")
+    public ResponseEntity<Void> addBacklogToSprint(@RequestBody SimpleBacklogRequest request, @PathVariable Long sprintId) {
+        backlogService.createBacklog(request, sprintId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    //     /api/v1/projects/{projectId}/sprints/{sprintId}/backlogs
+    //나의 Backlog + 나의 달성 현황
+    // 3.4 프론트랑 연결 하고 다시 봐야할듯
+    @Operation(summary = "내 Backlog 조회", description = "User에게 속한 Backlog 정보 제공")
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/users/{userId}")
+    public ResponseEntity<Slice<BacklogInfoResponse>> getBacklogInfoList(@PathVariable Long projectId, @PathVariable Long userId, @PageableDefault(size = 5) Pageable pageable) {
+        return ResponseEntity.ok(backlogService.findBacklogListByProjectId(projectId, userId, pageable));
+    }
+
+
+    //Backlog 정보
+    @Operation(summary = "Backlog ", description = "backlogId의 Backlog의 제목 정보를 제공합니다.")
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}")
+    public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId) {
+        return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
+    }
+
+    //백로그 제목 수정
+    @Operation(summary = "")
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/title")
+    public ResponseEntity<BacklogTitleResponse> updateBacklogTitle(@RequestBody BacklogTitleRequest request, @PathVariable Long backlogId) {
+        return ResponseEntity.ok(backlogService.updateBacklogTitle(request, backlogId));
+    }
+
 
     //Backlog에 걸려있는 유저
     @Operation(summary = "Backlog의 걸려있는 유저", description = "Backlog의 걸려있는 유저 리스트를 제공합니다.")
@@ -243,11 +278,6 @@ public class ProjectController {
         return ResponseEntity.ok(backlogService.findIssueByBacklogId(backlogId));
     }
 
-    //Backlog 추가 (한번에)
-//    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs")
-    public ResponseEntity<BacklogPostResponse> addBacklog(@RequestBody BacklogPostRequest request, @PathVariable Long sprintId) {
-        return ResponseEntity.ok(backlogService.createBacklog(request, sprintId));
-    }
 
     //---------------------------------- 수정 시 한번에 -----------------------------------
     //백로그 유저 수정 (삭제 , 삽입)

@@ -28,7 +28,7 @@ public class JoinController {
         return ResponseEntity.status(HttpStatus.OK).body("Check successful");
     }
 
-    @Operation(summary = "회원가입", description = "회원가입을 합니다.")
+    @Operation(summary = "회원가입", description = "회원가입을 합니다.") // 프론트 연동 OK
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponseDto> join(@RequestBody @Validated SignUpRequestDto request){
         userService.join(request);
@@ -36,14 +36,14 @@ public class JoinController {
     }
 
     //AccessToken은 프론트쪽에서 지워버리고 RefreshToken만 받아 DB에서 삭제
-    @Operation(summary = "로그아웃", description = "로그아웃을 합니다.")
+    @Operation(summary = "로그아웃", description = "로그아웃을 합니다.") // 프론트 연동 OK
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) throws LoginFormException {
         String refreshToken = jwtUtil.getRefreshToken(request);
         return userService.logout(refreshToken);
     }
 
-    @Operation(summary = "토큰 재발급", description = "토큰을 재발급합니다.")
+    @Operation(summary = "토큰 재발급", description = "토큰을 재발급합니다.") // 프론트 연동 OK
     @GetMapping("/refresh")
     public ResponseEntity<Void> refresh(HttpServletRequest request, HttpServletResponse response){
         String refresh= jwtUtil.getRefreshToken(request);

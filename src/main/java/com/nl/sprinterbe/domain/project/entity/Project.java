@@ -1,13 +1,11 @@
 package com.nl.sprinterbe.domain.project.entity;
 
-import com.nl.sprinterbe.domain.sprint.dto.SprintDto;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
-import com.nl.sprinterbe.domain.userProject.entity.UserProject;
+import com.nl.sprinterbe.domain.userproject.entity.UserProject;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

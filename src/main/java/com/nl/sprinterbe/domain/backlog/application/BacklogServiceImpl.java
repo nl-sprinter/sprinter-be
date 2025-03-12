@@ -3,7 +3,7 @@ package com.nl.sprinterbe.domain.backlog.application;
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
-import com.nl.sprinterbe.domain.dailyScrum.dto.BacklogResponse;
+import com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse;
 import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
@@ -12,9 +12,10 @@ import com.nl.sprinterbe.domain.task.dao.TaskRepository;
 import com.nl.sprinterbe.domain.task.entity.Task;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
-import com.nl.sprinterbe.domain.userBacklog.dao.UserBacklogRepository;
-import com.nl.sprinterbe.domain.userBacklog.entity.UserBacklog;
+import com.nl.sprinterbe.domain.userbacklog.dao.UserBacklogRepository;
+import com.nl.sprinterbe.domain.userbacklog.entity.UserBacklog;
 import com.nl.sprinterbe.global.exception.NoDataFoundException;
+import com.nl.sprinterbe.global.exception.backlog.BacklogNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
@@ -39,8 +40,8 @@ public class BacklogServiceImpl implements BacklogService {
 
     @Override
     @Transactional(readOnly = true)
-    public Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId,Pageable pageable ) {
-        return backlogRepository.findByProjectIdDesc(projectId,userId, pageable).map(BacklogInfoResponse::of);
+    public Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId, Pageable pageable) {
+        return backlogRepository.findByProjectIdDesc(projectId, userId, pageable).map(BacklogInfoResponse::of);
     }
 
 
@@ -55,7 +56,7 @@ public class BacklogServiceImpl implements BacklogService {
     @Transactional(readOnly = true)
     public List<BacklogTaskResponse> findTaskByBacklogId(Long backlogId) {
         List<Task> tasks = backlogRepository.findTasksByBacklogId(backlogId);
-        if(tasks.isEmpty()) {
+        if (tasks.isEmpty()) {
             throw new NoDataFoundException("해당 Id로 조회된 Task가 없습니다.");
         }
         return tasks.stream().map(BacklogTaskResponse::of).collect(Collectors.toList());
@@ -65,7 +66,7 @@ public class BacklogServiceImpl implements BacklogService {
     @Transactional(readOnly = true)
     public List<BacklogUserResponse> findUserByBacklogId(Long backlogId) {
         List<User> users = userBacklogRepository.findUsersByBacklogId(backlogId);
-        if(users.isEmpty()) {
+        if (users.isEmpty()) {
             throw new NoDataFoundException("해당 Id로 조회된 유저가 없습니다.");
         }
         return users.stream().map(BacklogUserResponse::of).collect(Collectors.toList());
@@ -75,7 +76,7 @@ public class BacklogServiceImpl implements BacklogService {
     @Transactional(readOnly = true)
     public List<BacklogIssueResponse> findIssueByBacklogId(Long backlogId) {
         List<Issue> issues = backlogRepository.findIssuesByBacklogId(backlogId);
-        if(issues.isEmpty()) {
+        if (issues.isEmpty()) {
             throw new NoDataFoundException("해당 Id로 조회된 Issue가 없습니다.");
         }
         return issues.stream().map(BacklogIssueResponse::of).collect(Collectors.toList());
@@ -94,16 +95,15 @@ public class BacklogServiceImpl implements BacklogService {
     // backlogId와 task의 content로 연관관계 주입
     // content와 checked=false로 issue 연관관계 주입
     @Override
-    public BacklogPostResponse createBacklog(BacklogPostRequest request,Long sprintId) {
-        Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(() -> new NoDataFoundException("해당 Id로 조회된 Sprint가 없습니다."));
-        Backlog newBacklog = Backlog.builder().title(request.getTitle()).sprint(sprint).isFinished(false).weight(request.getWeight()).build();
+    public void createBacklog(SimpleBacklogRequest request, Long sprintId) {
+        Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(BacklogNotFoundException::new);
+        Backlog newBacklog = Backlog.builder()
+                .title(request.getTitle())
+                .sprint(sprint)
+                .weight(request.getWeight())
+                .isFinished(false)
+                .build();
         backlogRepository.save(newBacklog);
-        List<User> savedUsers = getUsers(request, newBacklog);
-        List<Task> savedTasks = getTasks(request, newBacklog);
-        Issue newIssue = Issue.builder().backlog(newBacklog).checked(false).content(request.getIssue().getContent()).build();
-        issueRepository.save(newIssue);
-
-        return BacklogPostResponse.of(newBacklog,request.getWeight(),savedUsers,savedTasks,newIssue);
     }
 
     @Override
@@ -276,7 +276,6 @@ public class BacklogServiceImpl implements BacklogService {
                 .collect(Collectors.toList());
         return savedUsers;
     }
-
 
 
 }

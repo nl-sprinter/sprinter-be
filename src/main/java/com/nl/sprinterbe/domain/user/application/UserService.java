@@ -4,14 +4,14 @@ import com.nl.sprinterbe.domain.project.dto.ProjectResponse;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.dto.UserUpdateRequest;
-import com.nl.sprinterbe.domain.userProject.entity.UserProject;
-import com.nl.sprinterbe.domain.refreshToken.application.RefreshTokenService;
+import com.nl.sprinterbe.domain.userproject.entity.UserProject;
+import com.nl.sprinterbe.domain.refreshtoken.application.RefreshTokenService;
 import com.nl.sprinterbe.domain.user.dao.SignUpRequestDto;
-import com.nl.sprinterbe.domain.refreshToken.entity.RefreshToken;
+import com.nl.sprinterbe.domain.refreshtoken.entity.RefreshToken;
 import com.nl.sprinterbe.global.exception.LoginFormException;
-import com.nl.sprinterbe.domain.refreshToken.dao.RefreshTokenRepository;
+import com.nl.sprinterbe.domain.refreshtoken.dao.RefreshTokenRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
-import com.nl.sprinterbe.domain.userProject.dao.UserProjectRepository;
+import com.nl.sprinterbe.domain.userproject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserPasswordNotEqualsException;
@@ -124,6 +124,10 @@ public class UserService {
     public UserInfoResponse getUserInfo(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return UserInfoResponse.of(user);
+    }
+
+    public void deleteUser(Long userId) {
+
     }
 
 }
