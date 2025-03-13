@@ -13,37 +13,37 @@ import org.springframework.data.domain.Slice;
 import java.util.List;
 
 public interface BacklogService {
-    Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId,Pageable pageable );
+    Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId, Pageable pageable);
 
     BacklogDetailResponse findBacklogDetailById(Long backlogId);
 
-    List<BacklogUserResponse> findUserByBacklogId(Long backlogId);
+    List<UserBacklogResponse> findUserByBacklogId(Long backlogId);
 
     List<BacklogTaskResponse> findTasksByBacklogId(Long backlogId);
 
-    List<BacklogIssueResponse> findIssueByBacklogId(Long backlogId);
+    List<BacklogIssueResponse> findIssuesByBacklogId(Long backlogId);
 
-    List<BacklogUserResponse> findBacklogExceptUsers(Long projectId, Long backlogId);
+    List<UserBacklogResponse> findBacklogExceptUsers(Long projectId, Long backlogId);
 
     void createBacklog(SimpleBacklogRequest request, Long sprintId);
 
-    BacklogTitleResponse updateBacklogTitle(BacklogTitleRequest request,Long backlogId);
+    void updateBacklog(BacklogUpdateRequest backlogUpdateRequest, Long backlogId);
 
-    List<BacklogUserResponse> updateBacklogUsers(Long backlogId, BacklogUserUpdateRequest request);
+    List<UserBacklogResponse> updateBacklogUsers(Long backlogId, BacklogUserUpdateRequest request);
 
     List<BacklogTaskResponse> updateBacklogTasks(Long backlogId, BacklogTaskUpdateRequest request);
 
-    BacklogUserResponse addBacklogUser(Long backlogId, Long userId);
+    UserBacklogResponse addUserInBacklog(Long backlogId, Long userId);
 
-    void deleteUser(Long backlogId,Long userId);
+    void deleteUserInBacklog(Long backlogId, Long userId);
 
     void deleteTask(Long taskId);
 
     void addTaskToBacklog(Long backlogId, String content);
 
-    BacklogIssueResponse addIssue(Long backlogId,BacklogIssueRequest request);
+    BacklogIssueResponse addIssueToBacklog(Long backlogId, String content);
 
-    BacklogIssueResponse updateIssue(Long issueId,BacklogIssueRequest request);
+    void updateIssue(Long issueId, IssueRequest issueRequest);
 
     void deleteIssue(Long issueId);
 

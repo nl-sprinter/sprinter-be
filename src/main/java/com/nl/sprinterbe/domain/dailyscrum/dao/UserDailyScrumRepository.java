@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.dailyscrum.dao;
 
 import com.nl.sprinterbe.domain.dailyscrum.entity.UserDailyScrum;
+import com.nl.sprinterbe.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +19,8 @@ public interface UserDailyScrumRepository extends JpaRepository<UserDailyScrum, 
     Optional<UserDailyScrum> findByDailyScrumIdAndUserId(
             @Param("dailyScrumId") Long dailyScrumId,
             @Param("userId") Long userId);
-
+  
+ 
     void deleteByUserUserId(Long userId);
+
 }

@@ -25,6 +25,7 @@ public class Backlog {
     private String title;
 
     @Column(name = "weight")
+    @Setter
     private Long weight;
 
     @Column(name = "is_finish")

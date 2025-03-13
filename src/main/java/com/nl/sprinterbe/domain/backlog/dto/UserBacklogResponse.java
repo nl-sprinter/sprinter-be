@@ -6,16 +6,14 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class BacklogUserResponse {
+public class UserBacklogResponse {
     private Long userId;
     private String nickname;
-    private String email;
 
-    public static BacklogUserResponse of(User user) {
-        return BacklogUserResponse.builder()
+    public static UserBacklogResponse of(User user) {
+        return UserBacklogResponse.builder()
                 .userId(user.getUserId())
                 .nickname(user.getNickname())
-                .email(user.getEmail())
                 .build();
     }
 }

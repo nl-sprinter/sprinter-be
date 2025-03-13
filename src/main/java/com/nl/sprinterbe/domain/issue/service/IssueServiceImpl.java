@@ -4,8 +4,7 @@ import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
 import com.nl.sprinterbe.domain.issue.dto.CreateIssueRequest;
-import com.nl.sprinterbe.domain.issue.dto.IssueCheckStatusRequest;
-import com.nl.sprinterbe.domain.issue.dto.IssueCheckStatusResponse;
+import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 
@@ -54,13 +53,11 @@ public class IssueServiceImpl implements IssueService {
 
 
     @Override
-    public IssueRepsonse deleteIssue(Long issueId) {
+    public void deleteIssue(Long issueId) {
         Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(() -> new IssueNotFoundException());
+                .orElseThrow(IssueNotFoundException::new);
 
         issueRepository.delete(issue);
-
-        return IssueRepsonse.of(issueId);
     }
 
     @Override
@@ -99,13 +96,12 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public IssueCheckStatusResponse updateIssueCheckStatus(Long issueId, IssueCheckStatusRequest issueCheckStatusRequest) {
+    public IssueCheckedDto updateIssueChecked(Long issueId, boolean checked) {
         Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(() -> new IssueNotFoundException());
-
-        issue.setChecked(issueCheckStatusRequest.isChecked());
-
-        return new IssueCheckStatusResponse(issue.getChecked());
+                .orElseThrow(IssueNotFoundException::new);
+        checked = !checked;
+        issue.setChecked(checked);
+        return new IssueCheckedDto(checked);
     }
 
 

@@ -13,6 +13,7 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class Issue {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "issue_id")
@@ -21,8 +22,6 @@ public class Issue {
     private String content;
 
     private Boolean checked;
-
-    // TODO: user랑 연관관계 매핑해야함
 
     @ManyToOne
     @JoinColumn(name = "backlog_id", nullable = false)
