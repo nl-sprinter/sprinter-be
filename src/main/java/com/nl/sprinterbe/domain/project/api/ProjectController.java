@@ -3,7 +3,6 @@ package com.nl.sprinterbe.domain.project.api;
 import com.nl.sprinterbe.domain.backlog.application.BacklogService;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
-import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentFromResponse;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentUpdateContent;
 import com.nl.sprinterbe.domain.backlogcomment.service.BacklogCommentService;
@@ -245,10 +244,17 @@ public class ProjectController {
         return ResponseEntity.ok(backlogService.addBacklogUser(backlogId, userId));
     }
 
-    //Backlog에 걸려있는 Task
+    @Operation(summary = "Task 조회", description = "백로그에 포함된 Task 를 조회합니다.")
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks")
-    public ResponseEntity<List<BacklogTaskResponse>> getBacklogTask(@PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.findTaskByBacklogId(backlogId));
+    public ResponseEntity<List<BacklogTaskResponse>> getTasksInBacklog(@PathVariable Long backlogId) {
+        return ResponseEntity.status(HttpStatus.OK).body(backlogService.findTasksByBacklogId(backlogId));
+    }
+
+    @Operation(summary = "백로그에 Task 추가", description = "백로그에 Task 를 추가합니다.")
+    @PostMapping(value = "/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> addTaskToBacklog(@PathVariable Long backlogId, @RequestBody TaskRequest taskRequest) {
+        backlogService.addTaskToBacklog(backlogId, taskRequest.getContent());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     //Backlog에 Task 완료된 비율 응답 3/12
@@ -382,13 +388,7 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    //업무 add 3/12
-    @Operation(summary = "백로그에 업무 추가", description = "업무를 추가합니다.")
-    @PostMapping(value = "/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> addTask(@PathVariable Long backlogId, @RequestBody TaskConentRequest request) {
-        backlogService.addTask(backlogId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
+
 
     //업무 check 설정/헤제  3/12
     @Operation(summary = "업무 check 설정/해제", description = "업무의 check를 설정/해제합니다.")
@@ -400,7 +400,7 @@ public class ProjectController {
     //업무 content 수정 3/12
     @Operation(summary = "업무 content 수정", description = "업무의 content를 수정합니다.")
     @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/content")
-    public ResponseEntity<Void> updateTaskContent(@PathVariable Long taskId, @RequestBody TaskConentRequest request) {
+    public ResponseEntity<Void> updateTaskContent(@PathVariable Long taskId, @RequestBody TaskRequest request) {
         backlogService.updateTaskContent(taskId, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

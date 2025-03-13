@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
+
     @Query("SELECT t FROM Task t WHERE t.backlog.backlogId=:backlogId")
     List<Task> findByBacklogId(@Param("backlogId") Long backlogId);
 

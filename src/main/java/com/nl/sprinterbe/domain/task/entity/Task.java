@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Builder
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,4 +29,13 @@ public class Task {
     private String content;
 
     private Boolean checked;
+
+
+    @Builder
+    public Task(Backlog backlog, String content, boolean checked) {
+        this.backlog = backlog;
+        this.content = content;
+        this.checked = checked;
+    }
+
 }

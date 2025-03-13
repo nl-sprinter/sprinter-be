@@ -19,7 +19,7 @@ public interface BacklogService {
 
     List<BacklogUserResponse> findUserByBacklogId(Long backlogId);
 
-    List<BacklogTaskResponse> findTaskByBacklogId(Long backlogId);
+    List<BacklogTaskResponse> findTasksByBacklogId(Long backlogId);
 
     List<BacklogIssueResponse> findIssueByBacklogId(Long backlogId);
 
@@ -39,7 +39,7 @@ public interface BacklogService {
 
     void deleteTask(Long taskId);
 
-    void addTask(Long backlogId, TaskConentRequest request);
+    void addTaskToBacklog(Long backlogId, String content);
 
     BacklogIssueResponse addIssue(Long backlogId,BacklogIssueRequest request);
 
@@ -55,7 +55,7 @@ public interface BacklogService {
 
     TaskCheckStatusResponse updateTaskCheckStatus(Long taskId, TaskCheckStatusRequest request);
 
-    void updateTaskContent(Long taskId, TaskConentRequest request);
+    void updateTaskContent(Long taskId, TaskRequest request);
 
     void updateTaskUser(Long taskId, Long userId);
 

@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.user.entity;
 //import com.nl.sprinterbe.entity.*;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

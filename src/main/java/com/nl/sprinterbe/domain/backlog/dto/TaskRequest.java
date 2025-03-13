@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class TaskConentRequest {
+public class TaskRequest {
     private String content;
 }

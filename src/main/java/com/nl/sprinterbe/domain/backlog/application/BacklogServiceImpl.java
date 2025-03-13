@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,12 +61,10 @@ public class BacklogServiceImpl implements BacklogService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BacklogTaskResponse> findTaskByBacklogId(Long backlogId) {
-        List<Task> tasks = backlogRepository.findTasksByBacklogId(backlogId);
-        if (tasks.isEmpty()) {
-            throw new NoDataFoundException("해당 Id로 조회된 Task가 없습니다.");
-        }
-        return tasks.stream().map(BacklogTaskResponse::of).collect(Collectors.toList());
+    public List<BacklogTaskResponse> findTasksByBacklogId(Long backlogId) {
+        return backlogRepository.findTasksByBacklogId(backlogId).stream()
+                .map(BacklogTaskResponse::of)
+                .toList();
     }
 
     @Override
@@ -210,17 +207,13 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public void addTask(Long backlogId, TaskConentRequest request) {
-        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new BacklogNotFoundException());
-        Long currentUserId = Long.parseLong(securityUtil.getCurrentUserId().orElseThrow(() -> new UserNotHereException()));
-        User user = userRepository.findById(currentUserId).orElseThrow(() -> new UserNotFoundException());
+    public void addTaskToBacklog(Long backlogId, String content) {
+        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(BacklogNotFoundException::new);
         Task task = Task.builder()
                 .backlog(backlog)
-                .content(request.getContent())
-                .user(user)
+                .content(content)
                 .checked(false)
                 .build();
-
         taskRepository.save(task);
     }
 
@@ -274,7 +267,7 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public void updateTaskContent(Long taskId, TaskConentRequest request) {
+    public void updateTaskContent(Long taskId, TaskRequest request) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
         task.setContent(request.getContent());
     }
