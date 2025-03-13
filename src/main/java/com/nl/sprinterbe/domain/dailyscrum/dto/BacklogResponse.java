@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 public class BacklogResponse {
     private Long backlogId;
-    private Long sprinterId;
     private Boolean isFinished;
     private Long weight;
     private String title;
@@ -17,7 +16,6 @@ public class BacklogResponse {
     public static BacklogResponse of(Backlog backlog) {
         return BacklogResponse.builder()
                 .backlogId(backlog.getBacklogId())
-                .sprinterId(backlog.getSprint().getSprintId())
                 .isFinished(backlog.getIsFinished())
                 .weight(backlog.getWeight())
                 .title(backlog.getTitle())

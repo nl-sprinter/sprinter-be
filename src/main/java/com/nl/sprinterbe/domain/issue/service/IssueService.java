@@ -1,8 +1,7 @@
 package com.nl.sprinterbe.domain.issue.service;
 
 import com.nl.sprinterbe.domain.issue.dto.CreateIssueRequest;
-import com.nl.sprinterbe.domain.issue.dto.IssueCheckStatusRequest;
-import com.nl.sprinterbe.domain.issue.dto.IssueCheckStatusResponse;
+import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
 
 import java.util.List;
@@ -11,7 +10,7 @@ public interface IssueService {
 
     IssueRepsonse createIssue(CreateIssueRequest createIssueRequest, Long backlogId);
 
-    IssueRepsonse deleteIssue(Long issueId);
+    void deleteIssue(Long issueId);
 
     IssueRepsonse updateIssue(Long issueId, CreateIssueRequest createIssueRequest);
 
@@ -21,5 +20,5 @@ public interface IssueService {
 
     IssueRepsonse getIssue(Long issueId);
 
-    IssueCheckStatusResponse updateIssueCheckStatus(Long issueId, IssueCheckStatusRequest issueCheckStatusRequest);
+    IssueCheckedDto updateIssueChecked(Long issueId, boolean checked);
 }
