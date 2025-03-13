@@ -33,12 +33,10 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
     public BacklogCommentFromResponse createComment(Long backlogId, Long userId, BacklogCommentRequest request) {
         Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new BacklogNotFoundException());
         Optional<User> user = userRepository.findById(userId);
-        BacklogComment parent = null;
         BacklogComment newComment = BacklogComment.of(request, backlog, user);
 
         if(request.getParentCommentId() != null) {
-            parent = backlogCommentRepository.findById(request.getParentCommentId()).orElseThrow(() -> new BacklogCommentNotFoundException());
-            newComment.setParent(parent);
+            newComment.setParentCommentId(request.getParentCommentId());
         }
 
         BacklogComment savedComment = backlogCommentRepository.save(newComment);
@@ -105,8 +103,10 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
             BacklogCommentFromResponse commentResponse = BacklogCommentFromResponse.of(comment);
 
             map.put(commentResponse.getBacklogCommentId(), commentResponse);
-            if (comment.getParentComment() != null) {
-                map.get(comment.getParentComment().getBacklogCommentId()).getChildComments().add(commentResponse);
+            if (comment.getParentCommentId() != null) {
+                map.get(comment.getParentCommentId())
+                        .getChildComments()
+                        .add(commentResponse);
             } else {
                 commentResponses.add(commentResponse);
             }

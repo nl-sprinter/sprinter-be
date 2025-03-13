@@ -146,6 +146,8 @@ public class UserService {
 
         userBacklogRepository.deleteByUserUserId(userId);
 
+        userProjectRepository.deleteByUserUserId(userId);
+
         List<Task> tasks = taskRepository.findByUserId(userId);
         tasks
                 .stream()
