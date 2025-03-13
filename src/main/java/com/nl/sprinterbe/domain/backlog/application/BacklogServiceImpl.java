@@ -71,9 +71,6 @@ public class BacklogServiceImpl implements BacklogService {
     @Transactional(readOnly = true)
     public List<BacklogUserResponse> findUserByBacklogId(Long backlogId) {
         List<User> users = userBacklogRepository.findUsersByBacklogId(backlogId);
-        if (users.isEmpty()) {
-            throw new NoDataFoundException("해당 Id로 조회된 유저가 없습니다.");
-        }
         return users.stream().map(BacklogUserResponse::of).collect(Collectors.toList());
     }
 
@@ -273,11 +270,17 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public void updateTaskUser(Long taskId, Long userId) {
+    public void addTaskUser(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
-        task.setUser(user);
+        task.setUserId(userId);
     }
+
+    @Override
+    public void deleteTaskUser(Long taskId, Long userId) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
+        task.setUserId(null);
+    }
+
 
     @Override
     public BacklogTaskCompleteRateResponse getBacklogTaskCompleteRate(Long backlogId) {

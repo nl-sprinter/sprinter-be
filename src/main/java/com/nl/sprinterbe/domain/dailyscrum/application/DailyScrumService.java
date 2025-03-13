@@ -17,7 +17,7 @@ public interface DailyScrumService {
 
     List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDate startOfDay);
 
-    DailyScrumPostResponse createDailyScrum(DailyScrumPostRequest request , Long sprintId);
+    void createDailyScrum(Long sprintId);
 
     void removeBacklog(Long dailyScrumId, Long backlogId);
 

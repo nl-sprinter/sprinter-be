@@ -17,6 +17,8 @@ import com.nl.sprinterbe.domain.userproject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
 import com.nl.sprinterbe.global.exception.NoDataFoundException;
 import com.nl.sprinterbe.global.exception.sprint.SprintNotFoundException;
+import com.nl.sprinterbe.global.exception.user.UserNotHereException;
+import com.nl.sprinterbe.global.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,7 @@ public class DailyScrumServiceImpl implements DailyScrumService {
     private final DailyScrumBacklogRepository dailyScrumBacklogRepository;
     private final SprintRepository sprintRepository;
     private final UserProjectRepository userProjectRepository;
+    private final SecurityUtil securityUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -82,51 +85,22 @@ public class DailyScrumServiceImpl implements DailyScrumService {
     }
 
     @Override
-    public DailyScrumPostResponse createDailyScrum(DailyScrumPostRequest request, Long sprintId) {
+    public void createDailyScrum(Long sprintId) {
         Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(() -> new SprintNotFoundException());
+        Long currentUserId = Long.parseLong(securityUtil.getCurrentUserId().orElseThrow(() -> new UserNotHereException()));
+        User user = userRepository.findById(currentUserId).orElseThrow(() -> new UserNotHereException());
         // 1. DailyScrum 엔티티 생성
         DailyScrum dailyScrum = DailyScrum.builder()
-                .title(request.getTitle())
                 .sprint(sprint)
-                .content(request.getContent())
                 .build();
         dailyScrumRepository.save(dailyScrum);
 
-        List<User> users = new ArrayList<>();
+        UserDailyScrum userDailyScrum = UserDailyScrum.builder()
+                .dailyScrum(dailyScrum)
+                .user(user)
+                .build();
 
-        // 2. users 목록을 이용해 User 엔티티들을 DailyScrum과 연결
-        if (request.getUsers() != null) {
-            request.getUsers().forEach(userDto -> {
-                User user = userRepository.findById(userDto.getUserId())
-                        .orElseThrow(() -> new NoDataFoundException("해당 User가 없습니다. id: " + userDto.getUserId()));
-                userDailyScrumRepository.save(UserDailyScrum.builder().user(user).dailyScrum(dailyScrum).build());
-                users.add(user);
-            });
-        }
-
-        // 3. backlogs 목록을 이용해 Backlog 엔티티들을 DailyScrum과 연결
-        if (request.getBacklogs() != null) {
-            request.getBacklogs().forEach(backlogDto -> {
-                Backlog backlog = backlogRepository.findById(backlogDto.getBacklogId())
-                        .orElseThrow(() -> new NoDataFoundException("해당 Backlog가 없습니다. id: " + backlogDto.getBacklogId()));
-
-                // 중간 테이블 엔티티 생성 후 저장
-                DailyScrumBacklog dsb = DailyScrumBacklog.of(dailyScrum, backlog);
-                dailyScrumBacklogRepository.save(dsb);
-            });
-        }
-
-        // 4. 저장된 DailyScrum 엔티티를 기반으로 응답 DTO 구성
-        List<DailyScrumPostResponse.UserDto> userDtos = users.stream()
-                .map(user -> DailyScrumPostResponse.UserDto.of(user))
-                .collect(Collectors.toList());
-
-        List<DailyScrumPostResponse.BacklogDto> backlogDtos = dailyScrumBacklogRepository.findByDailyScrum(dailyScrum)
-                .stream()
-                .map(dsb -> DailyScrumPostResponse.BacklogDto.of(dsb.getBacklog()))
-                .collect(Collectors.toList());
-
-        return DailyScrumPostResponse.of(dailyScrum, userDtos, backlogDtos);
+        userDailyScrumRepository.save(userDailyScrum);
     }
 
     @Override

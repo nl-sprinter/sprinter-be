@@ -3,18 +3,17 @@ package com.nl.sprinterbe.domain.user.entity;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 @Table(name = "\"user\"")
 public class User {
@@ -45,6 +44,27 @@ public class User {
                 .anyMatch(UserProject::getIsProjectLeader);
     }
 
+    @Override
+    public String toString() {
+        return "User(userId=" + userId + 
+               ", nickname=" + nickname + 
+               ", email=" + email + 
+               ", provider=" + provider + 
+               ", role=" + role + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(userId, user.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId);
+    }
 
 //    @OneToMany(mappedBy = "user")
 //    private List<Todo> todos = new ArrayList<>();

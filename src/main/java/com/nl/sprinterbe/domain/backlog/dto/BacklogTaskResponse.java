@@ -17,7 +17,7 @@ public class BacklogTaskResponse {
         return BacklogTaskResponse.builder()
                 .taskId(task.getTaskId())
                 .content(task.getContent())
-                .userId(task.getUser().getUserId())
+                .userId(task.getUserId())
                 .checked(task.getChecked())
                 .build();
     }

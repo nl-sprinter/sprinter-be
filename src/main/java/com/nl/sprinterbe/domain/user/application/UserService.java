@@ -1,9 +1,14 @@
 package com.nl.sprinterbe.domain.user.application;
 
+import com.nl.sprinterbe.domain.backlogcomment.dao.BacklogCommentRepository;
+import com.nl.sprinterbe.domain.dailyscrum.dao.UserDailyScrumRepository;
 import com.nl.sprinterbe.domain.project.dto.ProjectResponse;
 import com.nl.sprinterbe.domain.project.entity.Project;
+import com.nl.sprinterbe.domain.task.dao.TaskRepository;
+import com.nl.sprinterbe.domain.task.entity.Task;
 import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.dto.UserUpdateRequest;
+import com.nl.sprinterbe.domain.userbacklog.dao.UserBacklogRepository;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
 import com.nl.sprinterbe.domain.refreshtoken.application.RefreshTokenService;
 import com.nl.sprinterbe.domain.user.dao.SignUpRequestDto;
@@ -39,6 +44,15 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final UserProjectRepository userProjectRepository;
     private final JwtUtil jwtUtil;
+    // 댓글
+    private final BacklogCommentRepository backlogCommentRepository;
+    // 유저 백로그
+    private final UserDailyScrumRepository userDailyScrumRepository;
+    // Task
+    private final TaskRepository taskRepository;
+    // UserBacklog
+    private final UserBacklogRepository userBacklogRepository;
+
 
     public void updateUser(Long userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId)
@@ -128,6 +142,31 @@ public class UserService {
 
     public void deleteUser(Long userId) {
 
-    }
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
+        userBacklogRepository.deleteByUserUserId(userId);
+
+        List<Task> tasks = taskRepository.findByUserId(userId);
+        tasks
+                .stream()
+                .map(task -> {
+                    task.setUserId(null);
+                    return task;
+                })
+                .collect(Collectors.toList());
+
+        userDailyScrumRepository.deleteByUserUserId(userId);
+
+//        List<BacklogComment> backlogComments = backlogCommentRepository.findByUserUserId(userId);
+//        backlogComments
+//                .stream()
+//                .map(backlogComment -> {
+//                    backlogComment.setUser(null);
+//                    return backlogComment;
+//                })
+//                .collect(Collectors.toList());
+
+        backlogCommentRepository.deleteByUserUserId(user.getUserId());
+
+    }
 }

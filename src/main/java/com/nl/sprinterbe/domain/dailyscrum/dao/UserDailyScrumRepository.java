@@ -18,4 +18,6 @@ public interface UserDailyScrumRepository extends JpaRepository<UserDailyScrum, 
     Optional<UserDailyScrum> findByDailyScrumIdAndUserId(
             @Param("dailyScrumId") Long dailyScrumId,
             @Param("userId") Long userId);
+
+    void deleteByUserUserId(Long userId);
 }

@@ -406,13 +406,21 @@ public class ProjectController {
     }
 
     //업무 user 수정 3/12
-    @Operation(summary = "업무 user 수정", description = "업무의 user를 수정합니다.")
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/user")
-    public ResponseEntity<Void> updateTaskUser(@PathVariable Long taskId, @RequestBody Map<String, Long> userIdMap) {
-        backlogService.updateTaskUser(taskId, userIdMap.get("userId"));
+
+    //add
+    @Operation(summary = "업무 user 추가", description = "업무의 user를 수정합니다.")
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/user")
+    public ResponseEntity<Void> addTaskUser(@PathVariable Long taskId, @RequestBody Map<String, Long> userIdMap) {
+        backlogService.addTaskUser(taskId, userIdMap.get("userId"));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    //delete
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/user")
+    public ResponseEntity<Void> deleteTaskUser(@PathVariable Long taskId, @RequestBody Map<String, Long> userIdMap) {
+        backlogService.deleteTaskUser(taskId, userIdMap.get("userId"));
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 
     //---------------------------------- 수정 시 하나씩 -----------------------------------
@@ -458,13 +466,11 @@ public class ProjectController {
     }
 
     //DailyScrum 생성  3/12
-    //DailyScrumPostRequest dto 삭제해야하는데 로직이 좀 어려워서 준혁이한테 맡길 예정
     @PostMapping("/{projectId}/sprints/{sprintId}/dailyscrums")
-    public ResponseEntity<Void> addDailyScrum(@RequestBody DailyScrumPostRequest request, @PathVariable Long sprintId) {
+    public ResponseEntity<Void> addDailyScrum(@PathVariable Long sprintId) {
         //projectId 파라미터는 User가 project Leader인지 위해서
-        dailyScrumService.createDailyScrum(request, sprintId);
+        dailyScrumService.createDailyScrum(sprintId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-
     }
 
 
