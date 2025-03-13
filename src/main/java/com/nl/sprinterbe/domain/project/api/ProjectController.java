@@ -403,13 +403,21 @@ public class ProjectController {
     }
 
     //업무 user 수정 3/12
-    @Operation(summary = "업무 user 수정", description = "업무의 user를 수정합니다.")
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/user")
-    public ResponseEntity<Void> updateTaskUser(@PathVariable Long taskId, @RequestBody Map<String, Long> userIdMap) {
-        backlogService.updateTaskUser(taskId, userIdMap.get("userId"));
+
+    //add
+    @Operation(summary = "업무 user 추가", description = "업무의 user를 수정합니다.")
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/user")
+    public ResponseEntity<Void> addTaskUser(@PathVariable Long taskId, @RequestBody Map<String, Long> userIdMap) {
+        backlogService.addTaskUser(taskId, userIdMap.get("userId"));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    //delete
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/user")
+    public ResponseEntity<Void> deleteTaskUser(@PathVariable Long taskId, @RequestBody Map<String, Long> userIdMap) {
+        backlogService.deleteTaskUser(taskId, userIdMap.get("userId"));
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     //---------------------------------- 수정 시 하나씩 -----------------------------------
 
@@ -496,7 +504,6 @@ public class ProjectController {
     public ResponseEntity<List<DailyScrumDetailResponse>> getTodayDailyScrumDetail() {
         return ResponseEntity.ok(dailyScrumService.findDailyScrumByDate(LocalDate.now()));
     }
-
 
 
     //backlog 중 DailyScrum에 걸려있지 않고 Sprint에는 해당되는 백로그 조회

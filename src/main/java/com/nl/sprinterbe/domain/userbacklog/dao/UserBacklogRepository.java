@@ -24,4 +24,6 @@ public interface UserBacklogRepository extends JpaRepository<UserBacklog, Long> 
     void deleteByUserIdAndBacklogId(@Param("userId") Long userId, @Param("backlogId") Long backlogId);
 
     Optional<UserBacklog> findByUserAndBacklog(User user, Backlog backlog);
+
+    void deleteByUserUserId(Long userId);
 }

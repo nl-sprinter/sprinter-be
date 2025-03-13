@@ -57,7 +57,9 @@ public interface BacklogService {
 
     void updateTaskContent(Long taskId, TaskRequest request);
 
-    void updateTaskUser(Long taskId, Long userId);
+    void addTaskUser(Long taskId, Long userId);
+
+    void deleteTaskUser(Long taskId, Long userId);
 
     BacklogTaskCompleteRateResponse getBacklogTaskCompleteRate(Long backlogId);
 }

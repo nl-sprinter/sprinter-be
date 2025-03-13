@@ -42,18 +42,10 @@ public class BacklogComment {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_comment_id")
-    private BacklogComment parentComment;
+    private Long parentCommentId;
 
-    @OneToMany(
-            mappedBy = "parentComment",
-            fetch = FetchType.LAZY)
-    private List<BacklogComment> childComments = new ArrayList<>();
-
-    public void setParent(BacklogComment parent) {
-        this.parentComment = parent;
-        parent.getChildComments().add(this);
+    public void setParentCommentId(Long parentCommentId) {
+        this.parentCommentId = parentCommentId;
     }
 
     public static BacklogComment of(BacklogCommentRequest request, Backlog backlog, Optional<User> user) {

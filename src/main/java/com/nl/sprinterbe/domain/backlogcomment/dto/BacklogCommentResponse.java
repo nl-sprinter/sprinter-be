@@ -25,7 +25,7 @@ public class BacklogCommentResponse {
                 .content(backlogComment.getContent())
                 .createdDate(backlogComment.getCreatedAt())
                 .nickname(backlogComment.getUser().getNickname())
-                .parentCommentId(backlogComment.getParentComment() == null ? 0 : backlogComment.getParentComment().getBacklogCommentId())
+                .parentCommentId(backlogComment.getParentCommentId() == null ? 0 : backlogComment.getParentCommentId())
                 .build();
     }
 }

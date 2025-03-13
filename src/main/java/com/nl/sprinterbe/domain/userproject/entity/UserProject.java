@@ -3,15 +3,15 @@ package com.nl.sprinterbe.domain.userproject.entity;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.Objects;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 public class UserProject {
     @Id
@@ -34,5 +34,26 @@ public class UserProject {
         this.user = user;
         this.project = project;
         this.isProjectLeader = isProjectLeader;
+    }
+
+    @Override
+    public String toString() {
+        return "UserProject(id=" + id + 
+               ", userId=" + (user != null ? user.getUserId() : null) + 
+               ", projectId=" + (project != null ? project.getProjectId() : null) + 
+               ", isProjectLeader=" + isProjectLeader + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserProject that = (UserProject) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
