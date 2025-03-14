@@ -6,7 +6,6 @@ import com.nl.sprinterbe.domain.backlogcomment.dao.BacklogCommentRepository;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentFromResponse;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
-import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentUpdateContent;
 import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
@@ -44,18 +43,6 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
     }
 
 
-
-    @Override
-    public BacklogCommentFromResponse updateComment(Long userId, Long commentId, BacklogCommentUpdateContent request) {
-        BacklogComment comment = backlogCommentRepository.findById(commentId).orElseThrow(() -> new BacklogCommentNotFoundException());
-        if(comment.getUser().getUserId() != userId) {throw new ForbiddenCommentAccessException();}
-
-        comment.setContent(request.getContent());
-        BacklogComment savedComment = backlogCommentRepository.save(comment);
-        return BacklogCommentFromResponse.of(savedComment);
-
-    }
-
     @Override
     public void deleteBacklogComment(Long userId, Long commentId) {
         BacklogComment comment = backlogCommentRepository.findById(commentId).orElseThrow(BacklogCommentNotFoundException::new);
@@ -64,30 +51,13 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
         backlogCommentRepository.delete(comment);
     }
 
-    @Override
-    public List<BacklogCommentFromResponse> getUserComment(Long userId) {
-        List<BacklogComment> comments = backlogCommentRepository.findByUserUserId(userId);
-        List<BacklogCommentFromResponse> commentResponses = comments.stream()
-                .map(BacklogCommentFromResponse::of)
-                .toList();
-        return commentResponses;
-    }
-
 
     @Override
     public List<BacklogCommentResponse> getBacklogComments(Long backlogId) {
         List<BacklogComment> comments = backlogCommentRepository.findCommentsByBacklogId(backlogId);
-        List<BacklogCommentResponse> commentResponses = comments.stream()
+        return comments.stream()
                 .map(BacklogCommentResponse::of)
                 .toList();
-        return commentResponses;
-    }
-
-    @Override
-    public List<BacklogCommentFromResponse> getStructComments(Long backlogId) {
-        List<BacklogComment> comments = backlogCommentRepository.findCommentsByBacklogId(backlogId);
-        List<BacklogCommentFromResponse> commentResponses = getBacklogCommentResponses(comments);
-        return commentResponses;
     }
 
     /**

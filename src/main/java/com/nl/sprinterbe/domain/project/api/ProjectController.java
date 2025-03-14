@@ -108,6 +108,13 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "프로젝트 유저 자진탈퇴", description = "프로젝트에 속한 유저가 자진탈퇴합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/users")
+    public ResponseEntity<Void> goOutUserInProject(@PathVariable Long projectId, @RequestHeader("Authorization") String token) {
+        projectService.deleteUserInProject(projectId, jwtUtil.removeBearer(token));
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @Operation(summary = "프로젝트 이름 업데이트", description = "프로젝트 이름을 업데이트합니다.") // 프론트 연동 OK
     @PatchMapping("/{projectId}")
     public ResponseEntity<Void> updateProjectName(@PathVariable Long projectId, @RequestBody Map<String, String> newProjectNameMap) {

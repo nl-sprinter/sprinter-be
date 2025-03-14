@@ -1,7 +1,9 @@
 package com.nl.sprinterbe.domain.user.entity;
-//import com.nl.sprinterbe.entity.*;
+
+import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
+import com.nl.sprinterbe.domain.dailyscrum.entity.UserDailyScrum;
+import com.nl.sprinterbe.domain.userbacklog.entity.UserBacklog;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,25 +34,31 @@ public class User {
 
     private String role;
 
+    // 일대다 매핑 (유저, 백로그커맨트)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BacklogComment> backlogComments = new ArrayList<>();
+
     // 다대다 매핑 (유저, 프로젝트)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserProject> userProjects = new ArrayList<>();
 
+    // 다대다 매핑 (유저, 백로그)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserBacklog> userBacklogs = new ArrayList<>();
 
-    //해당 유저가 프로젝트의 Leader인지 확인
-    public boolean isProjectLeader(Long projectId) {
-        return this.getUserProjects().stream()
-                .filter(up -> up.getProject().getProjectId().equals(projectId))
-                .anyMatch(UserProject::getIsProjectLeader);
-    }
+    // 다대다 매핑 (유저, 데일리스크럼)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserDailyScrum> userDailyScrums = new ArrayList<>();
+
+
 
     @Override
     public String toString() {
-        return "User(userId=" + userId + 
-               ", nickname=" + nickname + 
-               ", email=" + email + 
-               ", provider=" + provider + 
-               ", role=" + role + ")";
+        return "User(userId=" + userId +
+                ", nickname=" + nickname +
+                ", email=" + email +
+                ", provider=" + provider +
+                ", role=" + role + ")";
     }
 
     @Override
@@ -65,25 +73,5 @@ public class User {
     public int hashCode() {
         return Objects.hash(userId);
     }
-
-//    @OneToMany(mappedBy = "user")
-//    private List<Todo> todos = new ArrayList<>();
-//
-
-//    @OneToMany(mappedBy = "user")
-//    private List<Schedule> schedules = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<Notification> notifications = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<Like> likes = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<UserBacklog> userBacklogs = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<BacklogComment> backlogComments = new ArrayList<>();
-
 
 }

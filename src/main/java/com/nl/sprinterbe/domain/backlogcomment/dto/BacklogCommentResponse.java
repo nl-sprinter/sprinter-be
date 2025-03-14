@@ -14,6 +14,7 @@ public class BacklogCommentResponse {
 
     private Long BacklogCommentId;
     private Long parentCommentId;
+    private Long userId;
 
     private String nickname;
     private String content;
@@ -22,10 +23,11 @@ public class BacklogCommentResponse {
     public static BacklogCommentResponse of(BacklogComment backlogComment) {
         return BacklogCommentResponse.builder()
                 .BacklogCommentId(backlogComment.getBacklogCommentId())
+                .parentCommentId(backlogComment.getParentCommentId())
+                .userId(backlogComment.getUser().getUserId())
+                .nickname(backlogComment.getUser().getNickname())
                 .content(backlogComment.getContent())
                 .createdDate(backlogComment.getCreatedAt())
-                .nickname(backlogComment.getUser().getNickname())
-                .parentCommentId(backlogComment.getParentCommentId()) // TODO 널값 검사할지안할지
                 .build();
     }
 }
