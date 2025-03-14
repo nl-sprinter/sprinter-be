@@ -362,17 +362,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(summary = "댓글 내용 수정", description = "백로그에 달린 댓글을 내용을 수정합니다.")
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/{backlogCommentsId}")
-    public ResponseEntity<Void> updateComment(
-            @PathVariable Long backlogCommentsId,
-            @RequestBody @Validated BacklogCommentUpdateContent request,
-            @RequestHeader("Authorization") String token) {
-        backlogCommentService.updateComment(jwtUtil.removeBearer(token), backlogCommentsId, request);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @Operation(summary = "댓글 삭제", description = "백로그에 댓글을 삭제합니다.")
+    @Operation(summary = "댓글 삭제", description = "백로그에 댓글을 삭제합니다.") // 프론트 연동 OK
     @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/{backlogCommentId}")
     public ResponseEntity<Void> deleteBacklogComment(
             @PathVariable Long backlogCommentId,
@@ -455,7 +445,12 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-
+    @Operation(summary = "DailyScrum 삭제", description = "DailyScrum 을 삭제합니다") // 프론트 연동 OK
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}")
+    public ResponseEntity<Void> deleteDailyScrum(@PathVariable Long dailyScrumId) {
+        dailyScrumService.deleteDailyScrum(dailyScrumId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
 
 

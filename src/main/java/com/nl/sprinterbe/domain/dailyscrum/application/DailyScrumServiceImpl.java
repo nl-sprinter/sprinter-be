@@ -187,7 +187,11 @@ public class DailyScrumServiceImpl implements DailyScrumService {
         dailyScrum.setContent(content);
     }
 
-
+    @Override
+    public void deleteDailyScrum(Long dailyScrumId) {
+        DailyScrum dailyScrum = dailyScrumRepository.findById(dailyScrumId).orElseThrow(() -> new NoDataFoundException("해당 dailyScrum 을 조회할 수 없습니다."));
+        dailyScrumRepository.delete(dailyScrum);
+    }
 
 
 }

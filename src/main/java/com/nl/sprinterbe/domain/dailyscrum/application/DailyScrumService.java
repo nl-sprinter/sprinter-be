@@ -30,4 +30,6 @@ public interface DailyScrumService {
     void removeUserFromDailyScrum(Long dailyScrumId, Long userId);
 
     void updateContent(Long dailyScrumId, String content);
+
+    void deleteDailyScrum(Long dailyScrumId);
 }
