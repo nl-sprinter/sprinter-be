@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface BacklogCommentService {
 
-    BacklogCommentFromResponse createComment(Long backlogId, Long userId, BacklogCommentRequest request);
+    BacklogCommentFromResponse createBacklogComment(Long backlogId, Long userId, BacklogCommentRequest request);
 
     BacklogCommentFromResponse updateComment(Long userId, Long commentId, BacklogCommentUpdateContent request);
 
-    BacklogCommentFromResponse deleteComment(Long userId, Long commentId);
+    BacklogCommentFromResponse deleteBacklogComment(Long userId, Long commentId);
 
     List<BacklogCommentFromResponse> getUserComment(Long userId);
 

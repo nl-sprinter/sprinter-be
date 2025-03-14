@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class BacklogTaskCompleteRateResponse {
-    private Long completeRate;
+    private int completeRate;
 }

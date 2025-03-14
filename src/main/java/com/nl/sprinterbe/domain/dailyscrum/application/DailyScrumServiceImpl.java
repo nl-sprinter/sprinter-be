@@ -70,9 +70,11 @@ public class DailyScrumServiceImpl implements DailyScrumService {
     @Override
     @Transactional(readOnly = true)
     public String findContentByDailyScrumId(Long dailyScrumId) {
-        return dailyScrumRepository.findById(dailyScrumId)
-                .orElseThrow(() -> new RuntimeException("Daily scrum not found"))
-                .getContent();
+        DailyScrum dailyScrum = dailyScrumRepository.findById(dailyScrumId).orElseThrow(() -> new RuntimeException("Daily scrum not found"));
+        if (dailyScrum.getContent() == null) {
+            dailyScrum.setContent("");
+        }
+        return dailyScrum.getContent();
     }
 
     //02.23) 해당 요일에 걸려있는 DailyScrum이 2개일 수 있어서 일단 List로 해놓음

@@ -9,7 +9,7 @@ import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.task.dao.TaskRepository;
-import com.nl.sprinterbe.domain.task.dto.TaskCheckStatusRequest;
+import com.nl.sprinterbe.domain.task.dto.TaskCheckedDto;
 import com.nl.sprinterbe.domain.task.dto.TaskCheckStatusResponse;
 import com.nl.sprinterbe.domain.task.entity.Task;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
@@ -19,7 +19,6 @@ import com.nl.sprinterbe.domain.userbacklog.entity.UserBacklog;
 import com.nl.sprinterbe.global.exception.NoDataFoundException;
 import com.nl.sprinterbe.global.exception.backlog.BacklogNotFoundException;
 import com.nl.sprinterbe.global.exception.task.TaskNotFoundException;
-import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.global.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -204,11 +203,7 @@ public class BacklogServiceImpl implements BacklogService {
     @Override
     public void addTaskToBacklog(Long backlogId, String content) {
         Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(BacklogNotFoundException::new);
-        Task task = Task.builder()
-                .backlog(backlog)
-                .content(content)
-                .checked(false)
-                .build();
+        Task task = new Task(backlog, content, false);
         taskRepository.save(task);
     }
 
@@ -259,10 +254,12 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public TaskCheckStatusResponse updateTaskCheckStatus(Long taskId, TaskCheckStatusRequest request) {
-        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
-        task.setChecked(request.isChecked());
-        return new TaskCheckStatusResponse(task.getChecked());
+    public TaskCheckedDto updateTaskChecked(Long taskId, boolean checked) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(TaskNotFoundException::new);
+        checked = !checked;
+        task.setChecked(checked);
+        return new TaskCheckedDto(checked);
     }
 
     @Override
@@ -272,28 +269,28 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public void addTaskUser(Long taskId, Long userId) {
+    public void addUserOnTask(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
         task.setUserId(userId);
     }
 
     @Override
-    public void deleteTaskUser(Long taskId, Long userId) {
+    public void deleteUserOnTask(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
         task.setUserId(null);
     }
 
 
     @Override
-    public BacklogTaskCompleteRateResponse getBacklogTaskCompleteRate(Long backlogId) {
-        backlogRepository.findById(backlogId).orElseThrow(() -> new BacklogNotFoundException());
+    public int getBacklogTaskCompleteRate(Long backlogId) {
+        backlogRepository.findById(backlogId).orElseThrow(BacklogNotFoundException::new);
         List<Task> tasks = taskRepository.findByBacklogId(backlogId);
-        if(tasks.isEmpty()){
-            throw new TaskNotFoundException();
+        if (tasks.isEmpty()) {
+            return 0;
         }
         long totalTaskCount = tasks.size();
         long completeTaskCount = tasks.stream().filter(Task::getChecked).count();
-        return new BacklogTaskCompleteRateResponse(completeTaskCount*100/totalTaskCount);
+        return (int) (completeTaskCount * 100 / totalTaskCount);
     }
 
     @NotNull

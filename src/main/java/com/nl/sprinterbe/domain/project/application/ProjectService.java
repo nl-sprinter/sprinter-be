@@ -90,7 +90,7 @@ public class ProjectService {
 
     //프로젝트 삭제
     public void deleteProject(Long projectId, Long userId) {
-        if (!checkUserIsProjectLeader(userId, projectId)) {
+        if (!checkUserIsProjectLeader(projectId, userId)) {
             throw new UserIsNotProjectLeaderException();
         }
 

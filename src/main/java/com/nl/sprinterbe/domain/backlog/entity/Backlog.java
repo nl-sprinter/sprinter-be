@@ -3,9 +3,11 @@ package com.nl.sprinterbe.domain.backlog.entity;
 import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
+import com.nl.sprinterbe.domain.userbacklog.entity.UserBacklog;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -44,8 +46,9 @@ public class Backlog {
 
     @OneToMany(mappedBy = "backlog", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<BacklogComment> backlogComments;
-/*    @OneToMany(mappedBy = "backlog")
-    private List<UserBacklog> userBacklogs = new ArrayList<>();*/
+
+    @OneToMany(mappedBy = "backlog", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserBacklog> userBacklogs = new ArrayList<>();
 
 //    @ManyToOne
 //    @JoinColumn(name= "daily_scrum_id")

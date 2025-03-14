@@ -30,8 +30,8 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
     private final BacklogRepository backlogRepository;
 
     @Override
-    public BacklogCommentFromResponse createComment(Long backlogId, Long userId, BacklogCommentRequest request) {
-        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new BacklogNotFoundException());
+    public BacklogCommentFromResponse createBacklogComment(Long backlogId, Long userId, BacklogCommentRequest request) {
+        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(BacklogNotFoundException::new);
         Optional<User> user = userRepository.findById(userId);
         BacklogComment newComment = BacklogComment.of(request, backlog, user);
 
@@ -57,7 +57,7 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
     }
 
     @Override
-    public BacklogCommentFromResponse deleteComment(Long userId, Long commentId) {
+    public BacklogCommentFromResponse deleteBacklogComment(Long userId, Long commentId) {
         BacklogComment comment = backlogCommentRepository.findById(commentId).orElseThrow(() -> new BacklogCommentNotFoundException());
         if(comment.getUser().getUserId() != userId) {throw new ForbiddenCommentAccessException();}
 
