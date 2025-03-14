@@ -57,12 +57,11 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
     }
 
     @Override
-    public BacklogCommentFromResponse deleteBacklogComment(Long userId, Long commentId) {
-        BacklogComment comment = backlogCommentRepository.findById(commentId).orElseThrow(() -> new BacklogCommentNotFoundException());
-        if(comment.getUser().getUserId() != userId) {throw new ForbiddenCommentAccessException();}
+    public void deleteBacklogComment(Long userId, Long commentId) {
+        BacklogComment comment = backlogCommentRepository.findById(commentId).orElseThrow(BacklogCommentNotFoundException::new);
+        if(!comment.getUser().getUserId().equals(userId)) {throw new ForbiddenCommentAccessException();}
 
         backlogCommentRepository.delete(comment);
-        return BacklogCommentFromResponse.of(comment);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
 
 
     @Override
-    public List<BacklogCommentResponse> getComments(Long backlogId) {
+    public List<BacklogCommentResponse> getBacklogComments(Long backlogId) {
         List<BacklogComment> comments = backlogCommentRepository.findCommentsByBacklogId(backlogId);
         List<BacklogCommentResponse> commentResponses = comments.stream()
                 .map(BacklogCommentResponse::of)

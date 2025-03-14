@@ -16,4 +16,8 @@ public class BacklogCommentRequest {
     @NotBlank(message = "content 는 필수 값입니다.")
     private String content;
 
+    public boolean isParentComment() {
+        return parentCommentId != null;
+    }
+
 }

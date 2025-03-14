@@ -345,8 +345,14 @@ public class ProjectController {
      * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      */
 
-    //createdDate Response 수정 필요
-    @Operation(summary = "댓글 생성", description = "백로그에 댓글을 생성합니다.")
+    @Operation(summary = "댓글 조회", description = "백로그에 달린 댓글을 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments")
+    public ResponseEntity<List<BacklogCommentResponse>> getBacklogComments(
+            @PathVariable Long backlogId) {
+        return ResponseEntity.ok(backlogCommentService.getBacklogComments(backlogId));
+    }
+
+    @Operation(summary = "댓글 생성", description = "백로그에 댓글을 생성합니다.") // 프론트 연동 OK
     @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments")
     public ResponseEntity<Void> createBacklogComment(
             @PathVariable Long backlogId,
@@ -354,39 +360,6 @@ public class ProjectController {
             @RequestHeader("Authorization") String token) {
         backlogCommentService.createBacklogComment(backlogId, jwtUtil.removeBearer(token), request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @Operation(summary = "댓글 삭제", description = "백로그에 댓글을 삭제합니다.")
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/{backlogCommentId}")
-    public ResponseEntity<Void> deleteBacklogComment(
-            @PathVariable Long backlogCommentId,
-            @RequestHeader("Authorization") String token) {
-        backlogCommentService.deleteBacklogComment(jwtUtil.removeBearer(token), backlogCommentId);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /*//내가 쓴 댓글 조회기능인데 굳이 필요 없어 보이긴 해보임
-    @Operation(summary = "내 댓글 조회", description = "내가 작성한 댓글을 조회합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/user")
-    public ResponseEntity<List<BacklogCommentResponse>> getUserComment(
-            @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(backlogCommentService.getUserComment(jwtUtil.removeBearer(token)));
-    }
-
-    //댓글 조회  부모 자식 관계 그대로 조회가 됨
-    @Operation(summary = "부모 자식 관계로 댓글 조회", description = "백로그에 달린 댓글을 조회합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments")
-    public ResponseEntity<List<BacklogCommentResponse>> getComments(
-            @PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogCommentService.getComments(backlogId));
-    }*/
-
-    // 3/12
-    @Operation(summary = "댓글 조회", description = "백로그에 달린 댓글을 조회합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments")
-    public ResponseEntity<List<BacklogCommentResponse>> getComments(
-            @PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogCommentService.getComments(backlogId));
     }
 
     @Operation(summary = "댓글 내용 수정", description = "백로그에 달린 댓글을 내용을 수정합니다.")
@@ -398,6 +371,16 @@ public class ProjectController {
         backlogCommentService.updateComment(jwtUtil.removeBearer(token), backlogCommentsId, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @Operation(summary = "댓글 삭제", description = "백로그에 댓글을 삭제합니다.")
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/{backlogCommentId}")
+    public ResponseEntity<Void> deleteBacklogComment(
+            @PathVariable Long backlogCommentId,
+            @RequestHeader("Authorization") String token) {
+        backlogCommentService.deleteBacklogComment(jwtUtil.removeBearer(token), backlogCommentId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 
     /**

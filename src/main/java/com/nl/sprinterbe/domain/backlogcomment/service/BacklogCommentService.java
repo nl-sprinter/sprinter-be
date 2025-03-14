@@ -13,11 +13,11 @@ public interface BacklogCommentService {
 
     BacklogCommentFromResponse updateComment(Long userId, Long commentId, BacklogCommentUpdateContent request);
 
-    BacklogCommentFromResponse deleteBacklogComment(Long userId, Long commentId);
+    void deleteBacklogComment(Long userId, Long commentId);
 
     List<BacklogCommentFromResponse> getUserComment(Long userId);
 
-    List<BacklogCommentResponse> getComments(Long backlogId);
+    List<BacklogCommentResponse> getBacklogComments(Long backlogId);
 
     List<BacklogCommentFromResponse> getStructComments(Long backlogId);
 }

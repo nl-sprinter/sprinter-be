@@ -15,6 +15,8 @@ public class SprintBacklogResponse {
     private Long sprintId;
     private Long sprintOrder;
 
+    private int completeRate;
+
     public static SprintBacklogResponse of(Backlog backlog) {
         return SprintBacklogResponse.builder()
                 .backlogId(backlog.getBacklogId())

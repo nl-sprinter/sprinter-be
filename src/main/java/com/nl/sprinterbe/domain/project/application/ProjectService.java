@@ -98,12 +98,6 @@ public class ProjectService {
                 .orElseThrow(ProjectNotFoundException::new);
 
         List<UserProject> userProjects = userProjectRepository.findByProject(project);
-        Optional<Long> leaderUserId = userProjects.stream()
-                .filter(UserProject::getIsProjectLeader)
-                .map(userProject -> userProject.getUser().getUserId())
-                .findFirst();
-
-        Long leaderId = leaderUserId.orElseThrow(() -> new RuntimeException("프로젝트 리더를 찾을 수 없습니다."));
 
         userProjectRepository.deleteAll(userProjects); // UserProject 삭제
         projectRepository.delete(project); // 프로젝트 삭제
