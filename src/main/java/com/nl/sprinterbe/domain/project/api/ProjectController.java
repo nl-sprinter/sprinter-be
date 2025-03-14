@@ -4,7 +4,6 @@ import com.nl.sprinterbe.domain.backlog.application.BacklogService;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
-import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentUpdateContent;
 import com.nl.sprinterbe.domain.backlogcomment.service.BacklogCommentService;
 import com.nl.sprinterbe.domain.dailyscrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyscrum.dto.*;
@@ -230,15 +229,6 @@ public class ProjectController {
         return ResponseEntity.ok(backlogService.findBacklogListByProjectId(projectId, userId, pageable));
     }
 
-
-    //Backlog 정보
-    @Operation(summary = "Backlog ", description = "backlogId의 Backlog의 제목 정보를 제공합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}")
-    public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
-    }
-
-
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
      * ::::: Task ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
@@ -392,6 +382,13 @@ public class ProjectController {
         return ResponseEntity.ok(dailyScrumService.findDailyScrumBySprintId(sprintId));
     }
 
+    @Operation(summary = "오늘 날짜의 DailyScrum 조회", description = "오늘 날짜의 DailyScrum 을 조회합니다.")
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyscrums/today")
+    public ResponseEntity<List<DailyScrumResponseWithSprintId>> getDailyScrumInToday(@PathVariable Long projectId) {
+        return ResponseEntity.ok(dailyScrumService.findDailyScrumByDate(LocalDate.now(), projectId));
+    }
+
+
     @Operation(summary = "Sprint 에 DailyScrum 생성", description = "Sprint 에 DailyScrum 을 생성합니다.") // 프론트 연동 OK
     @PostMapping("/{projectId}/sprints/{sprintId}/dailyscrums")
     public ResponseEntity<Void> addDailyScrumToSprint(@PathVariable Long sprintId) {
@@ -465,25 +462,6 @@ public class ProjectController {
 
 
 
-    @GetMapping("/{projectId}/sprints/{sprintId}/today-dailyscrums")
-    //Today Scrum , 만약 TodayScrum이 2개 이상이라면 어떻게 할것인가?
-    public ResponseEntity<List<DailyScrumDetailResponse>> getTodayDailyScrumDetail() {
-        return ResponseEntity.ok(dailyScrumService.findDailyScrumByDate(LocalDate.now()));
-    }
-
-
-    //backlog 중 DailyScrum에 걸려있지 않고 Sprint에는 해당되는 백로그 조회
-    @GetMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/backlogs/backlog-excluded")
-    public ResponseEntity<List<BacklogResponse>> getSprintBacklogsWithoutDailyScrum(@PathVariable Long sprintId, @PathVariable Long dailyScrumId) {
-        return ResponseEntity.ok(backlogService.getBacklogsExcludeDailyScrum(sprintId, dailyScrumId));
-    }
-
-
-    //유저 중 DailyScrum에 걸려있지 않고 project에는 해당되는 유저 조회
-    @GetMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/users/dailyscrum-excluded")
-    public ResponseEntity<List<DailyScrumUserResponse>> getProjectUsersNotInDailyScrum(@PathVariable Long dailyScrumId, @PathVariable Long projectId) {
-        return ResponseEntity.ok(dailyScrumService.findUsersNotInDailyScrum(projectId, dailyScrumId));
-    }
 
 
 }

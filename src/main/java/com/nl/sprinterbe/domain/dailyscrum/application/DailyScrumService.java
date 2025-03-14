@@ -15,7 +15,7 @@ public interface DailyScrumService {
 
     String findContentByDailyScrumId(Long dailyScrumId);
 
-    List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDate startOfDay);
+    List<DailyScrumResponseWithSprintId> findDailyScrumByDate(LocalDate localDate, Long projectId);
 
     void createDailyScrum(Long sprintId);
 

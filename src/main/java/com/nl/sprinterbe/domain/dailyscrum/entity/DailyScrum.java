@@ -35,7 +35,7 @@ public class DailyScrum extends JpaBaseEntity {
     @OneToMany(mappedBy = "dailyScrum", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserDailyScrum> userDailyScrums = new ArrayList<>();
 
-    private String title;
+    private String title; // TODO: 필요 없음
 
     private String content;
 

@@ -7,7 +7,6 @@ import com.nl.sprinterbe.domain.dailyscrum.dao.DailyScrumRepository;
 import com.nl.sprinterbe.domain.dailyscrum.dao.UserDailyScrumRepository;
 import com.nl.sprinterbe.domain.dailyscrum.dto.*;
 import com.nl.sprinterbe.domain.dailyscrum.entity.DailyScrum;
-import com.nl.sprinterbe.domain.dailyscrum.entity.DailyScrumBacklog;
 import com.nl.sprinterbe.domain.dailyscrum.entity.UserDailyScrum;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +52,15 @@ public class DailyScrumServiceImpl implements DailyScrumService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<DailyScrumResponseWithSprintId> findDailyScrumByDate(LocalDate localDate, Long projectId) {
+        List<DailyScrum> dailyScrums = dailyScrumRepository.findDailyScrumByProjectIdAndCreatedAt(projectId, localDate);
+        return dailyScrums.stream()
+                .map(DailyScrumResponseWithSprintId::of)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<DailyScrumUserResponse> findDailyScrumUserBySprintId(Long sprintId) {
         List<User> users = dailyScrumRepository.findUsersByDailyScrumId(sprintId);
         return users.stream()
@@ -75,14 +82,6 @@ public class DailyScrumServiceImpl implements DailyScrumService {
             dailyScrum.setContent("");
         }
         return dailyScrum.getContent();
-    }
-
-    //02.23) 해당 요일에 걸려있는 DailyScrum이 2개일 수 있어서 일단 List로 해놓음
-    @Override
-    @Transactional(readOnly = true)
-    public List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDate startOfDay) {
-        List<DailyScrum> dailyScrums = dailyScrumRepository.findByCreatedAt(startOfDay);
-        return dailyScrums.stream().map(DailyScrumDetailResponse::of).collect(Collectors.toList());
     }
 
     @Override
