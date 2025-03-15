@@ -6,13 +6,11 @@ import com.nl.sprinterbe.domain.backlog.dto.BacklogInfoResponse;
 import com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.task.dto.TaskCheckedDto;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
 public interface BacklogService {
-    Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId, Pageable pageable);
+    List<BacklogInfoResponse> findUserBacklogs(Long projectId, Long userId);
 
     BacklogDetailResponse findBacklogDetailById(Long backlogId);
 
@@ -50,7 +48,7 @@ public interface BacklogService {
 
     List<ProductBacklogResponse> getProductBacklogsByProjectId(Long projectId);
 
-    List<SprintBacklogResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId);
+    List<BacklogInfoResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId);
 
     TaskCheckedDto updateTaskChecked(Long taskId, boolean checked);
 
@@ -61,4 +59,6 @@ public interface BacklogService {
     void deleteUserOnTask(Long taskId, Long userId);
 
     int getBacklogTaskCompleteRate(Long backlogId);
+
+    boolean updateBacklogIsFinished(Long backlogId, boolean finished);
 }

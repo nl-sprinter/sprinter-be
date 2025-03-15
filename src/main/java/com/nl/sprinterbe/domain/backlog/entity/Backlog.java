@@ -33,6 +33,7 @@ public class Backlog {
     private Long weight;
 
     @Column(name = "is_finish")
+    @Setter
     private Boolean isFinished;
 
 
@@ -49,6 +50,7 @@ public class Backlog {
     @OneToMany(mappedBy = "backlog", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<BacklogComment> backlogComments;
 
+    // 다대다 매핑 (백로그, 유저)
     @OneToMany(mappedBy = "backlog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserBacklog> userBacklogs = new ArrayList<>();
 
@@ -59,10 +61,5 @@ public class Backlog {
     @OneToMany(mappedBy = "backlog", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Task> tasks = new ArrayList<>();
-
-//    @ManyToOne
-//    @JoinColumn(name= "daily_scrum_id")
-//    @Setter
-//    private DailyScrum dailyScrum;
 
 }
