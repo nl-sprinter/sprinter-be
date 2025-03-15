@@ -1,5 +1,4 @@
 package com.nl.sprinterbe.domain.backlog.dto;
-
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,21 +6,24 @@ import lombok.Getter;
 @Getter
 @Builder
 public class BacklogInfoResponse {
+
+    private Long backlogId;
+    private String title;
+    private Long weight;
+    private Boolean isFinished;
     private Long sprintId;
     private Long sprintOrder;
-    private Long backlogId;
-    private String backlogTitle;
-    private Boolean isFinished;
 
-
+    private int completeRate;
 
     public static BacklogInfoResponse of(Backlog backlog) {
         return BacklogInfoResponse.builder()
+                .backlogId(backlog.getBacklogId())
+                .title(backlog.getTitle())
+                .weight(backlog.getWeight())
+                .isFinished(backlog.getIsFinished())
                 .sprintId(backlog.getSprint().getSprintId())
                 .sprintOrder(backlog.getSprint().getSprintOrder())
-                .backlogId(backlog.getBacklogId())
-                .backlogTitle(backlog.getTitle())
-                .isFinished(backlog.getIsFinished())
                 .build();
     }
 }

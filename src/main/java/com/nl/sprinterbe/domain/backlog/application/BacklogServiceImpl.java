@@ -10,7 +10,6 @@ import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.task.dao.TaskRepository;
 import com.nl.sprinterbe.domain.task.dto.TaskCheckedDto;
-import com.nl.sprinterbe.domain.task.dto.TaskCheckStatusResponse;
 import com.nl.sprinterbe.domain.task.entity.Task;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
@@ -19,11 +18,8 @@ import com.nl.sprinterbe.domain.userbacklog.entity.UserBacklog;
 import com.nl.sprinterbe.global.exception.NoDataFoundException;
 import com.nl.sprinterbe.global.exception.backlog.BacklogNotFoundException;
 import com.nl.sprinterbe.global.exception.task.TaskNotFoundException;
-import com.nl.sprinterbe.global.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,12 +37,13 @@ public class BacklogServiceImpl implements BacklogService {
     private final SprintRepository sprintRepository;
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
-    private final SecurityUtil securityUtil;
 
     @Override
     @Transactional(readOnly = true)
-    public Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId, Pageable pageable) {
-        return backlogRepository.findByProjectIdDesc(projectId, userId, pageable).map(BacklogInfoResponse::of);
+    public List<BacklogInfoResponse> findUserBacklogs(Long projectId, Long userId) {
+        return backlogRepository.findUserBacklogsByProjectIdAndUserId(projectId, userId).stream()
+                .map(BacklogInfoResponse::of)
+                .toList();
     }
 
 
@@ -248,9 +245,9 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public List<SprintBacklogResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId) {
+    public List<BacklogInfoResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId) {
         List<Backlog> backlogs = backlogRepository.findBacklogsByProjectIdAndSprintId(projectId, sprintId);
-        return backlogs.stream().map(SprintBacklogResponse::of).collect(Collectors.toList());
+        return backlogs.stream().map(BacklogInfoResponse::of).collect(Collectors.toList());
     }
 
     @Override
@@ -291,6 +288,14 @@ public class BacklogServiceImpl implements BacklogService {
         long totalTaskCount = tasks.size();
         long completeTaskCount = tasks.stream().filter(Task::getChecked).count();
         return (int) (completeTaskCount * 100 / totalTaskCount);
+    }
+
+    @Override
+    public boolean updateBacklogIsFinished(Long backlogId, boolean finished) {
+        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(BacklogNotFoundException::new);
+        finished = !finished;
+        backlog.setIsFinished(finished);
+        return finished;
     }
 
     @NotNull

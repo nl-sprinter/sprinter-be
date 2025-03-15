@@ -33,6 +33,7 @@ public class Backlog {
     private Long weight;
 
     @Column(name = "is_finish")
+    @Setter
     private Boolean isFinished;
 
 

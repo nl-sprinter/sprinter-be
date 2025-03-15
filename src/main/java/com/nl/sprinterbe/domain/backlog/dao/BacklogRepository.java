@@ -4,9 +4,6 @@ import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.task.entity.Task;
 import com.nl.sprinterbe.domain.user.entity.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,20 +15,12 @@ import java.util.Optional;
 @Repository
 public interface BacklogRepository extends JpaRepository<Backlog, Long> {
 
-    @Query("SELECT b from Backlog b WHERE b.sprint.sprintId = :sprintId order by b.sprint.sprintOrder ASC")
-    Slice<Backlog> findBySprintIdDesc(@Param("sprintId") Long sprintId, Pageable pageable);
-
-    /*@Query("SELECT b FROM Backlog b JOIN b.sprint s JOIN b.userBacklogs u WHERE s.project.projectId = :projectId AND u.user.userId = :userId order by b.sprint.sprintOrder ASC")
-    Slice<Backlog> findByProjectIdDesc(@Param("projectId") Long projectId,@Param("userId") Long userId, Pageable pageable);*/
-
-    @Query("SELECT b FROM Backlog b JOIN b.sprint s, UserBacklog ub " +
-            "WHERE s.project.projectId = :projectId " +
-            "AND ub.user.userId = :userId " +
-            "AND ub.backlog = b " +
-            "ORDER BY b.sprint.sprintOrder ASC")
-    Slice<Backlog> findByProjectIdDesc(@Param("projectId") Long projectId,
-                                       @Param("userId") Long userId,
-                                       Pageable pageable);
+    @Query("SELECT b FROM Backlog b" +
+            " JOIN UserBacklog ub ON ub.backlog = b" +
+            " WHERE b.sprint.project.projectId = :projectId" +
+            " AND ub.user.userId = :userId" +
+            " ORDER BY b.sprint.sprintOrder DESC, ub.userBacklogId DESC")
+    List<Backlog> findUserBacklogsByProjectIdAndUserId(@Param("projectId") Long projectId, @Param("userId") Long userId);
 
 
     Optional<Backlog> findByBacklogId(Long backlogId);
