@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BacklogController {
     private final BacklogService backlogService;
-
+    /*
     //나의 Backlog + 나의 달성 현황
     @GetMapping("/projects/{projectId}/users/{userId}")
     public ResponseEntity<Slice<BacklogInfoResponse>> getBacklogInfoList(@PathVariable Long projectId,@PathVariable Long userId, @PageableDefault(size=5) Pageable pageable) {
@@ -71,6 +71,8 @@ public class BacklogController {
     public ResponseEntity<BacklogTitleResponse> updateBacklogTitle(@RequestBody BacklogTitleRequest request, @PathVariable Long backlogId){
         return ResponseEntity.ok(backlogService.updateBacklogTitle(request,backlogId));
     }
+
+     */
 
     //---------------------------------- 수정 시 한번에 -----------------------------------
     //백로그 유저 수정 (삭제 , 삽입)
@@ -137,7 +139,6 @@ public class BacklogController {
 //        backlogService.deleteIssue(issueId);
 //        return ResponseEntity.ok().build();
 //    }
-
 
 
 }

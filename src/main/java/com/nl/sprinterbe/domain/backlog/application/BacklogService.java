@@ -3,45 +3,44 @@ package com.nl.sprinterbe.domain.backlog.application;
 
 import com.nl.sprinterbe.domain.backlog.dto.BacklogDetailResponse;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogInfoResponse;
-import com.nl.sprinterbe.domain.dailyScrum.dto.BacklogResponse;
+import com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse;
 import com.nl.sprinterbe.domain.backlog.dto.*;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import com.nl.sprinterbe.domain.task.dto.TaskCheckedDto;
 
 import java.util.List;
 
 public interface BacklogService {
-    Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId,Pageable pageable );
+    List<BacklogInfoResponse> findUserBacklogs(Long projectId, Long userId);
 
     BacklogDetailResponse findBacklogDetailById(Long backlogId);
 
-    List<BacklogUserResponse> findUserByBacklogId(Long backlogId);
+    List<UserBacklogResponse> findUserByBacklogId(Long backlogId);
 
-    List<BacklogTaskResponse> findTaskByBacklogId(Long backlogId);
+    List<BacklogTaskResponse> findTasksByBacklogId(Long backlogId);
 
-    List<BacklogIssueResponse> findIssueByBacklogId(Long backlogId);
+    List<BacklogIssueResponse> findIssuesByBacklogId(Long backlogId);
 
-    List<BacklogUserResponse> findBacklogExceptUsers(Long projectId, Long backlogId);
+    List<UserBacklogResponse> findBacklogExceptUsers(Long projectId, Long backlogId);
 
-    BacklogPostResponse createBacklog(BacklogPostRequest request,Long sprintId);
+    void createBacklog(SimpleBacklogRequest request, Long sprintId);
 
-    BacklogTitleResponse updateBacklogTitle(BacklogTitleRequest request,Long backlogId);
+    void updateBacklog(BacklogUpdateRequest backlogUpdateRequest, Long backlogId);
 
-    List<BacklogUserResponse> updateBacklogUsers(Long backlogId, BacklogUserUpdateRequest request);
+    List<UserBacklogResponse> updateBacklogUsers(Long backlogId, BacklogUserUpdateRequest request);
 
     List<BacklogTaskResponse> updateBacklogTasks(Long backlogId, BacklogTaskUpdateRequest request);
 
-    BacklogUserResponse addBacklogUser(Long backlogId, Long userId);
+    UserBacklogResponse addUserInBacklog(Long backlogId, Long userId);
 
-    void deleteUser(Long backlogId,Long userId);
+    void deleteUserInBacklog(Long backlogId, Long userId);
 
     void deleteTask(Long taskId);
 
-    BacklogTaskResponse addTask(Long backlogId,BacklogTaskRequest request);
+    void addTaskToBacklog(Long backlogId, String content);
 
-    BacklogIssueResponse addIssue(Long backlogId,BacklogIssueRequest request);
+    BacklogIssueResponse addIssueToBacklog(Long backlogId, String content);
 
-    BacklogIssueResponse updateIssue(Long issueId,BacklogIssueRequest request);
+    void updateIssue(Long issueId, IssueRequest issueRequest);
 
     void deleteIssue(Long issueId);
 
@@ -49,5 +48,17 @@ public interface BacklogService {
 
     List<ProductBacklogResponse> getProductBacklogsByProjectId(Long projectId);
 
-    List<SprintBacklogResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId);
+    List<BacklogInfoResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId);
+
+    TaskCheckedDto updateTaskChecked(Long taskId, boolean checked);
+
+    void updateTaskContent(Long taskId, TaskRequest request);
+
+    void addUserOnTask(Long taskId, Long userId);
+
+    void deleteUserOnTask(Long taskId, Long userId);
+
+    int getBacklogTaskCompleteRate(Long backlogId);
+
+    boolean updateBacklogIsFinished(Long backlogId, boolean finished);
 }

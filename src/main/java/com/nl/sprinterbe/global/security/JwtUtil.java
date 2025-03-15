@@ -101,7 +101,7 @@ public class JwtUtil {
         return Long.parseLong(Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("id", String.class));
     }
 
-    public Long removeBearer(String token){
+    public Long getUserIdByToken(String token){
         return Long.parseLong(Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token.substring(7)).getBody().get("id", String.class));
     }
 }

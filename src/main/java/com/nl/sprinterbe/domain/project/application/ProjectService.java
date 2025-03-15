@@ -2,10 +2,15 @@ package com.nl.sprinterbe.domain.project.application;
 
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
+import com.nl.sprinterbe.domain.backlogcomment.dao.BacklogCommentRepository;
+import com.nl.sprinterbe.domain.dailyscrum.dao.DailyScrumBacklogRepository;
+import com.nl.sprinterbe.domain.dailyscrum.dao.UserDailyScrumRepository;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
+import com.nl.sprinterbe.domain.task.dao.TaskRepository;
 import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.dto.UserInfoWithTeamLeaderResponse;
+import com.nl.sprinterbe.domain.userbacklog.dao.UserBacklogRepository;
 import com.nl.sprinterbe.dto.*;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
@@ -39,6 +44,11 @@ public class ProjectService {
 
     private final UserRepository userRepository;
     private final UserProjectRepository userProjectRepository;
+    private final DailyScrumBacklogRepository dailyScrumBacklogRepository;
+    private final UserDailyScrumRepository userDailyScrumRepository;
+    private final UserBacklogRepository userBacklogRepository;
+    private final BacklogCommentRepository backlogCommentRepository;
+    private final TaskRepository taskRepository;
 
     public void createProject(StartingDataDto startingDataDto, Long userId) {
         // 유저 검증
@@ -90,7 +100,7 @@ public class ProjectService {
 
     //프로젝트 삭제
     public void deleteProject(Long projectId, Long userId) {
-        if (!checkUserIsProjectLeader(userId, projectId)) {
+        if (!checkUserIsProjectLeader(projectId, userId)) {
             throw new UserIsNotProjectLeaderException();
         }
 
@@ -98,12 +108,6 @@ public class ProjectService {
                 .orElseThrow(ProjectNotFoundException::new);
 
         List<UserProject> userProjects = userProjectRepository.findByProject(project);
-        Optional<Long> leaderUserId = userProjects.stream()
-                .filter(UserProject::getIsProjectLeader)
-                .map(userProject -> userProject.getUser().getUserId())
-                .findFirst();
-
-        Long leaderId = leaderUserId.orElseThrow(() -> new RuntimeException("프로젝트 리더를 찾을 수 없습니다."));
 
         userProjectRepository.deleteAll(userProjects); // UserProject 삭제
         projectRepository.delete(project); // 프로젝트 삭제
@@ -208,12 +212,23 @@ public class ProjectService {
         return projectRepository.searchUsersNotInProject(keyword, projectId);
     }
 
-    public void deleteUserInProject(Long projectId, Long userId, Long targetUserId) {
-        if (!checkUserIsProjectLeader(projectId, userId)) {
+    public void deleteUserInProject(Long projectId, Long teamLeaderUserId, Long targetUserId) {
+        if (!checkUserIsProjectLeader(projectId, teamLeaderUserId)) {
             throw new UserIsNotProjectLeaderException();
         }
         userProjectRepository.deleteByProjectIdAndUserId(projectId, targetUserId);
-        log.info("projectId={}, userId={}, nickname = {}", projectId, userId, userRepository.findById(userId).get().getNickname());
+        userBacklogRepository.deleteByUserUserId(targetUserId);
+        userDailyScrumRepository.deleteByUserUserId(targetUserId);
+        backlogCommentRepository.deleteByUserUserId(targetUserId);
+        taskRepository.updateUserIdToNullWhenUserGoOutProject(targetUserId);
+    }
+
+    public void deleteUserInProject(Long projectId, Long targetUserId) {
+        userProjectRepository.deleteByProjectIdAndUserId(projectId, targetUserId);
+        userBacklogRepository.deleteByUserUserId(targetUserId);
+        userDailyScrumRepository.deleteByUserUserId(targetUserId);
+        backlogCommentRepository.deleteByUserUserId(targetUserId);
+        taskRepository.updateUserIdToNullWhenUserGoOutProject(targetUserId);
     }
 
     public boolean checkUserIsProjectLeader(Long projectId, Long userId) {

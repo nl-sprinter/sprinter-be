@@ -3,22 +3,23 @@ package com.nl.sprinterbe.domain.backlog.application;
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
-import com.nl.sprinterbe.domain.dailyScrum.dto.BacklogResponse;
+import com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse;
 import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.task.dao.TaskRepository;
+import com.nl.sprinterbe.domain.task.dto.TaskCheckedDto;
 import com.nl.sprinterbe.domain.task.entity.Task;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userbacklog.dao.UserBacklogRepository;
 import com.nl.sprinterbe.domain.userbacklog.entity.UserBacklog;
 import com.nl.sprinterbe.global.exception.NoDataFoundException;
+import com.nl.sprinterbe.global.exception.backlog.BacklogNotFoundException;
+import com.nl.sprinterbe.global.exception.task.TaskNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +40,10 @@ public class BacklogServiceImpl implements BacklogService {
 
     @Override
     @Transactional(readOnly = true)
-    public Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId,Pageable pageable ) {
-        return backlogRepository.findByProjectIdDesc(projectId,userId, pageable).map(BacklogInfoResponse::of);
+    public List<BacklogInfoResponse> findUserBacklogs(Long projectId, Long userId) {
+        return backlogRepository.findUserBacklogsByProjectIdAndUserId(projectId, userId).stream()
+                .map(BacklogInfoResponse::of)
+                .toList();
     }
 
 
@@ -53,39 +56,34 @@ public class BacklogServiceImpl implements BacklogService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BacklogTaskResponse> findTaskByBacklogId(Long backlogId) {
-        List<Task> tasks = backlogRepository.findTasksByBacklogId(backlogId);
-        if(tasks.isEmpty()) {
-            throw new NoDataFoundException("해당 Id로 조회된 Task가 없습니다.");
-        }
-        return tasks.stream().map(BacklogTaskResponse::of).collect(Collectors.toList());
+    public List<BacklogTaskResponse> findTasksByBacklogId(Long backlogId) {
+        return backlogRepository.findTasksByBacklogId(backlogId).stream()
+                .map(BacklogTaskResponse::of)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BacklogUserResponse> findUserByBacklogId(Long backlogId) {
+    public List<UserBacklogResponse> findUserByBacklogId(Long backlogId) {
         List<User> users = userBacklogRepository.findUsersByBacklogId(backlogId);
-        if(users.isEmpty()) {
-            throw new NoDataFoundException("해당 Id로 조회된 유저가 없습니다.");
-        }
-        return users.stream().map(BacklogUserResponse::of).collect(Collectors.toList());
+        return users.stream()
+                .map(UserBacklogResponse::of)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BacklogIssueResponse> findIssueByBacklogId(Long backlogId) {
-        List<Issue> issues = backlogRepository.findIssuesByBacklogId(backlogId);
-        if(issues.isEmpty()) {
-            throw new NoDataFoundException("해당 Id로 조회된 Issue가 없습니다.");
-        }
-        return issues.stream().map(BacklogIssueResponse::of).collect(Collectors.toList());
+    public List<BacklogIssueResponse> findIssuesByBacklogId(Long backlogId) {
+        return backlogRepository.findIssuesByBacklogId(backlogId).stream()
+                .map(BacklogIssueResponse::of)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BacklogUserResponse> findBacklogExceptUsers(Long projectId, Long backlogId) {
+    public List<UserBacklogResponse> findBacklogExceptUsers(Long projectId, Long backlogId) {
         List<User> users = backlogRepository.findUsersNotInBacklog(projectId, backlogId);
-        return users.stream().map(BacklogUserResponse::of).collect(Collectors.toList());
+        return users.stream().map(UserBacklogResponse::of).collect(Collectors.toList());
     }
 
     // Sprint 찾기
@@ -94,28 +92,26 @@ public class BacklogServiceImpl implements BacklogService {
     // backlogId와 task의 content로 연관관계 주입
     // content와 checked=false로 issue 연관관계 주입
     @Override
-    public BacklogPostResponse createBacklog(BacklogPostRequest request,Long sprintId) {
-        Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(() -> new NoDataFoundException("해당 Id로 조회된 Sprint가 없습니다."));
-        Backlog newBacklog = Backlog.builder().title(request.getTitle()).sprint(sprint).isFinished(false).weight(request.getWeight()).build();
+    public void createBacklog(SimpleBacklogRequest request, Long sprintId) {
+        Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(BacklogNotFoundException::new);
+        Backlog newBacklog = Backlog.builder()
+                .title(request.getTitle())
+                .sprint(sprint)
+                .weight(request.getWeight())
+                .isFinished(false)
+                .build();
         backlogRepository.save(newBacklog);
-        List<User> savedUsers = getUsers(request, newBacklog);
-        List<Task> savedTasks = getTasks(request, newBacklog);
-        Issue newIssue = Issue.builder().backlog(newBacklog).checked(false).content(request.getIssue().getContent()).build();
-        issueRepository.save(newIssue);
-
-        return BacklogPostResponse.of(newBacklog,request.getWeight(),savedUsers,savedTasks,newIssue);
     }
 
     @Override
-    public BacklogTitleResponse updateBacklogTitle(BacklogTitleRequest request, Long backlogId) {
+    public void updateBacklog(BacklogUpdateRequest backlogUpdateRequest, Long backlogId) {
         Backlog backlog = backlogRepository.findById(backlogId)
                 .orElseThrow(() -> new NoDataFoundException("해당 Id로 조회된 Backlog 가 없습니다."));
-        backlog.setTitle(request.getTitle());
-
-        return BacklogTitleResponse.of(backlog);
+        backlog.setTitle(backlogUpdateRequest.getTitle());
+        backlog.setWeight(backlogUpdateRequest.getWeight());
     }
 
-    public List<BacklogUserResponse> updateBacklogUsers(Long backlogId, BacklogUserUpdateRequest request) {
+    public List<UserBacklogResponse> updateBacklogUsers(Long backlogId, BacklogUserUpdateRequest request) {
         // Backlog 엔티티 조회 (없으면 예외 발생)
         Backlog backlog = backlogRepository.findById(backlogId)
                 .orElseThrow(() -> new NoDataFoundException("해당 Backlog가 없습니다."));
@@ -143,16 +139,16 @@ public class BacklogServiceImpl implements BacklogService {
 
 
         return userBacklogRepository.findUsersByBacklogId(backlogId).stream()
-                .map(BacklogUserResponse::of)
+                .map(UserBacklogResponse::of)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public BacklogUserResponse addBacklogUser(Long backlogId, Long userId) {
+    public UserBacklogResponse addUserInBacklog(Long backlogId, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NoDataFoundException("해당 Id로 조회된 User가 없습니다."));
         Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new NoDataFoundException("해당 Id로 조회된 Backlog가 없습니다."));
         userBacklogRepository.save(new UserBacklog(user, backlog));
-        return BacklogUserResponse.of(user);
+        return UserBacklogResponse.of(user);
     }
 
     @Override
@@ -188,7 +184,7 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public void deleteUser(Long backlogId, Long userId) {
+    public void deleteUserInBacklog(Long backlogId, Long userId) {
         Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new NoDataFoundException("해당 Id의 Backlog가 없습니다."));
         User user = userRepository.findById(userId).orElseThrow(() -> new NoDataFoundException("해당 Id의 User가 없습니다."));
         UserBacklog find = userBacklogRepository.findByUserAndBacklog(user, backlog).orElseThrow(() -> new NoDataFoundException("해당 userId와 backlogId의 User가 없습니다."));
@@ -202,26 +198,29 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public BacklogTaskResponse addTask(Long backlogId, BacklogTaskRequest request) {
-        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new NoDataFoundException("해당 Id의 Backlog가 없습니다."));
-        Task task = Task.builder().backlog(backlog).content(request.getContent()).build();
+    public void addTaskToBacklog(Long backlogId, String content) {
+        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(BacklogNotFoundException::new);
+        Task task = new Task(backlog, content, false);
         taskRepository.save(task);
-        return BacklogTaskResponse.of(task);
     }
 
     @Override
-    public BacklogIssueResponse addIssue(Long backlogId, BacklogIssueRequest request) {
-        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new NoDataFoundException("해당 Id의 Backlog가 없습니다."));
-        Issue issue = Issue.builder().backlog(backlog).checked(false).content(request.getContent()).build();
+    public BacklogIssueResponse addIssueToBacklog(Long backlogId, String content) {
+        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(() -> new NoDataFoundException("Backlog 를 찾을 수 없습니다."));
+        Issue issue = Issue.builder()
+                .backlog(backlog)
+                .checked(false)
+                .content(content)
+                .build();
         issueRepository.save(issue);
         return BacklogIssueResponse.of(issue);
     }
 
     @Override
-    public BacklogIssueResponse updateIssue(Long issueId, BacklogIssueRequest request) {
-        Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NoDataFoundException("해당 Id의 Issue가 없습니다."));
-        issue.setContent(request.getContent());
-        return BacklogIssueResponse.of(issue);
+    public void updateIssue(Long issueId, IssueRequest issueRequest) {
+        issueRepository.findById(issueId)
+                .orElseThrow(() -> new NoDataFoundException("issue 가 없습니다."))
+                .setContent(issueRequest.getContent());
     }
 
     @Override
@@ -236,6 +235,7 @@ public class BacklogServiceImpl implements BacklogService {
         return backlogs.stream()
                 .map(BacklogResponse::of)
                 .collect(Collectors.toList());
+
     }
 
     @Override
@@ -245,9 +245,57 @@ public class BacklogServiceImpl implements BacklogService {
     }
 
     @Override
-    public List<SprintBacklogResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId) {
+    public List<BacklogInfoResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId) {
         List<Backlog> backlogs = backlogRepository.findBacklogsByProjectIdAndSprintId(projectId, sprintId);
-        return backlogs.stream().map(SprintBacklogResponse::of).collect(Collectors.toList());
+        return backlogs.stream().map(BacklogInfoResponse::of).collect(Collectors.toList());
+    }
+
+    @Override
+    public TaskCheckedDto updateTaskChecked(Long taskId, boolean checked) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(TaskNotFoundException::new);
+        checked = !checked;
+        task.setChecked(checked);
+        return new TaskCheckedDto(checked);
+    }
+
+    @Override
+    public void updateTaskContent(Long taskId, TaskRequest request) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
+        task.setContent(request.getContent());
+    }
+
+    @Override
+    public void addUserOnTask(Long taskId, Long userId) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
+        task.setUserId(userId);
+    }
+
+    @Override
+    public void deleteUserOnTask(Long taskId, Long userId) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
+        task.setUserId(null);
+    }
+
+
+    @Override
+    public int getBacklogTaskCompleteRate(Long backlogId) {
+        backlogRepository.findById(backlogId).orElseThrow(BacklogNotFoundException::new);
+        List<Task> tasks = taskRepository.findByBacklogId(backlogId);
+        if (tasks.isEmpty()) {
+            return 0;
+        }
+        long totalTaskCount = tasks.size();
+        long completeTaskCount = tasks.stream().filter(Task::getChecked).count();
+        return (int) (completeTaskCount * 100 / totalTaskCount);
+    }
+
+    @Override
+    public boolean updateBacklogIsFinished(Long backlogId, boolean finished) {
+        Backlog backlog = backlogRepository.findById(backlogId).orElseThrow(BacklogNotFoundException::new);
+        finished = !finished;
+        backlog.setIsFinished(finished);
+        return finished;
     }
 
     @NotNull
@@ -275,7 +323,6 @@ public class BacklogServiceImpl implements BacklogService {
                 .collect(Collectors.toList());
         return savedUsers;
     }
-
 
 
 }

@@ -9,10 +9,9 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class BacklogIssueResponse {
+
     private Long issueId;
-
     private String content;
-
     private Boolean checked;
 
     public static BacklogIssueResponse of(Issue issue) {

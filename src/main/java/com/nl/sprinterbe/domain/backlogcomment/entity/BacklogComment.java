@@ -9,8 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +22,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @Data
 @Builder
-public class BacklogComment extends JpaBaseEntity {
+public class BacklogComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "backlog_comment_id")
@@ -28,8 +30,9 @@ public class BacklogComment extends JpaBaseEntity {
 
     private String content;
 
+    @CreationTimestamp
     @Column(name = "created_at")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "backlog_id", nullable = false)
@@ -39,18 +42,10 @@ public class BacklogComment extends JpaBaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_comment_id")
-    private BacklogComment parentComment;
+    private Long parentCommentId;
 
-    @OneToMany(
-            mappedBy = "parentComment",
-            fetch = FetchType.LAZY)
-    private List<BacklogComment> childComments = new ArrayList<>();
-
-    public void setParent(BacklogComment parent) {
-        this.parentComment = parent;
-        parent.getChildComments().add(this);
+    public void setParentCommentId(Long parentCommentId) {
+        this.parentCommentId = parentCommentId;
     }
 
     public static BacklogComment of(BacklogCommentRequest request, Backlog backlog, Optional<User> user) {

@@ -7,14 +7,18 @@ import lombok.Getter;
 @Builder
 @Getter
 public class BacklogTaskResponse {
-    private String content;
+
     private Long taskId;
+    private String content;
+    private Long userId;
+    private Boolean checked;
 
     public static BacklogTaskResponse of(Task task) {
         return BacklogTaskResponse.builder()
-                .content(task.getContent())
                 .taskId(task.getTaskId())
+                .content(task.getContent())
+                .userId(task.getUserId())
+                .checked(task.getChecked())
                 .build();
-
     }
 }

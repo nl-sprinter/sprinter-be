@@ -9,7 +9,5 @@ public class SignUpRequestDto {
 
     private String nickname;
 
-    private String role;
-
     private String password;
 }

@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.backlogcomment.service;
 
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
+import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentFromResponse;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentUpdateContent;
 
@@ -8,13 +9,10 @@ import java.util.List;
 
 public interface BacklogCommentService {
 
-    BacklogCommentResponse createComment(Long backlogId, Long userId, BacklogCommentRequest request);
+    BacklogCommentFromResponse createBacklogComment(Long backlogId, Long userId, BacklogCommentRequest request);
 
-    BacklogCommentResponse updateComment(Long userId, Long commentId, BacklogCommentUpdateContent request);
+    void deleteBacklogComment(Long userId, Long commentId);
 
-    BacklogCommentResponse deleteComment(Long userId, Long commentId);
+    List<BacklogCommentResponse> getBacklogComments(Long backlogId);
 
-    List<BacklogCommentResponse> getUserComment(Long userId);
-
-    List<BacklogCommentResponse> getComments(Long backlogId);
 }

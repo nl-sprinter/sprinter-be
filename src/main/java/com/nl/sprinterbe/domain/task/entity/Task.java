@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Builder
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +22,18 @@ public class Task {
     @JoinColumn(name = "backlog_id", nullable = false)
     private Backlog backlog;
 
+    private Long userId;
+
     private String content;
+
+    private Boolean checked;
+
+
+    @Builder
+    public Task(Backlog backlog, String content, boolean checked) {
+        this.backlog = backlog;
+        this.content = content;
+        this.checked = checked;
+    }
 
 }

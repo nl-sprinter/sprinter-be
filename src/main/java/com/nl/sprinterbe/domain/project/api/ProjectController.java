@@ -4,17 +4,17 @@ import com.nl.sprinterbe.domain.backlog.application.BacklogService;
 import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
-import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentUpdateContent;
 import com.nl.sprinterbe.domain.backlogcomment.service.BacklogCommentService;
-import com.nl.sprinterbe.domain.dailyScrum.application.DailyScrumService;
-import com.nl.sprinterbe.domain.dailyScrum.dto.*;
-import com.nl.sprinterbe.domain.issue.dto.IssueRepsonse;
+import com.nl.sprinterbe.domain.dailyscrum.application.DailyScrumService;
+import com.nl.sprinterbe.domain.dailyscrum.dto.*;
+import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
 import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
 import com.nl.sprinterbe.domain.sprint.dto.SprintUpdateRequest;
+import com.nl.sprinterbe.domain.task.dto.TaskCheckedDto;
 import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.dto.UserInfoWithTeamLeaderResponse;
 import com.nl.sprinterbe.dto.StartingDataDto;
@@ -23,9 +23,6 @@ import com.nl.sprinterbe.global.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +56,7 @@ public class ProjectController {
     @Operation(summary = "프로젝트 생성", description = "StartingDataDto 를 받아서 프로젝트를 생성합니다.") // 프론트 연동 OK
     @PostMapping("/create")
     public ResponseEntity<String> createProject(@RequestBody StartingDataDto StartingDataDto, @RequestHeader("Authorization") String token) {
-        projectService.createProject(StartingDataDto, jwtUtil.removeBearer(token));
+        projectService.createProject(StartingDataDto, jwtUtil.getUserIdByToken(token));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -82,7 +79,7 @@ public class ProjectController {
     @Operation(summary = "프로젝트 삭제", description = "프로젝트를 삭제합니다.") // 프론트 연동 OK
     @DeleteMapping("/{projectId}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long projectId, @RequestHeader("Authorization") String token) {
-        projectService.deleteProject(projectId, jwtUtil.removeBearer(token));
+        projectService.deleteProject(projectId, jwtUtil.getUserIdByToken(token));
         return ResponseEntity.ok().build();
     }
 
@@ -96,14 +93,21 @@ public class ProjectController {
     @Operation(summary = "유저가 팀장인지 확인", description = "유저가 팀장인지 확인합니다.") // 프론트 연동 OK
     @GetMapping("/{projectId}/users/isleader")
     public ResponseEntity<Boolean> checkUserIsProjectLeader(@PathVariable Long projectId, @RequestHeader("Authorization") String token) {
-        boolean isProjectLeader = projectService.checkUserIsProjectLeader(projectId, jwtUtil.removeBearer(token));
+        boolean isProjectLeader = projectService.checkUserIsProjectLeader(projectId, jwtUtil.getUserIdByToken(token));
         return ResponseEntity.status(HttpStatus.OK).body(isProjectLeader);
     }
 
     @Operation(summary = "프로젝트 유저 삭제", description = "프로젝트에 속한 유저를 삭제합니다.") // 프론트 연동 OK
     @DeleteMapping("/{projectId}/users")
     public ResponseEntity<Void> deleteUserInProject(@PathVariable Long projectId, @RequestHeader("Authorization") String token, @RequestParam Long targetUserId) {
-        projectService.deleteUserInProject(projectId, jwtUtil.removeBearer(token), targetUserId);
+        projectService.deleteUserInProject(projectId, jwtUtil.getUserIdByToken(token), targetUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "프로젝트 유저 자진탈퇴", description = "프로젝트에 속한 유저가 자진탈퇴합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/users")
+    public ResponseEntity<Void> goOutUserInProject(@PathVariable Long projectId, @RequestHeader("Authorization") String token) {
+        projectService.deleteUserInProject(projectId, jwtUtil.getUserIdByToken(token));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -112,31 +116,6 @@ public class ProjectController {
     public ResponseEntity<Void> updateProjectName(@PathVariable Long projectId, @RequestBody Map<String, String> newProjectNameMap) {
         projectService.updateProjectName(projectId, newProjectNameMap.get("projectName"));
         return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-
-    //     /api/v1/projects/{projectId}/sprints/{sprintId}/backlogs
-    //나의 Backlog + 나의 달성 현황
-    // 3.4 프론트랑 연결 하고 다시 봐야할듯
-    @Operation(summary = "내 Backlog 조회", description = "User에게 속한 Backlog 정보 제공")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/users/{userId}")
-    public ResponseEntity<Slice<BacklogInfoResponse>> getBacklogInfoList(@PathVariable Long projectId, @PathVariable Long userId, @PageableDefault(size = 5) Pageable pageable) {
-        return ResponseEntity.ok(backlogService.findBacklogListByProjectId(projectId, userId, pageable));
-    }
-
-
-    //Backlog 정보
-    @Operation(summary = "Backlog ", description = "backlogId의 Backlog의 제목 정보를 제공합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}")
-    public ResponseEntity<BacklogDetailResponse> getBacklogDetail(@PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.findBacklogDetailById(backlogId));
-    }
-
-    //백로그 제목 수정
-    @Operation(summary = "")
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/title")
-    public ResponseEntity<BacklogTitleResponse> updateBacklogTitle(@RequestBody BacklogTitleRequest request, @PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.updateBacklogTitle(request, backlogId));
     }
 
 
@@ -172,7 +151,7 @@ public class ProjectController {
 
     @Operation(summary = "스프린트에 속한 백로그 조회", description = "스프린트에 속한 백로그들을 projectId와 sprintId 로 조회합니다.") // 프론트 연동 OK
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs")
-    public ResponseEntity<List<SprintBacklogResponse>> getSprintBacklogs(@PathVariable Long projectId, @PathVariable Long sprintId) {
+    public ResponseEntity<List<BacklogInfoResponse>> getSprintBacklogs(@PathVariable Long projectId, @PathVariable Long sprintId) {
         return ResponseEntity.status(HttpStatus.OK).body(backlogService.getSprintBacklogsByProjectIdAndSprintId(projectId, sprintId));
     }
 
@@ -197,257 +176,283 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //Backlog에 걸려있는 유저
-    @Operation(summary = "Backlog의 걸려있는 유저", description = "Backlog의 걸려있는 유저 리스트를 제공합니다.")
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Backlogs ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "스프린트 백로그 추가", description = "스프린트에 백로그를 title 과 weight 로 추가합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs")
+    public ResponseEntity<Void> addBacklogToSprint(@RequestBody SimpleBacklogRequest request, @PathVariable Long sprintId) {
+        backlogService.createBacklog(request, sprintId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "백로그 수정", description = "백로그 title 과 weight 를 수정합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}")
+    public ResponseEntity<Void> updateBacklog(@RequestBody BacklogUpdateRequest backlogUpdateRequest, @PathVariable Long backlogId) {
+        backlogService.updateBacklog(backlogUpdateRequest, backlogId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "Backlog isFinished 토글", description = "Backlog 의 isFinished 를 토글합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/finish")
+    public ResponseEntity<Map<String, Boolean>> updateBacklogFinished(@PathVariable Long backlogId, @RequestBody Map<String, Boolean> flagMap) {
+        boolean resultFlag = backlogService.updateBacklogIsFinished(backlogId, flagMap.get("finish"));
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("finish", resultFlag));
+    }
+
+    @Operation(summary = "Backlog 에 소속된 유저 조회", description = "Backlog 에 소속된 유저 리스트를 조회합니다.") // 프론트 연동 OK
     @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users")
-    public ResponseEntity<List<BacklogUserResponse>> getBacklogUser(@PathVariable Long backlogId) {
+    public ResponseEntity<List<UserBacklogResponse>> getUsersInBacklog(@PathVariable Long backlogId) {
         return ResponseEntity.ok(backlogService.findUserByBacklogId(backlogId));
     }
 
-    //유저 수정하기 기능 중 현재 백로그에는 할당되어 있지 않지만 프로젝트에는 할당된 유저
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users-excluded")
-    public ResponseEntity<List<BacklogUserResponse>> getBacklogExceptUsers(@PathVariable Long projectId, @PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.findBacklogExceptUsers(projectId, backlogId));
+    @Operation(summary = "Backlog 에 유저 추가", description = "Backlog 에 유저를 추가합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users/{userId}")
+    public ResponseEntity<Void> addUserInBacklog(@PathVariable Long backlogId, @PathVariable Long userId) {
+        backlogService.addUserInBacklog(backlogId, userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //백로그 유저 Delete
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long backlogId, @PathVariable Long userId) {
-        backlogService.deleteUser(backlogId, userId);
+    @Operation(summary = "Backlog 에 소속된 유저 삭제", description = "Backlog 에 소속된 유저를 삭제합니다.") // 프론트 연동 OK
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users")
+    public ResponseEntity<Void> deleteUserInBacklog(@PathVariable Long backlogId, @RequestParam Long userId) {
+        backlogService.deleteUserInBacklog(backlogId, userId);
         return ResponseEntity.ok().build();
     }
 
-    //백로그 유저 add
-    //Post 쓸 필요가 없음
-    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/users/{userId}")
-    public ResponseEntity<BacklogUserResponse> addUser(@PathVariable Long backlogId, @PathVariable Long userId) {
-        return ResponseEntity.ok(backlogService.addBacklogUser(backlogId, userId));
+    @Operation(summary = "내 Backlog 조회", description = "User 에게 할당된 Backlog 리스트를 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/user-backlogs")
+    public ResponseEntity<List<BacklogInfoResponse>> getUsersBacklogs(@PathVariable Long projectId, @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(backlogService.findUserBacklogs(projectId, jwtUtil.getUserIdByToken(token)));
     }
 
-    //Backlog에 걸려있는 Task
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks")
-    public ResponseEntity<List<BacklogTaskResponse>> getBacklogTask(@PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.findTaskByBacklogId(backlogId));
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Task ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "Task 조회", description = "백로그에 포함된 Task 를 조회합니다.") // 프론트 연동 OK
+    @GetMapping(value = "/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<BacklogTaskResponse>> getTasksInBacklog(@PathVariable Long backlogId) {
+        return ResponseEntity.status(HttpStatus.OK).body(backlogService.findTasksByBacklogId(backlogId));
     }
 
-
-    //Backlog에 걸려있는 이슈
-    /*
-     * issue
-     * */
-
-/*    @Operation(summary = "이슈 생성", description = "백로그에 이슈를 생성합니다.")
-    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
-    public ResponseEntity<IssueRepsonse> createIssue(@RequestBody @Validated CreateIssueRequest request, @PathVariable Long backlogId) {
-        return new ResponseEntity<>(issueService.createIssue(request, backlogId), HttpStatus.CREATED);
-    }*/
-
-
-    @Operation(summary = "이슈 삭제", description = "이슈를 삭제합니다.")
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/{issueId}")
-    public ResponseEntity<IssueRepsonse> deleteIssue(@PathVariable Long issueId) {
-        return new ResponseEntity<>(issueService.deleteIssue(issueId), HttpStatus.OK);
+    @Operation(summary = "백로그에 Task 추가", description = "백로그에 Task 를 추가합니다.") // 프론트 연동 OK
+    @PostMapping(value = "/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks")
+    public ResponseEntity<Void> addTaskToBacklog(@PathVariable Long backlogId, @RequestBody TaskRequest taskRequest) {
+        backlogService.addTaskToBacklog(backlogId, taskRequest.getContent());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-/*    @Operation(summary = "이슈 수정", description = "이슈를 수정합니다.")
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/{issueId}")
-    public ResponseEntity<IssueRepsonse> updateIssue(@PathVariable Long issueId, @RequestBody CreateIssueRequest createIssueRequest) {
-        return new ResponseEntity<>(issueService.updateIssue(issueId, createIssueRequest), HttpStatus.OK);
-    }*/
-
-    @Operation(summary = "이슈 전체 조회", description = "이슈를 전체를 조회합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
-    public ResponseEntity<List<BacklogIssueResponse>> getBacklogIssue(@PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogService.findIssueByBacklogId(backlogId));
+    @Operation(summary = "Task checked 토글", description = "Task 의 checked 를 토글합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/check")
+    public ResponseEntity<TaskCheckedDto> updateTaskChecked(@PathVariable Long taskId, @RequestBody TaskCheckedDto request) {
+        return ResponseEntity.status(HttpStatus.OK).body(backlogService.updateTaskChecked(taskId, request.isChecked()));
     }
 
-    //Backlog 추가 (한번에)
-//    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs")
-    public ResponseEntity<BacklogPostResponse> addBacklog(@RequestBody BacklogPostRequest request, @PathVariable Long sprintId) {
-        return ResponseEntity.ok(backlogService.createBacklog(request, sprintId));
+    @Operation(summary = "Task content 수정", description = "Task 의 content 를 수정합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/content")
+    public ResponseEntity<Void> updateTaskContent(@PathVariable Long taskId, @RequestBody TaskRequest request) {
+        backlogService.updateTaskContent(taskId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //---------------------------------- 수정 시 한번에 -----------------------------------
-    //백로그 유저 수정 (삭제 , 삽입)
-    /*@PatchMapping("/{backlogId}/users")
-    public ResponseEntity<List<BacklogUserResponse>> updateBacklogUsers(@PathVariable Long backlogId,
-                                                     @RequestBody BacklogUserUpdateRequest request) {
-        return ResponseEntity.ok(backlogService.updateBacklogUsers(backlogId, request));
+    @Operation(summary = "Task 에 유저 추가", description = "Task 에 유저를 추가합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/user")
+    public ResponseEntity<Void> addUserOnTask(@PathVariable Long taskId, @RequestBody Map<String, Long> userIdMap) {
+        backlogService.addUserOnTask(taskId, userIdMap.get("userId"));
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //업무 수정 (삭제 , 삽입)
-    @PatchMapping("/{backlogId}/tasks")
-    public ResponseEntity<List<BacklogTaskResponse>> updateBacklogTasks(@PathVariable Long backlogId,
-                                                     @RequestBody BacklogTaskUpdateRequest request) {
-        return ResponseEntity.ok(backlogService.updateBacklogTasks(backlogId, request));
-    }*/
-    //---------------------------------- 수정 시 한번에 -----------------------------------
-
-
-    //---------------------------------- 수정 시 하나씩(현재 채택) -----------------------------------
-    /*
-     * backlogComment
-     * */
-
-    //createdDate Response 수정 필요
-    @Operation(summary = "댓글 생성", description = "백로그에 댓글을 생성합니다.")
-    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments")
-    public ResponseEntity<BacklogCommentResponse> createComment(
-            @PathVariable Long backlogId,
-            @RequestBody @Validated BacklogCommentRequest request,
-            @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(backlogCommentService.createComment(backlogId, jwtUtil.removeBearer(token), request));
+    @Operation(summary = "Task 에 유저 삭제", description = "Task 에 유저를 삭제합니다.") // 프론트 연동 OK
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/user")
+    public ResponseEntity<Void> deleteUserOnTask(@PathVariable Long taskId, @RequestParam Long userId) {
+        backlogService.deleteUserOnTask(taskId, userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    // 3.4 Cascade 삭제
-    @Operation(summary = "댓글 삭제", description = "백로그에 댓글을 삭제합니다.")
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments/{backlogCommentId}")
-    public ResponseEntity<BacklogCommentResponse> deleteComment(
-            @PathVariable Long backlogCommentId,
-            @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(backlogCommentService.deleteComment(jwtUtil.removeBearer(token), backlogCommentId));
-    }
-
-    @Operation(summary = "내 댓글 조회", description = "내가 작성한 댓글을 조회합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments/user")
-    public ResponseEntity<List<BacklogCommentResponse>> getUserComment(
-            @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(backlogCommentService.getUserComment(jwtUtil.removeBearer(token)));
-    }
-
-    @Operation(summary = "댓글 조회", description = "백로그에 달린 댓글을 조회합니다.")
-    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments")
-    public ResponseEntity<List<BacklogCommentResponse>> getComments(
-            @PathVariable Long backlogId) {
-        return ResponseEntity.ok(backlogCommentService.getComments(backlogId));
-    }
-
-    @Operation(summary = "댓글 수정", description = "백로그에 댓글을 수정합니다.")
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogComments/{backlogCommentsId}")
-    public ResponseEntity<BacklogCommentResponse> updateComment(
-            @PathVariable Long backlogCommentsId,
-            @RequestBody @Validated BacklogCommentUpdateContent request,
-            @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(backlogCommentService.updateComment(jwtUtil.removeBearer(token), backlogCommentsId, request));
-    }
-
-    //업무 Delete
+    @Operation(summary = "Task 삭제", description = "백로그에 포함된 Task 를 삭제합니다.") // 프론트 연동 OK
     @DeleteMapping(("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}"))
     public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
         backlogService.deleteTask(taskId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //업무 add
-    @PostMapping(value = "/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BacklogTaskResponse> addTask(@PathVariable Long backlogId, @RequestBody BacklogTaskRequest request) {
-        return ResponseEntity.ok(backlogService.addTask(backlogId, request));
+    @Operation(summary = "백로그 내 Task 완료 비율", description = "백로그 내부의 Task 완료 비율을 퍼센트(정수)로 조회합니다.") // TODO
+    @GetMapping(value = "/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/complete-rate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BacklogTaskCompleteRateResponse> getBacklogTaskCompleteRate(@PathVariable Long backlogId) {
+        int rate = backlogService.getBacklogTaskCompleteRate(backlogId);
+        return ResponseEntity.status(HttpStatus.OK).body(new BacklogTaskCompleteRateResponse(rate));
     }
+
+
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Issue::: ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "이슈 전체 조회", description = "백로그에 포함된 이슈를 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
+    public ResponseEntity<List<BacklogIssueResponse>> getIssuesInBacklog(@PathVariable Long backlogId) {
+        return ResponseEntity.ok(backlogService.findIssuesByBacklogId(backlogId));
+
+    }
+
+    @Operation(summary = "이슈 추가", description = "백로그에 이슈를 추가합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
+    public ResponseEntity<BacklogIssueResponse> addIssueToBacklog(@PathVariable Long backlogId, @RequestBody IssueRequest issueRequest) {
+        return ResponseEntity.ok(backlogService.addIssueToBacklog(backlogId, issueRequest.getContent()));
+    }
+
+    @Operation(summary = "이슈 checked 토글", description = "이슈의 checked 를 토글합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/{issueId}/check")
+    public ResponseEntity<IssueCheckedDto> updateIssueChecked(@PathVariable Long issueId, @RequestBody IssueCheckedDto issueCheckedDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(issueService.updateIssueChecked(issueId, issueCheckedDto.isChecked()));
+    }
+
+    @Operation(summary = "이슈 컨텐츠 수정", description = "이슈의 컨텐츠를 수정합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/{issueId}")
+    public ResponseEntity<Void> updateIssueContent(@PathVariable Long issueId, @RequestBody IssueRequest issueRequest) {
+        backlogService.updateIssue(issueId, issueRequest);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "이슈 삭제", description = "이슈를 삭제합니다.") // 프론트 연동 OK
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/{issueId}")
+    public ResponseEntity<Void> deleteIssue(@PathVariable Long issueId) {
+        issueService.deleteIssue(issueId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+
+
 
 
     //---------------------------------- 수정 시 하나씩 -----------------------------------
 
-    //이슈 수정
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues/{issueId}")
-    public ResponseEntity<BacklogIssueResponse> updateIssue(@PathVariable Long issueId, @RequestBody BacklogIssueRequest request) {
-        return ResponseEntity.ok(backlogService.updateIssue(issueId, request));
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: 댓글 Comment :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "댓글 조회", description = "백로그에 달린 댓글을 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments")
+    public ResponseEntity<List<BacklogCommentResponse>> getBacklogComments(
+            @PathVariable Long backlogId) {
+        return ResponseEntity.ok(backlogCommentService.getBacklogComments(backlogId));
     }
 
-    //이슈 add
-    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
-    public ResponseEntity<BacklogIssueResponse> addIssue(@PathVariable Long backlogId, @RequestBody BacklogIssueRequest request) {
-        return ResponseEntity.ok(backlogService.addIssue(backlogId, request));
+    @Operation(summary = "댓글 생성", description = "백로그에 댓글을 생성합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments")
+    public ResponseEntity<Void> createBacklogComment(
+            @PathVariable Long backlogId,
+            @RequestBody @Validated BacklogCommentRequest request,
+            @RequestHeader("Authorization") String token) {
+        backlogCommentService.createBacklogComment(backlogId, jwtUtil.getUserIdByToken(token), request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    //---------------------------------------------------------------------
-
-    //스프린트에 걸려있는 DailyScrum 리스트
-    //3.4 DailyScrum에 Sprint 관계 매핑 안되어있음
-    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums")
-    public ResponseEntity<List<DailyScrumInfoResponse>> getDailyScrumInfoList(@PathVariable Long sprintId) {
-        return ResponseEntity.ok(dailyScrumService.findDailyScrumInfoBySprintId(sprintId));
+    @Operation(summary = "댓글 삭제", description = "백로그에 댓글을 삭제합니다.") // 프론트 연동 OK
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/{backlogCommentId}")
+    public ResponseEntity<Void> deleteBacklogComment(
+            @PathVariable Long backlogCommentId,
+            @RequestHeader("Authorization") String token) {
+        backlogCommentService.deleteBacklogComment(jwtUtil.getUserIdByToken(token), backlogCommentId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //DailyScrum의 User 리스트
-    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/users")
-    public ResponseEntity<List<DailyScrumUserResponse>> getUserInfoList(@PathVariable Long dailyScrumId) {
+
+
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: DailyScrum ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "Sprint 의 DailyScrum 조회", description = "Sprint 의 DailyScrum 을 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyscrums")
+    public ResponseEntity<List<DailyScrumResponse>> getDailyScrumList(@PathVariable Long sprintId) {
+        return ResponseEntity.ok(dailyScrumService.findDailyScrumBySprintId(sprintId));
+    }
+
+    @Operation(summary = "오늘 날짜의 DailyScrum 조회", description = "오늘 날짜의 DailyScrum 을 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyscrums/today")
+    public ResponseEntity<List<DailyScrumResponseWithSprintId>> getDailyScrumInToday(@PathVariable Long projectId) {
+        return ResponseEntity.ok(dailyScrumService.findDailyScrumByDate(LocalDate.now(), projectId));
+    }
+
+    @Operation(summary = "Sprint 에 DailyScrum 생성", description = "Sprint 에 DailyScrum 을 생성합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/dailyscrums")
+    public ResponseEntity<Void> addDailyScrumToSprint(@PathVariable Long sprintId) {
+        dailyScrumService.createDailyScrum(sprintId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "DailyScrum 참석 유저 조회", description = "DailyScrum 에 참석한 유저를 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/users")
+    public ResponseEntity<List<DailyScrumUserResponse>> getDailyScrumUserList(@PathVariable Long dailyScrumId) {
         return ResponseEntity.ok(dailyScrumService.findDailyScrumUserBySprintId(dailyScrumId));
     }
 
-    //DailyScrum에 걸려있는 백로그 리스트
-    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/backlogs")
-    public ResponseEntity<List<BacklogResponse>> getBacklogList(@PathVariable Long dailyScrumId) {
-        return ResponseEntity.ok(dailyScrumService.findBacklogByDailyScrumId(dailyScrumId));
-    }
-
-    // 3.4 LocalDate 타입 때문에 다시
-    @GetMapping("/{projectId}/sprints/{sprintId}/today-dailyScrums")
-    //Today Scrum , 만약 TodayScrum이 2개 이상이라면 어떻게 할것인가?
-    public ResponseEntity<List<DailyScrumDetailResponse>> getTodayDailyScrumDetail() {
-        return ResponseEntity.ok(dailyScrumService.findDailyScrumByDate(LocalDate.now()));
-    }
-
-    //DailyScrum 생성
-    @PostMapping("/{projectId}/sprints/{sprintId}/dailyScrums")
-    public ResponseEntity<DailyScrumPostResponse> addDailyScrum(@RequestBody DailyScrumPostRequest request, @PathVariable Long projectId, @PathVariable Long sprintId) {
-        //projectId 파라미터는 User가 project Leader인지 위해서
-        return ResponseEntity.ok(dailyScrumService.createDailyScrum(request, projectId, sprintId));
-
-    }
-
-
-    //backlog 중 DailyScrum에 걸려있지 않고 Sprint에는 해당되는 백로그 조회
-    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/backlogs/backlog-excluded")
-    public ResponseEntity<List<BacklogResponse>> getSprintBacklogsWithoutDailyScrum(@PathVariable Long sprintId, @PathVariable Long dailyScrumId) {
-        return ResponseEntity.ok(backlogService.getBacklogsExcludeDailyScrum(sprintId, dailyScrumId));
-    }
-
-
-    //DailyScrum 중 백로그 삭제 , 단일 연관관계 삭제 (하나씩 )
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/backlogs/{backlogId}")
-    public ResponseEntity<Void> removeBacklogFromDailyScrum(
-            @PathVariable Long dailyScrumId,
-            @PathVariable Long backlogId) {
-        dailyScrumService.removeBacklog(dailyScrumId, backlogId);
-        return ResponseEntity.noContent().build();
-    }
-
-    //DailyScrum 중 백로그 추가
-    @PostMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/backlogs/{backlogId}")
-    public ResponseEntity<BacklogResponse> addBacklogToDailyScrum(@PathVariable Long dailyScrumId, @PathVariable Long backlogId) {
-        return ResponseEntity.ok(dailyScrumService.addBacklogToDailyScrum(dailyScrumId, backlogId));
-    }
-
-    //유저 중 DailyScrum에 걸려있지 않고 project에는 해당되는 유저 조회
-    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/users/dailyScrum-excluded")
-    public ResponseEntity<List<DailyScrumUserResponse>> getProjectUsersNotInDailyScrum(@PathVariable Long dailyScrumId, @PathVariable Long projectId) {
-        return ResponseEntity.ok(dailyScrumService.findUsersNotInDailyScrum(projectId, dailyScrumId));
-    }
-
-    //DailyScrum 유저 추가
-    @PostMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/users/{userId}")
+    @Operation(summary = "DailyScrum 참석 유저 추가", description = "DailyScrum 에 유저를 userId 로 추가시킵니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/users/{userId}")
     public ResponseEntity<DailyScrumUserResponse> addUserToDailyScrum(@PathVariable Long dailyScrumId, @PathVariable Long userId) {
         return ResponseEntity.ok(dailyScrumService.addUserToDailyScrum(dailyScrumId, userId));
     }
 
-    //DailyScrum 유저 삭제
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/users/{userId}")
+    @Operation(summary = "DailyScrum 참석 유저 삭제", description = "DailyScrum 에 있는 유저를 userId로 삭제시킵니다.") // 프론트 연동 OK
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/users/{userId}")
     public ResponseEntity<Void> deleteUserFromDailyScrum(@PathVariable Long dailyScrumId, @PathVariable Long userId) {
         dailyScrumService.removeUserFromDailyScrum(dailyScrumId, userId);
         return ResponseEntity.noContent().build();
     }
 
-    //회의 노트
-    @GetMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/content")
-    public ResponseEntity<DailyScrumDetailResponse> getDailyScrumDetail(@PathVariable Long dailyScrumId) {
-        return ResponseEntity.ok(dailyScrumService.findContentByDailyScrumId(dailyScrumId));
+    @Operation(summary = "DailyScrum 백로그 조회", description = "DailyScrum 에 있는 Backlog 리스트를 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/backlogs")
+    public ResponseEntity<List<BacklogResponse>> getBacklogList(@PathVariable Long dailyScrumId) {
+        return ResponseEntity.ok(dailyScrumService.findBacklogByDailyScrumId(dailyScrumId));
     }
 
-    //DailyScrum 중 회의노트 수정
-    @PatchMapping("/{projectId}/sprints/{sprintId}/dailyScrums/{dailyScrumId}/content")
-    public ResponseEntity<DailyScrumDetailResponse> updateDailyScrumContent(@PathVariable Long dailyScrumId, @RequestBody DailyScrumContentUpdateRequest request) {
-        return ResponseEntity.ok(dailyScrumService.updateContent(dailyScrumId, request.getContent()));
+    @Operation(summary = "DailyScrum 에 백로그 추가", description = "DailyScrum 에 백로그를 추가합니다.") // 프론트 연동 OK
+    @PostMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/backlogs/{backlogId}")
+    public ResponseEntity<Void> addBacklogToDailyScrum(@PathVariable Long dailyScrumId, @PathVariable Long backlogId) {
+        dailyScrumService.addBacklogToDailyScrum(dailyScrumId, backlogId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(summary = "DailyScrum 에 있는 백로그 삭제", description = "DailyScrum 에 있는 백로그를 삭제합니다.") // 프론트 연동 OK
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/backlogs/{backlogId}")
+    public ResponseEntity<Void> removeBacklogFromDailyScrum(@PathVariable Long dailyScrumId, @PathVariable Long backlogId) {
+        dailyScrumService.removeBacklogFromDailyScrum(dailyScrumId, backlogId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "DailyScrum 의 회의노트 조회", description = "DailyScrum 의 회의노트를 불러옵니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/content")
+    public ResponseEntity<Map<String, String>> getDailyScrumContent(@PathVariable Long dailyScrumId) {
+        String content = dailyScrumService.findContentByDailyScrumId(dailyScrumId);
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("content", content));
+    }
+
+    @Operation(summary = "DailyScrum 에 회의노트 저장", description = "DailyScrum 에 회의노트를 저장합니다.") // 프론트 연동 OK
+    @PatchMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/content")
+    public ResponseEntity<Void> saveDailyScrumContent(@PathVariable Long dailyScrumId, @RequestBody DailyScrumContentUpdateRequest request) {
+        dailyScrumService.updateContent(dailyScrumId, request.getContent());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "DailyScrum 삭제", description = "DailyScrum 을 삭제합니다") // 프론트 연동 OK
+    @DeleteMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}")
+    public ResponseEntity<Void> deleteDailyScrum(@PathVariable Long dailyScrumId) {
+        dailyScrumService.deleteDailyScrum(dailyScrumId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
 }

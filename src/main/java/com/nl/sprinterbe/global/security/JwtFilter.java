@@ -1,11 +1,7 @@
 package com.nl.sprinterbe.global.security;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.nl.sprinterbe.global.common.code.ResponseStatus;
 import com.nl.sprinterbe.dto.CustomUserDetails;
-import com.nl.sprinterbe.global.common.ErrorDto;
 import com.nl.sprinterbe.domain.user.entity.User;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -52,7 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     user.setUserId(Long.parseLong(id));
                     user.setEmail(email);
                     user.setPassword("temppassword");
-//                    user.setRole(role);
+                    user.setRole(role);
 
                     CustomUserDetails customUserDetails = new CustomUserDetails(user);
                     Authentication authToken = new UsernamePasswordAuthenticationToken(
@@ -61,16 +57,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
                     filterChain.doFilter(request, response);
                 }
-            } catch (ExpiredJwtException ex){
-                ErrorDto.settingResponse(response,HttpStatus.UNAUTHORIZED, ResponseStatus.A_TOKEN_EXPIRED);
-                return;
             } catch (JwtException ex){
-                ErrorDto.settingResponse(response,HttpStatus.BAD_REQUEST,ResponseStatus.TOKEN_INVALID);
+                // 토큰 만료 및 검증 문제
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
         }
         else {
-            ErrorDto.settingResponse(response,HttpStatus.UNAUTHORIZED,ResponseStatus.TOKEN_COMI_ERROR);
+            // Refresh Token , Access Token 같이 보냈을때
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
             return;
         }
 

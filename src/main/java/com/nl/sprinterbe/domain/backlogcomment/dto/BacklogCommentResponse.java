@@ -1,35 +1,33 @@
 package com.nl.sprinterbe.domain.backlogcomment.dto;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonPropertyOrder({"backlogCommentId", "content", "nickname", "parentCommentId", "createdDate", "childComments"})
 public class BacklogCommentResponse {
+
     private Long BacklogCommentId;
-    private String content;
-    private LocalDate createdDate;
-    private String nickname;
     private Long parentCommentId;
-    private List<BacklogCommentResponse> childComments;
+    private Long userId;
+
+    private String nickname;
+    private String content;
+    private LocalDateTime createdDate;
 
     public static BacklogCommentResponse of(BacklogComment backlogComment) {
         return BacklogCommentResponse.builder()
                 .BacklogCommentId(backlogComment.getBacklogCommentId())
+                .parentCommentId(backlogComment.getParentCommentId())
+                .userId(backlogComment.getUser().getUserId())
+                .nickname(backlogComment.getUser().getNickname())
                 .content(backlogComment.getContent())
                 .createdDate(backlogComment.getCreatedAt())
-                .nickname(backlogComment.getUser().getNickname())
-                .parentCommentId(backlogComment.getParentComment() == null ? -999L : backlogComment.getParentComment().getBacklogCommentId())
-                .childComments(new ArrayList<>())
                 .build();
     }
 }
