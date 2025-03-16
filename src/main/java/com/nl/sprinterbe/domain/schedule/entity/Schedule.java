@@ -2,18 +2,20 @@ package com.nl.sprinterbe.domain.schedule.entity;
 
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.user.entity.User;
+import com.nl.sprinterbe.domain.userschedule.UserSchedule;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 public class Schedule {
     @Id
@@ -25,17 +27,25 @@ public class Schedule {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @OneToMany(mappedBy = "schedules", cascade = CascadeType.ALL,orphanRemoval = true)
+    @Builder.Default
+    private List<UserSchedule> userSchedules = new ArrayList<>();
 
     @Column(name = "start_time")
-    private Date startTime;
+    private LocalDateTime startDateTime;
 
     @Column(name = "end_time")
-    private Date endTime;
+    private LocalDateTime endDateTime;
 
     private String title;
 
     private Boolean notify;
+
+    private Boolean isAllDay;
+
+    @Enumerated(EnumType.STRING)
+    private ScheduleColor color;
+
+    private Integer preNotificationTime;
+
 }

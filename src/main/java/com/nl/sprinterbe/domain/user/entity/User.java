@@ -4,6 +4,8 @@ import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
 import com.nl.sprinterbe.domain.dailyscrum.entity.UserDailyScrum;
 import com.nl.sprinterbe.domain.userbacklog.entity.UserBacklog;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
+import com.nl.sprinterbe.domain.userschedule.UserSchedule;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -42,6 +44,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserProject> userProjects = new ArrayList<>();
 
+    // 다대다 매핑 (유저 , 스케줄)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<UserSchedule> userSchedules = new ArrayList<>();
+
     // 다대다 매핑 (유저, 백로그)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserBacklog> userBacklogs = new ArrayList<>();
@@ -49,6 +56,7 @@ public class User {
     // 다대다 매핑 (유저, 데일리스크럼)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserDailyScrum> userDailyScrums = new ArrayList<>();
+
 
 
 
