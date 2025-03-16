@@ -375,15 +375,10 @@ public class ProjectController {
      */
 
     @Operation(summary = "좋아요 On", description = "백로그 댓글에 좋아요가 on 됩니다.")
-    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/{backlogCommentId}/likes/on")
-    public ResponseEntity<List<BacklogCommentResponse>> onLikeToBacklogComment(@PathVariable Long backlogId, @PathVariable Long backlogCommentId) {
-        return ResponseEntity.status(HttpStatus.OK).body(backlogCommentService.onLikeToBacklogComment(backlogId, backlogCommentId));
-    }
-
-    @Operation(summary = "좋아요 Off", description = "백로그 댓글에 좋아요가 off 됩니다.")
-    @DeleteMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/{backlogCommentId}/likes/off")
-    public ResponseEntity<List<BacklogCommentResponse>> offLikeToBacklogComment(@PathVariable Long backlogId, @PathVariable Long backlogCommentId) {
-        return ResponseEntity.status(HttpStatus.OK).body(backlogCommentService.offLikeToBacklogComment(backlogId, backlogCommentId));
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/{backlogCommentId}/likes")
+    public ResponseEntity<Void> onLikeToBacklogComment(@PathVariable Long backlogId, @PathVariable Long backlogCommentId) {
+        backlogCommentService.onLikeToBacklogComment(backlogId, backlogCommentId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
