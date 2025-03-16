@@ -14,6 +14,12 @@ public interface LikeRepository extends JpaRepository<Like,Long> {
             "GROUP BY l.backlogComment.backlogCommentId")
     List<Object[]> countLikesByBacklogCommentIds(@Param("backlogCommentIds") List<Long> backlogCommentIds);
 
+    @Query("SELECT l.backlogComment.backlogCommentId FROM Like l " +
+            "WHERE l.user.userId = :userId " +
+            "AND l.backlogComment.backlogCommentId IN :backlogCommentIds")
+    List<Long> findLikedCommentIdsByUserId(@Param("userId") Long userId,
+                                           @Param("backlogCommentIds") List<Long> backlogCommentIds);
+
     void deleteByBacklogCommentBacklogCommentIdAndUserUserId(Long backlogCommentId, Long userId);
 
 

@@ -125,7 +125,7 @@ public class ProjectController {
      * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      */
     @Operation(summary = "Product Backlog 조회", description = "Product Backlog 리스트를 조회합니다.") // 프론트 연동 OK
-    @GetMapping("/{projectId}/productbacklogs")
+    @GetMapping("/{projectId}/productbacklogs")  // 보길 수정 3/16
     public ResponseEntity<List<ProductBacklogResponse>> getProductBacklogList(@PathVariable Long projectId) {
         return ResponseEntity.ok(backlogService.getProductBacklogsByProjectId(projectId));
     }
@@ -224,7 +224,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "내 Backlog 조회", description = "User 에게 할당된 Backlog 리스트를 조회합니다.") // 프론트 연동 OK
-    @GetMapping("/{projectId}/sprints/user-backlogs")
+    @GetMapping("/{projectId}/sprints/user-backlogs") // 보길 수정 3/16
     public ResponseEntity<List<BacklogInfoResponse>> getUsersBacklogs(@PathVariable Long projectId, @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(backlogService.findUserBacklogs(projectId, jwtUtil.getUserIdByToken(token)));
     }

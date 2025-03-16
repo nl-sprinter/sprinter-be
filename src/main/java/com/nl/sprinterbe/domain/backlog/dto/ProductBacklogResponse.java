@@ -16,7 +16,7 @@ public class ProductBacklogResponse {
     private String sprintName;
     private Long sprintOrder;
 
-
+    int completeRate;
 
     public static ProductBacklogResponse of(Backlog backlog) {
         return ProductBacklogResponse.builder()
@@ -29,4 +29,19 @@ public class ProductBacklogResponse {
                 .sprintOrder(backlog.getSprint().getSprintOrder())
                 .build();
     }
+
+    public static ProductBacklogResponse of(Backlog backlog, int completeRate) {
+        return ProductBacklogResponse.builder()
+                .backlogId(backlog.getBacklogId())
+                .title(backlog.getTitle())
+                .weight(backlog.getWeight())
+                .isFinished(backlog.getIsFinished())
+                .sprintId(backlog.getSprint().getSprintId())
+                .sprintName(backlog.getSprint().getSprintName())
+                .sprintOrder(backlog.getSprint().getSprintOrder())
+                .completeRate(completeRate)
+                .build();
+    }
+
+
 }

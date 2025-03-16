@@ -42,7 +42,7 @@ public class BacklogServiceImpl implements BacklogService {
     @Transactional(readOnly = true)
     public List<BacklogInfoResponse> findUserBacklogs(Long projectId, Long userId) {
         return backlogRepository.findUserBacklogsByProjectIdAndUserId(projectId, userId).stream()
-                .map(BacklogInfoResponse::of)
+                .map(backlog -> BacklogInfoResponse.of(backlog, getBacklogTaskCompleteRate(backlog.getBacklogId())))
                 .toList();
     }
 
@@ -241,7 +241,9 @@ public class BacklogServiceImpl implements BacklogService {
     @Override
     public List<ProductBacklogResponse> getProductBacklogsByProjectId(Long projectId) {
         List<Backlog> backlogs = backlogRepository.findBacklogsByProjectId(projectId);
-        return backlogs.stream().map(ProductBacklogResponse::of).collect(Collectors.toList());
+        return backlogs.stream()
+                .map(backlog-> ProductBacklogResponse.of(backlog, getBacklogTaskCompleteRate(backlog.getBacklogId())))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -61,14 +61,15 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
 
     @Override
     public List<BacklogCommentResponse> getBacklogComments(Long backlogId) {
+        Long userId = getCurrentUserId();
         List<BacklogComment> comments = backlogCommentRepository.findCommentsByBacklogId(backlogId);
 
-        return getCommentResponses(comments);
+        return getCommentResponses(userId, comments);
     }
 
     @Override
     public List<BacklogCommentResponse> onLikeToBacklogComment(Long backlogId, Long backlogCommentId) {
-        Long userId = Long.parseLong(securityUtil.getCurrentUserId().get());
+        Long userId = getCurrentUserId();
 
         if (!likeRepository.existsByUserUserIdAndBacklogCommentBacklogCommentId(userId, backlogCommentId)) {
             BacklogComment backlogComment = backlogCommentRepository.findById(backlogCommentId)
@@ -99,7 +100,7 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
      * @param comments 해당 백로그에 달린 댓글 리스트
      */
     @NotNull
-    private List<BacklogCommentResponse> getCommentResponses(List<BacklogComment> comments) {
+    private List<BacklogCommentResponse> getCommentResponses(Long userId, List<BacklogComment> comments) {
         List<Long> commentIds = comments.stream()
                 .map(BacklogComment::getBacklogCommentId)
                 .toList();
@@ -113,11 +114,20 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
                                 likeCount -> (Long) likeCount[1]
                         ));
 
+        Set<Long> likedCommentIds = commentIds.isEmpty() ?
+                Collections.emptySet() :
+                new HashSet<>(likeRepository.findLikedCommentIdsByUserId(userId, commentIds));
+
         return comments.stream()
                 .map(comment -> BacklogCommentResponse.of(
                         comment,
-                        likeCountMap.getOrDefault(comment.getBacklogCommentId(), 0L)))
+                        likeCountMap.getOrDefault(comment.getBacklogCommentId(), 0L),
+                        likedCommentIds.contains(comment.getBacklogCommentId())))
                 .toList();
+    }
+
+    private Long getCurrentUserId() {
+        return Long.parseLong(securityUtil.getCurrentUserId().get());
     }
 
     /**
