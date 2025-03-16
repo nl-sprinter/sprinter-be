@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-public class ScheduleAddRequest {
+public class ScheduleRequest {
 
-     List<Long> userId;
+    List<Long> userId;
 
     //제목
     String title;

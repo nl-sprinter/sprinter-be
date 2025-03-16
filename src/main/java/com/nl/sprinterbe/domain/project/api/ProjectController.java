@@ -14,7 +14,7 @@ import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
 import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
 import com.nl.sprinterbe.domain.schedule.dto.MyScheduleResponse;
-import com.nl.sprinterbe.domain.schedule.dto.ScheduleAddRequest;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleRequest;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
 import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
@@ -551,14 +551,22 @@ public class ProjectController {
 
     @Operation(summary = "캘린더 내 Schedule 생성", description = "해당 년도와 월의 내 Schedule 정보를 저장합니다.")
     @PostMapping("/{projectId}/schedule")
-    public ResponseEntity<Void> addMySchedule(@RequestBody ScheduleAddRequest request,@PathVariable Long projectId) {
+    public ResponseEntity<Void> addMySchedule(@RequestBody ScheduleRequest request, @PathVariable Long projectId) {
         scheduleService.createSchedule(request,projectId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(summary = "캘린더 내 Schedule 삭제", description = "해당 년도와 월의 내 Schedule 정보를 삭제합니다.")
     @DeleteMapping("/{projectId}/schedule/{scheduleId}")
     public ResponseEntity<Void> deleteMyScheduleFromScheduleId(@PathVariable Long scheduleId) {
         scheduleService.deleteSchedule(scheduleId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "캘린더 내 Schedule 수정", description = "해당 년도와 월의 내 Schedule 정보를 수정합니다.")
+    @PatchMapping("/{projectId}/schedule/{scheduleId}")
+    public ResponseEntity<Void> updateMyScheduleFromScheduleId(@RequestBody ScheduleRequest request, @PathVariable Long scheduleId) {
+        scheduleService.updateSchedule(request,scheduleId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

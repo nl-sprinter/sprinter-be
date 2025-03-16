@@ -3,7 +3,7 @@ package com.nl.sprinterbe.domain.schedule.application;
 import com.nl.sprinterbe.domain.project.dao.ProjectRepository;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.schedule.dto.MyScheduleResponse;
-import com.nl.sprinterbe.domain.schedule.dto.ScheduleAddRequest;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleRequest;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
 import com.nl.sprinterbe.domain.schedule.dao.ScheduleRepository;
 import com.nl.sprinterbe.domain.schedule.entity.Schedule;
@@ -12,10 +12,12 @@ import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.global.exception.project.ProjectNotFoundException;
+import com.nl.sprinterbe.global.exception.schedule.ScheduleNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.userschedule.UserSchedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,11 +28,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final SprintRepository sprintRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+
+    @Transactional(readOnly = true)
     public List<ScheduleResponse> getSchedule(Long projectId, int year , int month) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDateTime startOfMonth = startDate.atStartOfDay();
@@ -46,6 +51,7 @@ public class ScheduleService {
                 .collect(Collectors.toList()); // List<ScheduleResponse>
     }
 
+    @Transactional(readOnly = true)
     public List<MyScheduleResponse> getMySchedule(Long projectId, Long userId, int year , int month) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDateTime startOfMonth = startDate.atStartOfDay();
@@ -71,7 +77,7 @@ public class ScheduleService {
         return result;
     }
 
-    public void createSchedule(ScheduleAddRequest request, Long projectId) {
+    public void createSchedule(ScheduleRequest request, Long projectId) {
         // 1. Project 조회
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(ProjectNotFoundException::new);
@@ -109,4 +115,29 @@ public class ScheduleService {
         scheduleRepository.deleteById(scheduleId);
     }
 
+    public void updateSchedule(ScheduleRequest request, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(ScheduleNotFoundException::new);
+
+        // 모든 필드를 무조건 setter로 업데이트 (요청에 null이 포함되면 기존 값이 null로 변경됨)
+        schedule.setTitle(request.getTitle());
+        schedule.setIsAllDay(request.getIsAllDay());
+        schedule.setStartDateTime(request.getStartTime());
+        schedule.setEndDateTime(request.getEndTime());
+        schedule.setNotify(request.getIsAlarmOn());
+        schedule.setPreNotificationTime(request.getPreNotificationTime());
+        schedule.setColor(request.getColor());
+
+        // 연관관계도 동일하게 처리
+        // 기존 userSchedules 제거 및 재설정
+        schedule.getUserSchedules().clear();
+        if (request.getUserId() != null) {
+            for (Long userId : request.getUserId()) {
+                User user = userRepository.findById(userId)
+                        .orElseThrow(UserNotFoundException::new);
+                UserSchedule userSchedule = new UserSchedule(user, schedule);
+                schedule.getUserSchedules().add(userSchedule);
+                user.getUserSchedules().add(userSchedule);
+            }
+        }
+    }
 }
