@@ -1,10 +1,8 @@
 package com.nl.sprinterbe.domain.backlogcomment.dto;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -13,19 +11,23 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class BacklogCommentResponse {
+
     private Long BacklogCommentId;
+    private Long parentCommentId;
+    private Long userId;
+
+    private String nickname;
     private String content;
     private LocalDateTime createdDate;
-    private String nickname;
-    private Long parentCommentId;
 
     public static BacklogCommentResponse of(BacklogComment backlogComment) {
         return BacklogCommentResponse.builder()
                 .BacklogCommentId(backlogComment.getBacklogCommentId())
+                .parentCommentId(backlogComment.getParentCommentId())
+                .userId(backlogComment.getUser().getUserId())
+                .nickname(backlogComment.getUser().getNickname())
                 .content(backlogComment.getContent())
                 .createdDate(backlogComment.getCreatedAt())
-                .nickname(backlogComment.getUser().getNickname())
-                .parentCommentId(backlogComment.getParentCommentId() == null ? 0 : backlogComment.getParentCommentId())
                 .build();
     }
 }

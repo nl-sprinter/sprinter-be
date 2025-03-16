@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
-public class BacklogTaskCompleteRateResponse {
-    private int completeRate;
+public class BacklogFinishedDto {
+    private boolean finished;
+
 }

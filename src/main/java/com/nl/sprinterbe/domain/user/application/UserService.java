@@ -18,6 +18,7 @@ import com.nl.sprinterbe.domain.refreshtoken.dao.RefreshTokenRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.domain.userproject.dao.UserProjectRepository;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
+import com.nl.sprinterbe.global.exception.user.UserAlreadyExistsException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserPasswordNotEqualsException;
 import com.nl.sprinterbe.global.security.JwtUtil;
@@ -67,18 +68,19 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(userUpdateRequest.getNewPassword()));
     }
 
-    //jwt로 회원가입
-    public void join(SignUpRequestDto dto){
-        String email = dto.getEmail();
-        if(userRepository.findByEmailAndProvider(email,"LOCAL").isPresent()) {
-            throw new RuntimeException("User with email " + email + " already exists");
+    // JWT 로 회원가입
+    public void join(SignUpRequestDto signUpRequestDto) {
+        String email = signUpRequestDto.getEmail();
+        if (userRepository.findByEmailAndProvider(email, "LOCAL").isPresent()) {
+            throw new UserAlreadyExistsException();
         }
-        User user = new User();
-        user.setProvider("LOCAL");
-        user.setEmail(dto.getEmail());
-        user.setNickname(dto.getNickname());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole("ROLE_USER");
+        User user = User.builder()
+                .provider("LOCAL")
+                .email(signUpRequestDto.getEmail())
+                .nickname(signUpRequestDto.getNickname())
+                .password(passwordEncoder.encode(signUpRequestDto.getPassword()))
+                .role("ROLE_USER")
+                .build();
         userRepository.save(user);
     }
 
@@ -86,7 +88,7 @@ public class UserService {
     public ResponseEntity<Void> logout(String refreshToken) throws LoginFormException {
         Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefresh(refreshToken);
 
-        if (refreshTokenOpt.isPresent() && refreshToken!=null && !refreshTokenOpt.get().getExpired()) {
+        if (refreshTokenOpt.isPresent() && refreshToken != null && !refreshTokenOpt.get().getExpired()) {
             refreshTokenService.updateExpiredTokens(jwtUtil.getId(refreshToken));
             return ResponseEntity.ok().build();
         } else {
@@ -94,8 +96,8 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Void> refresh(String refreshToken, HttpServletResponse response){
-        if(refreshToken==null){
+    public ResponseEntity<Void> refresh(String refreshToken, HttpServletResponse response) {
+        if (refreshToken == null) {
             throw new JwtException("Refresh Null");
         }
         jwtUtil.isExpired(refreshToken);
@@ -107,13 +109,13 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException());
 
         String newRefreshToken = jwtUtil.createRefreshJwt(id); // 새 Refresh Token 생성
-        String newAccessToken = jwtUtil.createJwt(id,userOpt.getEmail());
+        String newAccessToken = jwtUtil.createJwt(id, userOpt.getEmail());
 
         refreshTokenOpt.setExpired(true); // 기존 refreshToken Expire 필드 값 true로 변경
-        refreshTokenService.save(newRefreshToken,id); // 새로운 refreshToken DB에 저장
+        refreshTokenService.save(newRefreshToken, id); // 새로운 refreshToken DB에 저장
 
-        response.setHeader("Authorization","Bearer "+ newAccessToken);
-        response.addCookie(jwtUtil.createCookie("Refresh",newRefreshToken));
+        response.setHeader("Authorization", "Bearer " + newAccessToken);
+        response.addCookie(jwtUtil.createCookie("Refresh", newRefreshToken));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
@@ -125,7 +127,7 @@ public class UserService {
         List<Project> projects = userProjectRepository.findByUserUserId(userId)
                 .stream()
                 .map(UserProject::getProject)
-                .collect(Collectors.toList());
+                .toList();
 
         return projects.stream()
                 .map(project -> new ProjectResponse(project.getProjectId(), project.getProjectName(), project.getCreatedAt()))
@@ -141,34 +143,6 @@ public class UserService {
     }
 
     public void deleteUser(Long userId) {
-
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
-        userBacklogRepository.deleteByUserUserId(userId);
-
-        userProjectRepository.deleteByUserUserId(userId);
-
-        List<Task> tasks = taskRepository.findByUserId(userId);
-        tasks
-                .stream()
-                .map(task -> {
-                    task.setUserId(null);
-                    return task;
-                })
-                .collect(Collectors.toList());
-
-        userDailyScrumRepository.deleteByUserUserId(userId);
-
-//        List<BacklogComment> backlogComments = backlogCommentRepository.findByUserUserId(userId);
-//        backlogComments
-//                .stream()
-//                .map(backlogComment -> {
-//                    backlogComment.setUser(null);
-//                    return backlogComment;
-//                })
-//                .collect(Collectors.toList());
-
-        backlogCommentRepository.deleteByUserUserId(user.getUserId());
-
+        userRepository.deleteById(userId);
     }
 }

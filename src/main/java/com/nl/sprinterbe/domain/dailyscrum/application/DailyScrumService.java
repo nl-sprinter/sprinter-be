@@ -15,7 +15,7 @@ public interface DailyScrumService {
 
     String findContentByDailyScrumId(Long dailyScrumId);
 
-    List<DailyScrumDetailResponse> findDailyScrumByDate(LocalDate startOfDay);
+    List<DailyScrumResponseWithSprintId> findDailyScrumByDate(LocalDate localDate, Long projectId);
 
     void createDailyScrum(Long sprintId);
 
@@ -30,4 +30,6 @@ public interface DailyScrumService {
     void removeUserFromDailyScrum(Long dailyScrumId, Long userId);
 
     void updateContent(Long dailyScrumId, String content);
+
+    void deleteDailyScrum(Long dailyScrumId);
 }

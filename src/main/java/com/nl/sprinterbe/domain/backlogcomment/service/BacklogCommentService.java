@@ -9,15 +9,10 @@ import java.util.List;
 
 public interface BacklogCommentService {
 
-    BacklogCommentFromResponse createComment(Long backlogId, Long userId, BacklogCommentRequest request);
+    BacklogCommentFromResponse createBacklogComment(Long backlogId, Long userId, BacklogCommentRequest request);
 
-    BacklogCommentFromResponse updateComment(Long userId, Long commentId, BacklogCommentUpdateContent request);
+    void deleteBacklogComment(Long userId, Long commentId);
 
-    BacklogCommentFromResponse deleteComment(Long userId, Long commentId);
+    List<BacklogCommentResponse> getBacklogComments(Long backlogId);
 
-    List<BacklogCommentFromResponse> getUserComment(Long userId);
-
-    List<BacklogCommentResponse> getComments(Long backlogId);
-
-    List<BacklogCommentFromResponse> getStructComments(Long backlogId);
 }
