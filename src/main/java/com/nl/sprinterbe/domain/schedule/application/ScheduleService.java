@@ -14,7 +14,7 @@ import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.global.exception.project.ProjectNotFoundException;
 import com.nl.sprinterbe.global.exception.schedule.ScheduleNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
-import com.nl.sprinterbe.userschedule.UserSchedule;
+import com.nl.sprinterbe.domain.userschedule.UserSchedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
