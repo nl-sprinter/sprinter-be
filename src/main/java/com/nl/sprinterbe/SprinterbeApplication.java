@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @SpringBootApplication
-public class SprinterbeApplication {
+public class 	SprinterbeApplication {
 
 	public static void main(String[] args) {
 		Dotenv dotenv = Dotenv.load();

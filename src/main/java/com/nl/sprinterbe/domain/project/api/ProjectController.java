@@ -378,7 +378,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //업무 Delete
+    //Task Delete
     @Operation(summary = "백로그에 달린 업무 삭제", description = "백로그에 달린 업무를 삭제합니다.")
     @DeleteMapping(("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}"))
     public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
@@ -387,25 +387,25 @@ public class ProjectController {
     }
 
 
-    //업무 check 설정/헤제  3/12
-    @Operation(summary = "업무 check 설정/해제", description = "업무의 check를 설정/해제합니다.")
+    //Task check 설정/헤제  3/12
+    @Operation(summary = "Task check 설정/해제", description = "Task의 check를 설정/해제합니다.")
     @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/check")
     public ResponseEntity<TaskCheckStatusResponse> updateTaskCheckStatus(@PathVariable Long taskId, @RequestBody TaskCheckStatusRequest request) {
         return new ResponseEntity<>(backlogService.updateTaskCheckStatus(taskId, request), HttpStatus.OK);
     }
 
-    //업무 content 수정 3/12
-    @Operation(summary = "업무 content 수정", description = "업무의 content를 수정합니다.")
+    //Task content 수정 3/12
+    @Operation(summary = "Task content 수정", description = "Task의 content를 수정합니다.")
     @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/content")
     public ResponseEntity<Void> updateTaskContent(@PathVariable Long taskId, @RequestBody TaskRequest request) {
         backlogService.updateTaskContent(taskId, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //업무 user 수정 3/12
+    //Task user 수정 3/12
 
     //add
-    @Operation(summary = "업무 user 추가", description = "업무의 user를 수정합니다.")
+    @Operation(summary = "Task user 추가", description = "업무의 user를 수정합니다.")
     @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/tasks/{taskId}/user")
     public ResponseEntity<Void> addTaskUser(@PathVariable Long taskId, @RequestBody Map<String, Long> userIdMap) {
         backlogService.addTaskUser(taskId, userIdMap.get("userId"));
@@ -513,10 +513,6 @@ public class ProjectController {
     }
 
 
-
-
-
-
     //유저 중 DailyScrum에 걸려있지 않고 project에는 해당되는 유저 조회
     @GetMapping("/{projectId}/sprints/{sprintId}/dailyscrums/{dailyScrumId}/users/dailyscrum-excluded")
     public ResponseEntity<List<DailyScrumUserResponse>> getProjectUsersNotInDailyScrum(@PathVariable Long dailyScrumId, @PathVariable Long projectId) {
@@ -524,9 +520,57 @@ public class ProjectController {
     }
 
 
+    /**
+     * Schedule
+     */
 
+//    @Operation(summary = "캘린더 정보 조회", description = "해당 년도와 월의 캘린더 정보(시작 요일, 마지막 날짜 등)를 조회합니다.")
+//    @GetMapping("/{projectId}/calendar")
+//    public ResponseEntity<CalendarResponse> getCalendar(
+//            @RequestParam int year,
+//            @RequestParam int month) {
+//
+//        // 해당 월의 첫 날짜 생성
+//        LocalDate firstDate = LocalDate.of(year, month, 1);
+//
+//        // 해당 월의 마지막 날짜 구하기
+//        LocalDate lastDate = firstDate.withDayOfMonth(firstDate.lengthOfMonth());
+//
+//        // 1일의 요일 구하기 (1: 일요일, 2: 월요일, ..., 7: 토요일)
+//        int firstDayOfWeek = firstDate.getDayOfWeek().getValue() % 7 + 1;
+//
+//        // 마지막 날짜의 요일 구하기
+//        int lastDayOfWeek = lastDate.getDayOfWeek().getValue() % 7 + 1;
+//
+//        CalendarResponse response = CalendarResponse.of(
+//            year,
+//            month,
+//            firstDayOfWeek,
+//            lastDate.getDayOfMonth(),
+//            lastDayOfWeek
+//        );
+//
+//        return ResponseEntity.ok(response);
+//    }
 
+//    @GetMapping("/{projectId}/calendar/users/{userId}")
+//    public ResponseEntity<> getMySchedule() {
+//
+//    }
+//
+//
+//    @PostMapping("/{projectId}/calendar/users/{userId}")
+//    public ResponseEntity<Void> addMySchedule() {
+//
+//    }
 
+    // Schedule에 사람 추가
+
+    // Schedule에 사람 제거
+
+    // 제목 수정
+
+    // 색상
 
 
 
