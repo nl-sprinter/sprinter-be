@@ -10,6 +10,10 @@ import com.nl.sprinterbe.domain.dailyscrum.dto.*;
 import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
+import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
+import com.nl.sprinterbe.domain.schedule.dto.MyScheduleResponse;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleRequest;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
 import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
@@ -45,7 +49,7 @@ public class ProjectController {
     private final SprintService sprintService;
     private final IssueService issueService;
     private final BacklogCommentService backlogCommentService;
-    private final ScheduleService
+    private final ScheduleService scheduleService;
     private final JwtUtil jwtUtil;
 
     /**
