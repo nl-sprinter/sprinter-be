@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.dailyscrum.dao;
 
 import com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse;
+import com.nl.sprinterbe.domain.dailyscrum.dto.DailyScrumResponse;
 import com.nl.sprinterbe.domain.dailyscrum.entity.DailyScrum;
 import com.nl.sprinterbe.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,11 @@ public interface DailyScrumRepository extends JpaRepository<DailyScrum, Long> {
 
     @Query("select d FROM DailyScrum  d join d.sprint s where s.sprintId = :sprintId")
     List<DailyScrum> findDailyScrumBySprintId(@Param("sprintId") Long sprintId);
+
+    @Query("SELECT ds FROM DailyScrum ds" +
+            " WHERE ds.sprint.project.projectId = :projectId" +
+            " AND ds.createdAt = :createdAt")
+    List<DailyScrum> findDailyScrumByProjectIdAndCreatedAt(@Param("projectId") Long projectId, @Param("createdAt") LocalDate createdAt);
 
     List<DailyScrum> findByCreatedAt(LocalDate startDate);
 

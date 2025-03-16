@@ -5,15 +5,12 @@ import com.nl.sprinterbe.domain.backlog.dto.BacklogDetailResponse;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogInfoResponse;
 import com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse;
 import com.nl.sprinterbe.domain.backlog.dto.*;
-import com.nl.sprinterbe.domain.task.dto.TaskCheckStatusRequest;
-import com.nl.sprinterbe.domain.task.dto.TaskCheckStatusResponse;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import com.nl.sprinterbe.domain.task.dto.TaskCheckedDto;
 
 import java.util.List;
 
 public interface BacklogService {
-    Slice<BacklogInfoResponse> findBacklogListByProjectId(Long projectId, Long userId, Pageable pageable);
+    List<BacklogInfoResponse> findUserBacklogs(Long projectId, Long userId);
 
     BacklogDetailResponse findBacklogDetailById(Long backlogId);
 
@@ -51,15 +48,17 @@ public interface BacklogService {
 
     List<ProductBacklogResponse> getProductBacklogsByProjectId(Long projectId);
 
-    List<SprintBacklogResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId);
+    List<BacklogInfoResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId);
 
-    TaskCheckStatusResponse updateTaskCheckStatus(Long taskId, TaskCheckStatusRequest request);
+    TaskCheckedDto updateTaskChecked(Long taskId, boolean checked);
 
     void updateTaskContent(Long taskId, TaskRequest request);
 
-    void addTaskUser(Long taskId, Long userId);
+    void addUserOnTask(Long taskId, Long userId);
 
-    void deleteTaskUser(Long taskId, Long userId);
+    void deleteUserOnTask(Long taskId, Long userId);
 
-    BacklogTaskCompleteRateResponse getBacklogTaskCompleteRate(Long backlogId);
+    int getBacklogTaskCompleteRate(Long backlogId);
+
+    boolean updateBacklogIsFinished(Long backlogId, boolean finished);
 }
