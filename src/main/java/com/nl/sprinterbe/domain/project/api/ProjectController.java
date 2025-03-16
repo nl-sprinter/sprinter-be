@@ -11,8 +11,8 @@ import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
 import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
-import com.nl.sprinterbe.domain.schedule.dto.MyScheduleResponse;
-import com.nl.sprinterbe.domain.schedule.dto.ScheduleRequest;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleListResponse;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleDto;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
@@ -475,47 +475,42 @@ public class ProjectController {
 
 
     /**
-     * Schedule
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Schedule ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      */
 
-    @Operation(summary = "캘린더 Schedule 조회", description = "해당 년도와 월의 Schedule 정보를 조회합니다.")
+    @Operation(summary = "프로젝트 내 특정 년/월 Sprint + Schedule list 조회", description = "프로젝트 내부에서 특정 년도와 월의 Sprint + Schedule 정보를 조회합니다.")
     @GetMapping("/{projectId}/schedule")
-    public ResponseEntity<List<ScheduleResponse>> getSchedulesInDate(
-            @PathVariable Long projectId,
-            @RequestParam int year,
-            @RequestParam int month) {
-
-        //캘린더 Response 줄때 Sprint는 기존 API 가져다가 씀.
-
-        //Schedule
-        return ResponseEntity.ok(scheduleService.getSchedule(projectId, year, month));
-
+    public ResponseEntity<List<ScheduleListResponse>> getScheduleList(@PathVariable Long projectId, @RequestParam int year, @RequestParam int month) {
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getScheduleList(projectId, year, month));
     }
 
-    @Operation(summary = "캘린더 내 Sprint + Schedule 조회", description = "해당 년도와 월의 내 Sprint + Schedule 정보를 조회합니다.")
-    @GetMapping("/{projectId}/schedule/users/{userId}")
-    public ResponseEntity<List<MyScheduleResponse>> getMySchedule(@PathVariable Long projectId, @PathVariable Long userId, @RequestParam int year, @RequestParam int month) {
-        return ResponseEntity.ok(scheduleService.getMySchedule(projectId, userId, year, month));
+    @Operation(summary = "scheduleId 로 Schedule 조회", description = "scheduleId 로 특정 Schedule 을 조회합니다.")
+    @GetMapping("/{projectId}/schedule/{scheduleId}")
+    public ResponseEntity<ScheduleDto> getScheduleByScheduleId(@PathVariable Long scheduleId) {
+        ScheduleDto scheduleDto = scheduleService.getSchedule(scheduleId);
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
     }
 
-    @Operation(summary = "캘린더 내 Schedule 생성", description = "해당 년도와 월의 내 Schedule 정보를 저장합니다.")
+    @Operation(summary = "Schedule 생성", description = "Schedule 을 생성합니다.")
     @PostMapping("/{projectId}/schedule")
-    public ResponseEntity<Void> addMySchedule(@RequestBody ScheduleRequest request, @PathVariable Long projectId) {
+    public ResponseEntity<Void> addSchedule(@RequestBody ScheduleDto request, @PathVariable Long projectId) {
         scheduleService.createSchedule(request,projectId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(summary = "캘린더 내 Schedule 삭제", description = "해당 년도와 월의 내 Schedule 정보를 삭제합니다.")
-    @DeleteMapping("/{projectId}/schedule/{scheduleId}")
-    public ResponseEntity<Void> deleteMyScheduleFromScheduleId(@PathVariable Long scheduleId) {
-        scheduleService.deleteSchedule(scheduleId);
+    @Operation(summary = "Schedule 수정", description = "해당 년도와 월의 Schedule 정보를 수정합니다.")
+    @PatchMapping("/{projectId}/schedule/{scheduleId}")
+    public ResponseEntity<Void> updateScheduleByScheduleId(@RequestBody ScheduleDto request, @PathVariable Long scheduleId) {
+        scheduleService.updateSchedule(request, scheduleId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @Operation(summary = "캘린더 내 Schedule 수정", description = "해당 년도와 월의 내 Schedule 정보를 수정합니다.")
-    @PatchMapping("/{projectId}/schedule/{scheduleId}")
-    public ResponseEntity<Void> updateMyScheduleFromScheduleId(@RequestBody ScheduleRequest request, @PathVariable Long scheduleId) {
-        scheduleService.updateSchedule(request,scheduleId);
+    @Operation(summary = "Schedule 삭제", description = "Schedule 을 삭제합니다.")
+    @DeleteMapping("/{projectId}/schedule/{scheduleId}")
+    public ResponseEntity<Void> deleteScheduleByScheduleId(@PathVariable Long scheduleId) {
+        scheduleService.deleteSchedule(scheduleId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

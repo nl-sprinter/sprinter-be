@@ -2,8 +2,8 @@ package com.nl.sprinterbe.domain.schedule.application;
 
 import com.nl.sprinterbe.domain.project.dao.ProjectRepository;
 import com.nl.sprinterbe.domain.project.entity.Project;
-import com.nl.sprinterbe.domain.schedule.dto.MyScheduleResponse;
-import com.nl.sprinterbe.domain.schedule.dto.ScheduleRequest;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleListResponse;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleDto;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
 import com.nl.sprinterbe.domain.schedule.dao.ScheduleRepository;
 import com.nl.sprinterbe.domain.schedule.entity.Schedule;
@@ -30,84 +30,57 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class ScheduleService {
+
     private final ScheduleRepository scheduleRepository;
     private final SprintRepository sprintRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public List<ScheduleResponse> getSchedule(Long projectId, int year , int month) {
+    public List<ScheduleListResponse> getScheduleList(Long projectId, int year , int month) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDateTime startOfMonth = startDate.atStartOfDay();
 
         LocalDate lastDay = startDate.with(TemporalAdjusters.lastDayOfMonth());
         LocalDateTime endOfMonth = lastDay.atTime(23, 59, 59, 999_999_999);
 
-        List<Schedule> schedules = scheduleRepository
-                .findAllScheduleInMonth(startOfMonth, endOfMonth,projectId);
-        // 2) Stream으로 DTO 변환
-        return schedules.stream()
-                .map(ScheduleResponse::of)     // Schedule -> ScheduleResponse
-                .collect(Collectors.toList()); // List<ScheduleResponse>
-    }
+        List<Schedule> schedules = scheduleRepository.findAllScheduleInMonth(startOfMonth, endOfMonth, projectId);
+        List<Sprint> sprints = sprintRepository.findAllSprintInMonth(startDate, lastDay, projectId);
 
-    @Transactional(readOnly = true)
-    public List<MyScheduleResponse> getMySchedule(Long projectId, Long userId, int year , int month) {
-        LocalDate startDate = LocalDate.of(year, month, 1);
-        LocalDateTime startOfMonth = startDate.atStartOfDay();
-
-        LocalDate lastDay = startDate.with(TemporalAdjusters.lastDayOfMonth());
-        LocalDateTime endOfMonth = lastDay.atTime(23, 59, 59, 999_999_999);
-
-        List<Schedule> schedules = scheduleRepository.findAllMyScheduleInMonthByUserId(startOfMonth, endOfMonth, projectId, userId);
-        List<Sprint> sprints = sprintRepository.findAllSprintInMonthByUserId(startDate, lastDay, projectId, userId);
         // 3. 각각을 DTO로 변환
-        List<MyScheduleResponse> scheduleDtos = schedules.stream()
-                .map(MyScheduleResponse::of)
-                .collect(Collectors.toList());
+        List<ScheduleListResponse> scheduleDtoList = schedules.stream()
+                .map(ScheduleListResponse::of)
+                .toList();
 
-        List<MyScheduleResponse> sprintDtos = sprints.stream()
-                .map(MyScheduleResponse::of)
-                .collect(Collectors.toList());
+        List<ScheduleListResponse> sprintDtoList = sprints.stream()
+                .map(ScheduleListResponse::of)
+                .toList();
 
         // 4. 두 리스트를 합침
-        List<MyScheduleResponse> result = new ArrayList<>();
-        result.addAll(scheduleDtos);
-        result.addAll(sprintDtos);
+        List<ScheduleListResponse> result = new ArrayList<>();
+        result.addAll(scheduleDtoList);
+        result.addAll(sprintDtoList);
         return result;
     }
 
-    public void createSchedule(ScheduleRequest request, Long projectId) {
-        // 1. Project 조회
+    public void createSchedule(ScheduleDto request, Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(ProjectNotFoundException::new);
 
-        // 2. Schedule 생성 (요청 데이터를 기반으로)
+        List<User> users = userRepository.findAllById(request.getUserId());
+
         Schedule schedule = Schedule.builder()
                 .project(project)
+                .title(request.getTitle())
                 .startDateTime(request.getStartTime())
                 .endDateTime(request.getEndTime())
-                .title(request.getTitle())
-                .notify(request.getIsAlarmOn())
-                .color(request.getColor())
-                .preNotificationTime(request.getPreNotificationTime())
                 .isAllDay(request.getIsAllDay())
+                .notify(request.getNotify())
+                .preNotificationHours(request.getPreNotificationHours())
+                .color(request.getColor())
                 .build();
 
-        // 3. 요청에 포함된 모든 userId에 대해 UserSchedule 연관관계 생성
-        for (Long userId : request.getUserId()) {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(UserNotFoundException::new);
-
-            // 중간 테이블 엔티티 UserSchedule 생성 및 연관관계 설정
-            UserSchedule userSchedule = new UserSchedule(user,schedule);
-
-            // 양방향 연관관계라면 양쪽 컬렉션에 추가
-            schedule.getUserSchedules().add(userSchedule);
-            user.getUserSchedules().add(userSchedule);
-        }
-
-        // 4. Schedule 저장 (Cascade 옵션에 따라 UserSchedule도 함께 persist됨)
+        schedule.setUsers(users);
         scheduleRepository.save(schedule);
     }
 
@@ -115,7 +88,7 @@ public class ScheduleService {
         scheduleRepository.deleteById(scheduleId);
     }
 
-    public void updateSchedule(ScheduleRequest request, Long scheduleId) {
+    public void updateSchedule(ScheduleDto request, Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(ScheduleNotFoundException::new);
 
         // 모든 필드를 무조건 setter로 업데이트 (요청에 null이 포함되면 기존 값이 null로 변경됨)
@@ -123,8 +96,8 @@ public class ScheduleService {
         schedule.setIsAllDay(request.getIsAllDay());
         schedule.setStartDateTime(request.getStartTime());
         schedule.setEndDateTime(request.getEndTime());
-        schedule.setNotify(request.getIsAlarmOn());
-        schedule.setPreNotificationTime(request.getPreNotificationTime());
+        schedule.setNotify(request.getNotify());
+        schedule.setPreNotificationHours(request.getPreNotificationHours());
         schedule.setColor(request.getColor());
 
         // 연관관계도 동일하게 처리
@@ -139,5 +112,26 @@ public class ScheduleService {
                 user.getUserSchedules().add(userSchedule);
             }
         }
+    }
+
+    public ScheduleDto getSchedule(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(ScheduleNotFoundException::new);
+
+        List<Long> userList = schedule.getUserSchedules().stream()
+                .map(us -> us.getUser().getUserId())
+                .toList();
+
+        ScheduleDto scheduleDto = ScheduleDto.builder()
+                .userId(userList)
+                .title(schedule.getTitle())
+                .isAllDay(schedule.getIsAllDay())
+                .startTime(schedule.getStartDateTime())
+                .endTime(schedule.getEndDateTime())
+                .notify(schedule.getNotify())
+                .preNotificationHours(schedule.getPreNotificationHours())
+                .color(schedule.getColor())
+                .build();
+
+        return scheduleDto;
     }
 }

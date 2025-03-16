@@ -27,7 +27,11 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 //            "  AND s.user.userId=:userId" +
 //            "  AND s.startDateTime <= :endOfMonth " +
 //            "  AND s.endDateTime >= :startOfMonth")
-    @Query("SELECT s FROM Schedule s JOIN s.userSchedules us WHERE s.project.projectId=:projectId AND us.users.userId=:userId AND s.startDateTime <= :endOfMonth AND s.endDateTime >= :startOfMonth")
+    @Query("SELECT s FROM Schedule s JOIN s.userSchedules us" +
+            " WHERE s.project.projectId=:projectId" +
+            " AND us.user.userId=:userId" +
+            " AND s.startDateTime <= :endOfMonth" +
+            " AND s.endDateTime >= :startOfMonth")
     List<Schedule> findAllMyScheduleInMonthByUserId(@Param("startOfMonth") LocalDateTime startOfMonth,
                                                     @Param("endOfMonth") LocalDateTime endOfMonth ,
                                                     @Param("projectId") Long projectId , @Param("userId") Long userId);

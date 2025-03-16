@@ -45,8 +45,7 @@ public class User {
     private List<UserProject> userProjects = new ArrayList<>();
 
     // 다대다 매핑 (유저 , 스케줄)
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSchedule> userSchedules = new ArrayList<>();
 
     // 다대다 매핑 (유저, 백로그)

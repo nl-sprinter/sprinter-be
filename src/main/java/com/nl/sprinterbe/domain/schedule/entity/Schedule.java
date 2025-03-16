@@ -16,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +26,9 @@ public class Schedule {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @OneToMany(mappedBy = "schedules", cascade = CascadeType.ALL,orphanRemoval = true)
-    @Builder.Default
+    private String title;
+
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSchedule> userSchedules = new ArrayList<>();
 
     @Column(name = "start_time")
@@ -37,15 +37,39 @@ public class Schedule {
     @Column(name = "end_time")
     private LocalDateTime endDateTime;
 
-    private String title;
+    private Boolean isAllDay;
 
     private Boolean notify;
 
-    private Boolean isAllDay;
+    private Integer preNotificationHours;
 
     @Enumerated(EnumType.STRING)
     private ScheduleColor color;
 
-    private Integer preNotificationTime;
 
+    // 연관관계 편의메서드
+    public void setUsers(List<User> users) {
+        this.userSchedules.clear();
+        for (User user : users) {
+            UserSchedule userSchedule = new UserSchedule(user, this);
+            this.userSchedules.add(userSchedule);
+            user.getUserSchedules().add(userSchedule);
+        }
+    }
+
+    @Builder
+    public Schedule(Long scheduleId, Project project, String title, LocalDateTime startDateTime,
+                    LocalDateTime endDateTime, Boolean isAllDay, Boolean notify,
+                    Integer preNotificationHours, ScheduleColor color) {
+        this.scheduleId = scheduleId;
+        this.project = project;
+        this.title = title;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.isAllDay = isAllDay;
+        this.notify = notify;
+        this.preNotificationHours = preNotificationHours;
+        this.color = color;
+        this.userSchedules = new ArrayList<>();
+    }
 }
