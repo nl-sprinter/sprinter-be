@@ -530,7 +530,7 @@ public class ProjectController {
      */
 
     @Operation(summary = "캘린더 Schedule 조회", description = "해당 년도와 월의 Schedule 정보를 조회합니다.")
-    @GetMapping("/{projectId}/calendar")
+    @GetMapping("/{projectId}/schedule")
     public ResponseEntity<List<ScheduleResponse>> getSchedulesInDate(
             @PathVariable Long projectId,
             @RequestParam int year,
@@ -544,16 +544,22 @@ public class ProjectController {
     }
 
     @Operation(summary = "캘린더 내 Sprint + Schedule 조회", description = "해당 년도와 월의 내 Sprint + Schedule 정보를 조회합니다.")
-    @GetMapping("/{projectId}/calendar/users/{userId}")
+    @GetMapping("/{projectId}/schedule/users/{userId}")
     public ResponseEntity<List<MyScheduleResponse>> getMySchedule(@PathVariable Long projectId, @PathVariable Long userId, @RequestParam int year, @RequestParam int month) {
         return ResponseEntity.ok(scheduleService.getMySchedule(projectId, userId, year, month));
     }
 
     @Operation(summary = "캘린더 내 Schedule 생성", description = "해당 년도와 월의 내 Schedule 정보를 저장합니다.")
-    @PostMapping("/{projectId}/calendar")
+    @PostMapping("/{projectId}/schedule")
     public ResponseEntity<Void> addMySchedule(@RequestBody ScheduleAddRequest request,@PathVariable Long projectId) {
         scheduleService.createSchedule(request,projectId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{projectId}/schedule/{scheduleId}")
+    public ResponseEntity<Void> deleteMyScheduleFromScheduleId(@PathVariable Long scheduleId) {
+        scheduleService.deleteSchedule(scheduleId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
