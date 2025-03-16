@@ -27,7 +27,7 @@ public interface DailyScrumRepository extends JpaRepository<DailyScrum, Long> {
     List<DailyScrum> findByCreatedAt(LocalDate startDate);
 
     // 일단 살려는 주실게
-    @Query("SELECT new com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse(b.backlogId, b.isFinished, b.weight, b.title) " +
+    @Query("SELECT new com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse(b.backlogId, b.isFinished, b.weight) " +
             "FROM DailyScrum ds " +
             "JOIN ds.dailyScrumBacklogs dsb " +
             "JOIN dsb.backlog b " +

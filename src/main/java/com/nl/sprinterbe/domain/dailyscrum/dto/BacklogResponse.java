@@ -10,7 +10,6 @@ public class BacklogResponse {
     private Long backlogId;
     private Boolean isFinished;
     private Long weight;
-    private String title;
 
 
     public static BacklogResponse of(Backlog backlog) {
@@ -18,7 +17,6 @@ public class BacklogResponse {
                 .backlogId(backlog.getBacklogId())
                 .isFinished(backlog.getIsFinished())
                 .weight(backlog.getWeight())
-                .title(backlog.getTitle())
                 .build();
     }
 }

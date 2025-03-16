@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @NoArgsConstructor
@@ -21,11 +23,12 @@ public class Like {
     private Long likeId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "backlog_comment_id", nullable = false)
+    @JoinColumn(name = "backlog_comment_id")
     private BacklogComment backlogComment;
 
 }
