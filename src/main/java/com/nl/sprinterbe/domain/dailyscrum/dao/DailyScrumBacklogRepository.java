@@ -30,7 +30,7 @@ public interface DailyScrumBacklogRepository extends JpaRepository<DailyScrumBac
             @Param("backlogId") Long backlogId
     );
 
-    @Query("SELECT new com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse(dsb.backlog.backlogId, dsb.backlog.isFinished, dsb.backlog.weight, dsb.backlog.title) " +
+    @Query("SELECT new com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse(dsb.backlog.backlogId, dsb.backlog.isFinished, dsb.backlog.weight) " +
             "FROM DailyScrumBacklog dsb " +
             "WHERE dsb.dailyScrum.dailyScrumId = :dailyScrumId")
     List<BacklogResponse> findBacklogByDailyScrumId(@Param("dailyScrumId") Long dailyScrumId);

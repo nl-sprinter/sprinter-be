@@ -26,4 +26,16 @@ public class BacklogInfoResponse {
                 .sprintOrder(backlog.getSprint().getSprintOrder())
                 .build();
     }
+
+    public static BacklogInfoResponse of(Backlog backlog, int completeRate) {
+        return BacklogInfoResponse.builder()
+                .backlogId(backlog.getBacklogId())
+                .title(backlog.getTitle())
+                .weight(backlog.getWeight())
+                .isFinished(backlog.getIsFinished())
+                .sprintId(backlog.getSprint().getSprintId())
+                .sprintOrder(backlog.getSprint().getSprintOrder())
+                .completeRate(completeRate)
+                .build();
+    }
 }

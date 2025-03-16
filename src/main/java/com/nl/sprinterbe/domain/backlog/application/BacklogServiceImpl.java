@@ -247,7 +247,9 @@ public class BacklogServiceImpl implements BacklogService {
     @Override
     public List<BacklogInfoResponse> getSprintBacklogsByProjectIdAndSprintId(Long projectId, Long sprintId) {
         List<Backlog> backlogs = backlogRepository.findBacklogsByProjectIdAndSprintId(projectId, sprintId);
-        return backlogs.stream().map(BacklogInfoResponse::of).collect(Collectors.toList());
+        return backlogs.stream()
+                .map(backlog -> BacklogInfoResponse.of(backlog, getBacklogTaskCompleteRate(backlog.getBacklogId())))
+                .collect(Collectors.toList());
     }
 
     @Override

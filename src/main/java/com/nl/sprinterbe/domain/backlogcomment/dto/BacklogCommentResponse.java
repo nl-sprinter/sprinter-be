@@ -20,7 +20,9 @@ public class BacklogCommentResponse {
     private String content;
     private LocalDateTime createdDate;
 
-    public static BacklogCommentResponse of(BacklogComment backlogComment) {
+    private Long likeCount;
+
+    public static BacklogCommentResponse of(BacklogComment backlogComment, Long likeCount) {
         return BacklogCommentResponse.builder()
                 .BacklogCommentId(backlogComment.getBacklogCommentId())
                 .parentCommentId(backlogComment.getParentCommentId())
@@ -28,6 +30,7 @@ public class BacklogCommentResponse {
                 .nickname(backlogComment.getUser().getNickname())
                 .content(backlogComment.getContent())
                 .createdDate(backlogComment.getCreatedAt())
+                .likeCount(likeCount)
                 .build();
     }
 }
