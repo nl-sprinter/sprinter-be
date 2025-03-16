@@ -3,11 +3,13 @@ package com.nl.sprinterbe.userschedule;
 import com.nl.sprinterbe.domain.schedule.entity.Schedule;
 import com.nl.sprinterbe.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NoArgsConstructor
 public class UserSchedule {
 
     @Id
@@ -16,9 +18,15 @@ public class UserSchedule {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     User users;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id", nullable = false)
     Schedule schedules;
 
+    public UserSchedule(User users, Schedule schedules) {
+        this.users = users;
+        this.schedules = schedules;
+    }
 }

@@ -10,7 +10,11 @@ import com.nl.sprinterbe.domain.dailyscrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyscrum.dto.*;
 import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
+import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
+import com.nl.sprinterbe.domain.schedule.dto.MyScheduleResponse;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleAddRequest;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
 import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
@@ -50,6 +54,7 @@ public class ProjectController {
     private final SprintService sprintService;
     private final IssueService issueService;
     private final BacklogCommentService backlogCommentService;
+    private final ScheduleService scheduleService;
     private final JwtUtil jwtUtil;
 
     /**
@@ -524,53 +529,35 @@ public class ProjectController {
      * Schedule
      */
 
-//    @Operation(summary = "캘린더 정보 조회", description = "해당 년도와 월의 캘린더 정보(시작 요일, 마지막 날짜 등)를 조회합니다.")
-//    @GetMapping("/{projectId}/calendar")
-//    public ResponseEntity<CalendarResponse> getCalendar(
-//            @RequestParam int year,
-//            @RequestParam int month) {
-//
-//        // 해당 월의 첫 날짜 생성
-//        LocalDate firstDate = LocalDate.of(year, month, 1);
-//
-//        // 해당 월의 마지막 날짜 구하기
-//        LocalDate lastDate = firstDate.withDayOfMonth(firstDate.lengthOfMonth());
-//
-//        // 1일의 요일 구하기 (1: 일요일, 2: 월요일, ..., 7: 토요일)
-//        int firstDayOfWeek = firstDate.getDayOfWeek().getValue() % 7 + 1;
-//
-//        // 마지막 날짜의 요일 구하기
-//        int lastDayOfWeek = lastDate.getDayOfWeek().getValue() % 7 + 1;
-//
-//        CalendarResponse response = CalendarResponse.of(
-//            year,
-//            month,
-//            firstDayOfWeek,
-//            lastDate.getDayOfMonth(),
-//            lastDayOfWeek
-//        );
-//
-//        return ResponseEntity.ok(response);
-//    }
+    @Operation(summary = "캘린더 Schedule 조회", description = "해당 년도와 월의 Schedule 정보를 조회합니다.")
+    @GetMapping("/{projectId}/calendar")
+    public ResponseEntity<List<ScheduleResponse>> getSchedulesInDate(
+            @PathVariable Long projectId,
+            @RequestParam int year,
+            @RequestParam int month) {
 
-//    @GetMapping("/{projectId}/calendar/users/{userId}")
-//    public ResponseEntity<> getMySchedule() {
-//
-//    }
-//
-//
-//    @PostMapping("/{projectId}/calendar/users/{userId}")
-//    public ResponseEntity<Void> addMySchedule() {
-//
-//    }
+        //캘린더 Response 줄때 Sprint는 기존 API 가져다가 씀.
 
-    // Schedule에 사람 추가
+        //Schedule
+        return ResponseEntity.ok(scheduleService.getSchedule(projectId, year, month));
 
-    // Schedule에 사람 제거
+    }
 
-    // 제목 수정
+    @Operation(summary = "캘린더 내 Sprint + Schedule 조회", description = "해당 년도와 월의 내 Sprint + Schedule 정보를 조회합니다.")
+    @GetMapping("/{projectId}/calendar/users/{userId}")
+    public ResponseEntity<List<MyScheduleResponse>> getMySchedule(@PathVariable Long projectId, @PathVariable Long userId, @RequestParam int year, @RequestParam int month) {
+        return ResponseEntity.ok(scheduleService.getMySchedule(projectId, userId, year, month));
+    }
 
-    // 색상
+    @Operation(summary = "캘린더 내 Schedule 생성", description = "해당 년도와 월의 내 Schedule 정보를 저장합니다.")
+    @PostMapping("/{projectId}/calendar")
+    public ResponseEntity<Void> addMySchedule(@RequestBody ScheduleAddRequest request,@PathVariable Long projectId) {
+        scheduleService.createSchedule(request,projectId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
+
 
 
 

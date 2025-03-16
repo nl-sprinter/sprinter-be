@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.user.entity;
 //import com.nl.sprinterbe.entity.*;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
+import com.nl.sprinterbe.userschedule.UserSchedule;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,6 +37,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserProject> userProjects = new ArrayList<>();
 
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<UserSchedule> userSchedules = new ArrayList<>();
 
     //해당 유저가 프로젝트의 Leader인지 확인
     public boolean isProjectLeader(Long projectId) {
