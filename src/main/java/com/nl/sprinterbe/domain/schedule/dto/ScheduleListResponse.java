@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.schedule.dto;
 
 import com.nl.sprinterbe.domain.schedule.entity.Schedule;
+import com.nl.sprinterbe.domain.schedule.entity.ScheduleColor;
 import com.nl.sprinterbe.domain.schedule.entity.ScheduleType;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import lombok.Builder;
@@ -25,6 +26,13 @@ public class ScheduleListResponse {
     //Sprint / Scheduel
     ScheduleType scheduleType;
 
+    private ScheduleColor scheduleColor;
+
+    private boolean isAllDay;
+
+
+
+
     public static ScheduleListResponse of(Schedule schedule) {
         return ScheduleListResponse.builder()
                 .id(schedule.getScheduleId())
@@ -32,6 +40,8 @@ public class ScheduleListResponse {
                 .startTime(schedule.getStartDateTime())
                 .endTime(schedule.getEndDateTime())
                 .scheduleType(ScheduleType.PERSONAL)
+                .scheduleColor(schedule.getColor())
+                .isAllDay(schedule.getIsAllDay())
                 .build();
     }
 

@@ -15,6 +15,7 @@ import com.nl.sprinterbe.global.exception.project.ProjectNotFoundException;
 import com.nl.sprinterbe.global.exception.schedule.ScheduleNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.domain.userschedule.UserSchedule;
+import com.nl.sprinterbe.global.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ public class ScheduleService {
     private final SprintRepository sprintRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final SecurityUtil securityUtil;
 
     @Transactional(readOnly = true)
     public List<ScheduleListResponse> getScheduleList(Long projectId, int year , int month) {
@@ -134,4 +136,5 @@ public class ScheduleService {
 
         return scheduleDto;
     }
+
 }

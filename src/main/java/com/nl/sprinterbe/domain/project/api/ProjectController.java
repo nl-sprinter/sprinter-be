@@ -24,6 +24,7 @@ import com.nl.sprinterbe.domain.user.dto.UserInfoWithTeamLeaderResponse;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.domain.project.application.ProjectService;
 import com.nl.sprinterbe.global.security.JwtUtil;
+import com.nl.sprinterbe.global.security.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,7 @@ public class ProjectController {
     private final BacklogCommentService backlogCommentService;
     private final ScheduleService scheduleService;
     private final JwtUtil jwtUtil;
+    private final SecurityUtil securityUtil;
 
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
