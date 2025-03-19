@@ -1,4 +1,4 @@
-package com.nl.sprinterbe.domain.issue.dto;
+package com.nl.sprinterbe.domain.dailyscrum.dto;
 
 import com.nl.sprinterbe.domain.search.dto.keywordResponse;
 import com.nl.sprinterbe.domain.search.type.SearchType;
@@ -10,21 +10,22 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class IssueSearchResponse extends keywordResponse {
+public class DailyScrumSearchResponse extends keywordResponse {
+    private Long dailyScrumId;
     private Long sprintId;
-    private Long backlogId;
     private String content;
 
+
     @QueryProjection
-    public IssueSearchResponse(String content, Long projectId, Long sprintId, Long backlogId) {
+    public DailyScrumSearchResponse(Long projectId, Long dailyScrumId, Long sprintId, String content) {
         super(projectId);
-        this.sprintId = sprintId;
-        this.backlogId = backlogId;
         this.content = content;
+        this.sprintId = sprintId;
+        this.dailyScrumId = dailyScrumId;
     }
 
     public String getUrl() {
-        return generateUrl(SearchType.ISSUE, sprintId, backlogId);
+        return generateUrl(SearchType.DAILYSCRUM, sprintId, dailyScrumId);
     }
 
     @Override
@@ -34,6 +35,6 @@ public class IssueSearchResponse extends keywordResponse {
 
     @Override
     public SearchType getType() {
-        return SearchType.ISSUE;
+        return SearchType.DAILYSCRUM;
     }
 }

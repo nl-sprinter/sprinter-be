@@ -1,4 +1,4 @@
-package com.nl.sprinterbe.domain.backlog.dto;
+package com.nl.sprinterbe.domain.schedule.dto;
 
 import com.nl.sprinterbe.domain.search.dto.keywordResponse;
 import com.nl.sprinterbe.domain.search.type.SearchType;
@@ -10,21 +10,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BacklogSearchResponse extends keywordResponse {
-    private Long sprintId;
-    private Long backlogId;
+public class ScheduleSearchResponse extends keywordResponse {
+    private Long scheduleId;
     private String title;
 
     @QueryProjection
-    public BacklogSearchResponse(Long backlogId, String title, Long projectId, Long sprintId) {
+    public ScheduleSearchResponse(Long projectId, Long scheduleId, String title) {
         super(projectId);
-        this.backlogId = backlogId;
         this.title = title;
-        this.sprintId = sprintId;
+        this.scheduleId = scheduleId;
     }
 
     public String getUrl() {
-        return generateUrl(SearchType.BACKLOG, sprintId, backlogId);
+        return generateUrl(SearchType.SCHEDULE, null, scheduleId);
     }
 
     @Override
@@ -34,6 +32,6 @@ public class BacklogSearchResponse extends keywordResponse {
 
     @Override
     public SearchType getType() {
-        return SearchType.BACKLOG;
+        return SearchType.SCHEDULE;
     }
 }

@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.backlog.dao;
 
 import com.nl.sprinterbe.domain.backlog.dto.BacklogSearchResponse;
+import com.nl.sprinterbe.domain.backlog.dto.QBacklogSearchResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,8 +27,7 @@ public class BacklogSearchQueryRepositoryImpl implements BacklogSearchQueryRepos
         * */
         List<BacklogSearchResponse> backlogSearchResponses = query
                 .select(
-                        Projections.constructor(
-                                BacklogSearchResponse.class,
+                        new QBacklogSearchResponse(
                                 backlog.backlogId.as("backlogId"),
                                 backlog.title.as("title"),
                                 project.projectId.as("projectId"),

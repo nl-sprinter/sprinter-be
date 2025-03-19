@@ -1,37 +1,30 @@
 package com.nl.sprinterbe.domain.search.dto;
 
 import com.nl.sprinterbe.domain.search.type.SearchType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-
+import com.querydsl.core.types.dsl.StringExpression;
+import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
-public abstract class SearchResponse {
-    protected Long projectId;
+@AllArgsConstructor
+@Builder
+public class SearchResponse {
+    private SearchType searchType;
+    private String title;
+    private String content;
+    private String url;
 
-    public Long getProjectId() {
-        return projectId;
+    public SearchResponse(StringExpression title) {
     }
 
-    public String generateUrl(SearchType type, Long sprintId, Long id) {
-        switch (type) {
-            case ISSUE:
-            case TASK:
-            case BACKLOG:
-                return String.format("/projects/%d/sprints/%d/backlogs/%d", projectId, sprintId, id);
-            case SCHEDULE:
-                return String.format("/projects/%d/calendar/schedule/%d", projectId, id);
-            case DAILYSCRUM:
-                return String.format("/projects/%d/sprints/%d/dailyscrums/%d", projectId, sprintId, id);
-            default:
-                return "";
-        }
+
+    public static SearchResponse of(SearchType searchType, String title, String content, String url) {
+        return SearchResponse.builder()
+                .searchType(searchType)
+                .title(title)
+                .content(content)
+                .url(url)
+                .build();
     }
 }
