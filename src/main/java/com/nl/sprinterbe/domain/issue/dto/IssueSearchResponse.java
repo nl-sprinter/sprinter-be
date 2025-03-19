@@ -1,4 +1,4 @@
-package com.nl.sprinterbe.domain.backlog.dto;
+package com.nl.sprinterbe.domain.issue.dto;
 
 import com.nl.sprinterbe.domain.search.dto.SearchResponse;
 import com.nl.sprinterbe.domain.search.type.SearchType;
@@ -10,19 +10,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BacklogSearchResponse extends SearchResponse {
+public class IssueSearchResponse extends SearchResponse {
     private Long sprintId;
     private Long backlogId;
-    private String title;
+    private String content;
 
-    public BacklogSearchResponse(Long backlogId, String title, Long projectId, Long sprintId) {
+    public IssueSearchResponse(String content, Long projectId, Long sprintId, Long backlogId) {
         super(projectId);
-        this.backlogId = backlogId;
-        this.title = title;
         this.sprintId = sprintId;
+        this.backlogId = backlogId;
+        this.content = content;
     }
 
     public String getUrl() {
-        return generateUrl(SearchType.BACKLOG, sprintId, backlogId);
+        return generateUrl(SearchType.ISSUE, sprintId, backlogId);
     }
 }

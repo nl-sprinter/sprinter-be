@@ -1,9 +1,9 @@
 package com.nl.sprinterbe.domain.search.application;
 
-import com.nl.sprinterbe.domain.search.dto.SearchResponseDto;
+import com.nl.sprinterbe.domain.search.dto.AllSearchResponseDto;
 
 import java.util.List;
 
 public interface SearchService {
-    List<SearchResponseDto> search(String keyword);
+    List<AllSearchResponseDto> search(String keyword);
 }

@@ -2,13 +2,18 @@ package com.nl.sprinterbe.domain.search.application;
 
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.dto.BacklogSearchResponse;
-import com.nl.sprinterbe.domain.search.dto.SearchResponseDto;
+import com.nl.sprinterbe.domain.issue.dao.IssueRepository;
+import com.nl.sprinterbe.domain.issue.dto.IssueSearchResponse;
+import com.nl.sprinterbe.domain.search.dto.AllSearchResponseDto;
+import com.nl.sprinterbe.domain.search.dto.SearchResponse;
 import com.nl.sprinterbe.domain.search.type.SearchType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,35 +21,20 @@ import java.util.List;
 public class SearchServiceImpl implements SearchService {
 
     private final BacklogRepository backlogRepository;
+    private final IssueRepository issueRepository;
 
     @Override
-    public List<SearchResponseDto> search(String keyword) {
-        List<BacklogSearchResponse> backlogSearchResponses = backlogRepository.searchBacklog(keyword);
+    public List<AllSearchResponseDto> search(String keyword) {
+        List<AllSearchResponseDto> responseDtos = new ArrayList<>();
 
-        return backlogSearchResponses.stream().map(backlogSearchResponse ->
-                SearchResponseDto.of(SearchType.BACKLOG, backlogSearchResponse.getTitle(),BacklogUrlMaker(backlogSearchResponse))).toList();
-    }
+        backlogRepository.searchBacklog(keyword).stream().map(backlogSearchResponse ->
+                AllSearchResponseDto.of(SearchType.BACKLOG, backlogSearchResponse.getTitle(),"", backlogSearchResponse.getUrl())).forEach(responseDtos::add);
 
-    private String BacklogUrlMaker(BacklogSearchResponse backlogSearchResponses) {
-        return generateUrl(SearchType.BACKLOG,
-                backlogSearchResponses.getProjectId(),
-                backlogSearchResponses.getSprintId(),
-                backlogSearchResponses.getBacklogId());
-    }
+        issueRepository.searchIssue(keyword).stream().map(issueSearchResponse ->
+                AllSearchResponseDto.of(SearchType.ISSUE,"", issueSearchResponse.getContent(), issueSearchResponse.getUrl())).forEach(responseDtos::add);
 
-    private String generateUrl(SearchType type, Long projectId, Long sprintId, Long Id) {
-        switch (type) {
-            case ISSUE:
-            case TASK:
-            case BACKLOG:
-                return String.format("/projects/%d/sprints/%d/backlogs/%d", projectId, sprintId, Id);
-            case SCHEDULE:
-                return String.format("/projects/%d/calendar/schedule/%d", projectId, Id);
-            case DAILYSCRUM:
-                return String.format("/projects/%d/sprints/%d/dailyscrums/%d", projectId, sprintId, Id);
-            default:
-                return "";
-        }
+
+        return responseDtos;
     }
 
 }

@@ -9,21 +9,21 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SearchResponseDto {
+public class AllSearchResponseDto {
     private SearchType searchType;
     private String title;
     private String content;
     private String url;
 
-    public SearchResponseDto(StringExpression title) {
+    public AllSearchResponseDto(StringExpression title) {
     }
 
 
-    public static SearchResponseDto of(SearchType searchType, String title, String url) {
-        return SearchResponseDto.builder()
+    public static AllSearchResponseDto of(SearchType searchType, String title, String content, String url) {
+        return AllSearchResponseDto.builder()
                 .searchType(searchType)
                 .title(title)
-                .content("")
+                .content(content)
                 .url(url)
                 .build();
     }

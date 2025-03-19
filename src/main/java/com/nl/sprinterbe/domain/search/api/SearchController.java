@@ -1,7 +1,7 @@
 package com.nl.sprinterbe.domain.search.api;
 
 import com.nl.sprinterbe.domain.search.application.SearchService;
-import com.nl.sprinterbe.domain.search.dto.SearchResponseDto;
+import com.nl.sprinterbe.domain.search.dto.AllSearchResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class SearchController {
 
     @Operation(summary = "검색 기능", description = "이슈, 백로그, task, 스케줄, 데일리스크럼 본문을 검색합니다.")
     @GetMapping("/test")
-    public ResponseEntity<List<SearchResponseDto>> search(@RequestParam(required = false) String keyword) {
+    public ResponseEntity<List<AllSearchResponseDto>> search(@RequestParam(required = false) String keyword) {
         return ResponseEntity.ok(searchService.search(keyword));
     }
 }

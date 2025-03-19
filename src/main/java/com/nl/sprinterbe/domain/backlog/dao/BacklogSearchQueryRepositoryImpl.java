@@ -1,7 +1,6 @@
 package com.nl.sprinterbe.domain.backlog.dao;
 
 import com.nl.sprinterbe.domain.backlog.dto.BacklogSearchResponse;
-import com.nl.sprinterbe.domain.search.dto.SearchResponseDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
