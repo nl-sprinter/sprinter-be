@@ -2,6 +2,7 @@ package com.nl.sprinterbe.domain.project.dao;
 
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
+import com.nl.sprinterbe.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,5 +24,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             " AND" +
             " u.userId NOT IN (SELECT up.user.userId FROM UserProject up WHERE up.project.projectId = :projectId)")
     List<UserInfoResponse> searchUsersNotInProject(@Param("keyword") String keyword, @Param("projectId") Long projectId);
+
+    @Query("SELECT DISTINCT u FROM User u " +
+            "JOIN u.userProjects up " +
+            "WHERE up.project.projectId = :projectId")
+    List<User> findAllUsersByProjectId(@Param("projectId") Long projectId);
+
 
 }

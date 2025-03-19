@@ -27,6 +27,7 @@ public class NotificationController {
     /**
      * 특정 User의 알림 Dto 반환
      *  userId를 기반으로 Notification 정보
+     *
      *  create 트리거:
      *  댓글 / 대댓글
      *  이슈등록
@@ -35,6 +36,7 @@ public class NotificationController {
      *  스케줄 알림
      *  채팅 (보류 중)
      */
+
     @GetMapping()
     public ResponseEntity<List<NotificationDto>> getNotifications(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(notificationService.findNotificationsByUserId(jwtUtil.getUserIdByToken(token)));

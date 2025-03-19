@@ -1,5 +1,6 @@
 package com.nl.sprinterbe.domain.notification.dto;
 
+import com.nl.sprinterbe.domain.notification.entity.Notification;
 import com.nl.sprinterbe.domain.notification.entity.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
