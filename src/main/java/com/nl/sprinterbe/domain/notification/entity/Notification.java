@@ -28,6 +28,7 @@ public class Notification {
     private Long notificationId;
 
     // 양방향
+    // receiver User
     @OneToMany(mappedBy = "users",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserNotification> userNotification;
 

@@ -85,7 +85,7 @@ public class DailyScrumServiceImpl implements DailyScrumService {
     }
 
     @Override
-    public void createDailyScrum(Long sprintId) {
+    public Long createDailyScrum(Long sprintId) {
         Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(SprintNotFoundException::new);
         Long currentUserId = Long.parseLong(securityUtil.getCurrentUserId().orElseThrow(UserNotHereException::new));
         User user = userRepository.findById(currentUserId).orElseThrow(UserNotHereException::new);
@@ -101,6 +101,7 @@ public class DailyScrumServiceImpl implements DailyScrumService {
                 .build();
 
         userDailyScrumRepository.save(userDailyScrum);
+        return dailyScrum.getDailyScrumId();
     }
 
     @Override

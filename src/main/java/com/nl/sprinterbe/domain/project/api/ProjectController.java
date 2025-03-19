@@ -9,6 +9,8 @@ import com.nl.sprinterbe.domain.dailyscrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyscrum.dto.*;
 import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
+import com.nl.sprinterbe.domain.notification.application.NotificationService;
+import com.nl.sprinterbe.domain.notification.entity.NotificationType;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
 import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleListResponse;
@@ -23,6 +25,7 @@ import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.dto.UserInfoWithTeamLeaderResponse;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.domain.project.application.ProjectService;
+import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import com.nl.sprinterbe.global.security.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +56,7 @@ public class ProjectController {
     private final ScheduleService scheduleService;
     private final JwtUtil jwtUtil;
     private final SecurityUtil securityUtil;
+    private final NotificationService notificationService;
 
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
@@ -79,6 +83,8 @@ public class ProjectController {
     @PostMapping("/{projectId}/users")
     public ResponseEntity<Void> addUserToProject(@RequestBody Map<String, Long> userIdMap, @PathVariable Long projectId) {
         projectService.addUserToProject(userIdMap.get("userId"), projectId);
+        //알림 추가
+        notificationService.create(NotificationType.TEAMMATE,notificationService.makeTeammateContent(userIdMap.get("userId")),projectId,null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -312,7 +318,10 @@ public class ProjectController {
 
     @Operation(summary = "이슈 추가", description = "백로그에 이슈를 추가합니다.") // 프론트 연동 OK
     @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
-    public ResponseEntity<BacklogIssueResponse> addIssueToBacklog(@PathVariable Long backlogId, @RequestBody IssueRequest issueRequest) {
+    public ResponseEntity<BacklogIssueResponse> addIssueToBacklog(@PathVariable Long projectId ,@PathVariable Long sprintId, @PathVariable Long backlogId, @RequestBody IssueRequest issueRequest) {
+        String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
+        //알림 추가
+        notificationService.create(NotificationType.ISSUE,notificationService.makeIssueContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeIssueUrl(projectId,sprintId,backlogId));
         return ResponseEntity.ok(backlogService.addIssueToBacklog(backlogId, issueRequest.getContent()));
     }
 
@@ -359,10 +368,15 @@ public class ProjectController {
     @Operation(summary = "댓글 생성", description = "백로그에 댓글을 생성합니다.") // 프론트 연동 OK
     @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments")
     public ResponseEntity<Void> createBacklogComment(
+            @PathVariable Long projectId,
+            @PathVariable Long sprintId,
             @PathVariable Long backlogId,
             @RequestBody @Validated BacklogCommentRequest request,
             @RequestHeader("Authorization") String token) {
         backlogCommentService.createBacklogComment(backlogId, jwtUtil.getUserIdByToken(token), request);
+        String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
+        // 알림 추가
+        notificationService.create(NotificationType.COMMENT,notificationService.makeCommentContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeCommentUrl(projectId, sprintId, backlogId));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -410,8 +424,11 @@ public class ProjectController {
 
     @Operation(summary = "Sprint 에 DailyScrum 생성", description = "Sprint 에 DailyScrum 을 생성합니다.") // 프론트 연동 OK
     @PostMapping("/{projectId}/sprints/{sprintId}/dailyscrums")
-    public ResponseEntity<Void> addDailyScrumToSprint(@PathVariable Long sprintId) {
-        dailyScrumService.createDailyScrum(sprintId);
+    public ResponseEntity<Void> addDailyScrumToSprint(@PathVariable Long projectId, @PathVariable Long sprintId) {
+        Long dailyScrumId = dailyScrumService.createDailyScrum(sprintId);
+        String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
+        // 알림 추가
+        notificationService.create(NotificationType.DAILYSCRUM,notificationService.makeDailyScrumContent(Long.parseLong(userId)),projectId,notificationService.makeDailyScrumUrl(projectId, sprintId,dailyScrumId));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -498,7 +515,9 @@ public class ProjectController {
     @Operation(summary = "Schedule 생성", description = "Schedule 을 생성합니다.")
     @PostMapping("/{projectId}/schedule")
     public ResponseEntity<Void> addSchedule(@RequestBody ScheduleDto request, @PathVariable Long projectId) {
-        scheduleService.createSchedule(request,projectId);
+        Long scheduleId = scheduleService.createSchedule(request, projectId);
+        //알림 추가
+        notificationService.create(NotificationType.SCHEDULE,notificationService.makeScheduleContent(scheduleId),projectId,notificationService.makeScheduleUrl(projectId,scheduleId));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -515,5 +534,7 @@ public class ProjectController {
         scheduleService.deleteSchedule(scheduleId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+
 
 }
