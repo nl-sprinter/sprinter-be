@@ -56,8 +56,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserDailyScrum> userDailyScrums = new ArrayList<>();
 
-
-
+    // 다대다 매핑 (유저, 알림)
+    @OneToMany()
 
     @Override
     public String toString() {
