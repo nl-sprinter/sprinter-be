@@ -25,14 +25,14 @@ public class SearchServiceImpl implements SearchService {
     private final DailyScrumRepository dailyScrumRepository;
 
     @Override
-    public List<SearchResponse> search(String keyword) {
+    public List<SearchResponse> search(String query,Long projectId) {
         List<SearchResponse> responses = new ArrayList<>();
 
-        if(keyword == null || keyword.isEmpty() || keyword.isBlank()) {
+        if(query == null || query.isEmpty() || query.isBlank()) {
             return responses;
         }
 
-        makeSearchResponse(keyword, responses);
+        makeSearchResponse(query, projectId, responses);
         return responses;
     }
 
@@ -42,25 +42,25 @@ public class SearchServiceImpl implements SearchService {
     * @param keyword 검색어
     * @param responseDtos 검색 결과를 담을 리스트
     * */
-    private void makeSearchResponse(String keyword, List<SearchResponse> responses) {
+    private void makeSearchResponse(String query,Long projectId, List<SearchResponse> responses) {
         /*
         * db에서 한번에 꺼낼까도 생각해봤는데 너무 쿼리가 어려움
         * 또한 나중에 새로운 기능을 추가할때 어려움이 많을 거 같아
         * type별로 나눠서 검색
         * */
-        backlogRepository.searchBacklog(keyword).stream().map(backlogSearchResponse ->
+        backlogRepository.searchBacklog(query,projectId).stream().map(backlogSearchResponse ->
                 SearchResponse.of(backlogSearchResponse.getType(), backlogSearchResponse.getTitle(),backlogSearchResponse.getContent(), backlogSearchResponse.getUrl())).forEach(responses::add);
 
-        issueRepository.searchIssue(keyword).stream().map(issueSearchResponse ->
+        issueRepository.searchIssue(query,projectId).stream().map(issueSearchResponse ->
                 SearchResponse.of(issueSearchResponse.getType(),issueSearchResponse.getTitle(), issueSearchResponse.getContent(), issueSearchResponse.getUrl())).forEach(responses::add);
 
-        taskRepository.searchTask(keyword).stream().map(taskSearchResponse ->
+        taskRepository.searchTask(query,projectId).stream().map(taskSearchResponse ->
                 SearchResponse.of(taskSearchResponse.getType(), taskSearchResponse.getTitle(), taskSearchResponse.getContent(), taskSearchResponse.getUrl())).forEach(responses::add);
 
-        scheduleRepository.searchSchedule(keyword).stream().map(scheduleSearchResponse ->
+        scheduleRepository.searchSchedule(query,projectId).stream().map(scheduleSearchResponse ->
                 SearchResponse.of(scheduleSearchResponse.getType(), scheduleSearchResponse.getTitle(), scheduleSearchResponse.getContent(), scheduleSearchResponse.getUrl())).forEach(responses::add);
 
-        dailyScrumRepository.searchDailyScrum(keyword).stream().map(dailyScrumSearchResponse ->
+        dailyScrumRepository.searchDailyScrum(query,projectId).stream().map(dailyScrumSearchResponse ->
                 SearchResponse.of(dailyScrumSearchResponse.getType(), dailyScrumSearchResponse.getTitle(), dailyScrumSearchResponse.getContent(), dailyScrumSearchResponse.getUrl())).forEach(responses::add);
     }
 

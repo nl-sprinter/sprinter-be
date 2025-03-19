@@ -18,7 +18,7 @@ public class ScheduleSearchQueryRepositoryImpl implements ScheduleSearchQueryRep
     private final JPAQueryFactory query;
 
     @Override
-    public List<ScheduleSearchResponse> searchSchedule(String keyword) {
+    public List<ScheduleSearchResponse> searchSchedule(String keyword, Long projectId) {
         List<ScheduleSearchResponse> scheduleSearchResponses = query
                 .select(
                         new QScheduleSearchResponse(
@@ -30,7 +30,8 @@ public class ScheduleSearchQueryRepositoryImpl implements ScheduleSearchQueryRep
                 .from(schedule)
                 .innerJoin(schedule.project, project)
                 .where(
-                        containsKeyword(keyword)
+                        containsKeyword(keyword),
+                        eqProjectId(projectId)
                 )
                 .fetch();
         return scheduleSearchResponses;
@@ -40,5 +41,11 @@ public class ScheduleSearchQueryRepositoryImpl implements ScheduleSearchQueryRep
         return keyword == null || keyword.isEmpty()
                 ? null
                 : schedule.title.contains(keyword);
+    }
+
+    private BooleanExpression eqProjectId(Long projectId) {
+        return projectId == null
+                ? null
+                : project.projectId.eq(projectId);
     }
 }

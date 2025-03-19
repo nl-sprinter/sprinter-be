@@ -21,7 +21,7 @@ public class IssueSearchQueryRepositoryImpl implements IssueSearchQueryRepositor
 
     private final JPAQueryFactory query;
     @Override
-    public List<IssueSearchResponse> searchIssue(String keyword) {
+    public List<IssueSearchResponse> searchIssue(String keyword, Long projectId) {
         /*
         * 이슈가 속한 projectid, sprintid, backlogid, 내용을 검색하여 결과를 반환하는 메소드
         * */
@@ -40,7 +40,8 @@ public class IssueSearchQueryRepositoryImpl implements IssueSearchQueryRepositor
                 .innerJoin(backlog.sprint, sprint) // 백로그와 스프린트 테이블을 조인
                 .innerJoin(sprint.project, project) // 스프린트와 프로젝트 테이블을 조인
                 .where(
-                        containsKeyword(keyword)
+                        containsKeyword(keyword),
+                        eqProjectId(projectId)
                 )
                 .fetch();
 
@@ -53,4 +54,9 @@ public class IssueSearchQueryRepositoryImpl implements IssueSearchQueryRepositor
                 : issue.content.contains(keyword);
     }
 
+    private BooleanExpression eqProjectId(Long projectId) {
+        return projectId == null
+                ? null
+                : project.projectId.eq(projectId);
+    }
 }

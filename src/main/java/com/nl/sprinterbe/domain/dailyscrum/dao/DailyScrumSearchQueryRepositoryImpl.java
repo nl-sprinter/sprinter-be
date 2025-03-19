@@ -18,7 +18,7 @@ import static com.nl.sprinterbe.domain.sprint.entity.QSprint.sprint;
 public class DailyScrumSearchQueryRepositoryImpl implements DailyScrumSearchQueryRepository {
     private final JPAQueryFactory query;
     @Override
-    public List<DailyScrumSearchResponse> searchDailyScrum(String keyword) {
+    public List<DailyScrumSearchResponse> searchDailyScrum(String keyword, Long projectId) {
         List<DailyScrumSearchResponse> dailyScrumSearchResponses = query
                 .select(
                         new QDailyScrumSearchResponse(
@@ -32,7 +32,8 @@ public class DailyScrumSearchQueryRepositoryImpl implements DailyScrumSearchQuer
                 .innerJoin(dailyScrum.sprint, sprint)
                 .innerJoin(sprint.project, project)
                 .where(
-                        containsKeyword(keyword)
+                        containsKeyword(keyword),
+                        eqProjectId(projectId)
                 )
                 .fetch();
 
@@ -43,5 +44,11 @@ public class DailyScrumSearchQueryRepositoryImpl implements DailyScrumSearchQuer
         return keyword == null || keyword.isEmpty()
                 ? null
                 : dailyScrum.content.contains(keyword);
+    }
+
+    private BooleanExpression eqProjectId(Long projectId) {
+        return projectId == null
+                ? null
+                : project.projectId.eq(projectId);
     }
 }

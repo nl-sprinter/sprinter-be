@@ -21,7 +21,7 @@ public class TaskSearchQueryRepositoryImpl implements TaskSearchQueryRepository 
 
 
     @Override
-    public List<TaskSearchResponse> searchTask(String keyword) {
+    public List<TaskSearchResponse> searchTask(String keyword, Long projectId) {
         List<TaskSearchResponse> taskSearchResponses = query
                 .select(
                         new QTaskSearchResponse(
@@ -36,7 +36,8 @@ public class TaskSearchQueryRepositoryImpl implements TaskSearchQueryRepository 
                 .innerJoin(backlog.sprint, sprint)
                 .innerJoin(sprint.project, project)
                 .where(
-                        containsKeyword(keyword)
+                        containsKeyword(keyword),
+                        eqProjectId(projectId)
                 )
                 .fetch();
 
@@ -47,5 +48,11 @@ public class TaskSearchQueryRepositoryImpl implements TaskSearchQueryRepository 
         return keyword == null || keyword.isEmpty()
                 ? null
                 : task.content.contains(keyword);
+    }
+
+    private BooleanExpression eqProjectId(Long projectId) {
+        return projectId == null
+                ? null
+                : project.projectId.eq(projectId);
     }
 }

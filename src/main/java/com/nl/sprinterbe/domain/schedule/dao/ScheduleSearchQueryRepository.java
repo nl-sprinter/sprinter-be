@@ -5,5 +5,5 @@ import com.nl.sprinterbe.domain.schedule.dto.ScheduleSearchResponse;
 import java.util.List;
 
 public interface ScheduleSearchQueryRepository {
-    List<ScheduleSearchResponse> searchSchedule(String keyword);
+    List<ScheduleSearchResponse> searchSchedule(String keyword, Long projectId);
 }

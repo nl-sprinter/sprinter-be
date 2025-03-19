@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface BacklogSearchQueryRepository {
 
-    List<BacklogSearchResponse> searchBacklog(String keyword);
+    List<BacklogSearchResponse> searchBacklog(String keyword, Long projectId);
 }

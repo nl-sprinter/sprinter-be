@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IssueSearchQueryRepository {
 
-    List<IssueSearchResponse> searchIssue(String keyword);
+    List<IssueSearchResponse> searchIssue(String keyword, Long projectId);
 }
