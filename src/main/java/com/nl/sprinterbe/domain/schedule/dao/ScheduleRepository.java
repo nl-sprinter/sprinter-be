@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
+public interface ScheduleRepository extends JpaRepository<Schedule, Long>, ScheduleSearchQueryRepository {
 
 
     //해당 년, 월에 걸려있는 Schedule 모두 가져오기

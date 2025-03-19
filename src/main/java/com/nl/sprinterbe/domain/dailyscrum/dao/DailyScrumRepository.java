@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 
-public interface DailyScrumRepository extends JpaRepository<DailyScrum, Long> {
+public interface DailyScrumRepository extends JpaRepository<DailyScrum, Long>, DailyScrumSearchQueryRepository {
     @Query("select ud.user from UserDailyScrum ud where ud.dailyScrum.dailyScrumId = :dailyScrumId")
     List<User> findUsersByDailyScrumId(@Param("dailyScrumId") Long dailyScrumId);
 
