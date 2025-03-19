@@ -13,7 +13,6 @@ import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
 import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleListResponse;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleDto;
-import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
 import com.nl.sprinterbe.domain.search.application.SearchService;
 import com.nl.sprinterbe.domain.search.dto.SearchResponse;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
