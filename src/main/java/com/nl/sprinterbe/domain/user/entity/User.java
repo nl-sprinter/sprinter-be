@@ -2,6 +2,7 @@ package com.nl.sprinterbe.domain.user.entity;
 
 import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
 import com.nl.sprinterbe.domain.dailyscrum.entity.UserDailyScrum;
+import com.nl.sprinterbe.domain.notification.entity.UserNotification;
 import com.nl.sprinterbe.domain.userbacklog.entity.UserBacklog;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
 import com.nl.sprinterbe.domain.userschedule.UserSchedule;
@@ -56,8 +57,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserDailyScrum> userDailyScrums = new ArrayList<>();
 
-    // 다대다 매핑 (유저, 알림)
-    @OneToMany()
+//    // 다대다 매핑 (유저, 알림)
+//    @OneToMany(mappedBy = "users" ,cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<UserNotification> userNotifications = new ArrayList<>();
 
     @Override
     public String toString() {

@@ -29,7 +29,7 @@ public class Notification {
 
     // 양방향
     // receiver User
-    @OneToMany(mappedBy = "users",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "notification",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserNotification> userNotification;
 
     @ManyToOne

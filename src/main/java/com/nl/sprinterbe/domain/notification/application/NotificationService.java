@@ -49,15 +49,23 @@ public class NotificationService {
                 .url(url)
                 .build();
 
-        notification.setUserNotification(
-                users.stream()
-                        .map(user -> UserNotification.builder().users(user).notification(notification).build())
-                        .toList() // List<UserNotification>으로 변환
-        );
 
 
+        // ✅ UserNotification을 먼저 지역 변수로 선언
+        List<UserNotification> userNotifications = users.stream()
+                .map(user -> UserNotification.builder()
+                        .users(user)
+                        .notification(notification)
+                        .build())
+                .toList();
+
+        // ✅ Notification에 userNotification 설정
+        notification.setUserNotification(userNotifications);
+
+        // ✅ Notification 먼저 저장
         notificationRepository.save(notification);
     }
+
 
     public List<NotificationDto> findNotificationsByUserId(Long userId) {
         return notificationRepository.findAllByUserId(userId);
