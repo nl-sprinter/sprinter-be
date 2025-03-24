@@ -273,6 +273,8 @@ public class BacklogServiceImpl implements BacklogService {
     public void addUserOnTask(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException());
         task.setUserId(userId);
+
+
     }
 
     @Override
