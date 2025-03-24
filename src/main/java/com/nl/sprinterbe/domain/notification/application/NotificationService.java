@@ -1,5 +1,6 @@
 package com.nl.sprinterbe.domain.notification.application;
 
+import com.nl.sprinterbe.domain.admin.dto.AlarmRequest;
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.notification.dao.NotificationRepository;
@@ -133,6 +134,52 @@ public class NotificationService {
 
     public String makeScheduleUrl(Long projectId ,Long scheduleId){
         return "/projects/" + projectId + "/calendar/schedule/" + scheduleId;
+    }
+
+
+    public void sendAlarmToUsers(AlarmRequest request) {
+        // 유저 ID 목록으로 유저 조회
+        List<User> users = userRepository.findAllById(request.getUserId());
+
+        if (users.isEmpty()) {
+            return; // 유저가 없으면 아무 작업도 하지 않음
+        }
+
+        // 각 유저에게 알림 전송
+        for (User user : users) {
+            // 관리자 알림 타입으로 알림 생성
+            // 프로젝트 ID는 null 또는 관리자 프로젝트 ID 사용
+            // URL은 null 또는 관리자 페이지 URL 사용
+            createAdminNotification(
+                    NotificationType.ADMIN_NOTICE,
+                    request.getContent(),
+                    user.getUserId()
+            );
+        }
+    }
+
+    public void createAdminNotification(NotificationType notificationType, String content, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        Notification notification = Notification.builder()
+                .notificationType(notificationType)
+                .content(content)
+                .createdAt(LocalDateTime.now())
+                .navigable(false)  // 관리자 알림은 이동할 URL이 없음
+                .url(null)
+                .build();
+
+        // 단일 사용자에게만 알림 전송
+        List<UserNotification> userNotifications = List.of(
+                UserNotification.builder()
+                        .users(user)
+                        .notification(notification)
+                        .build()
+        );
+
+        notification.setUserNotification(userNotifications);
+        notificationRepository.save(notification);
     }
 
     // 채팅 시 알람
