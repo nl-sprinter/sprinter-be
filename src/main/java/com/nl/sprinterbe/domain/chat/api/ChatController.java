@@ -2,6 +2,8 @@ package com.nl.sprinterbe.domain.chat.api;
 
 import com.nl.sprinterbe.domain.chat.application.ChatRoomService;
 import com.nl.sprinterbe.domain.chat.dto.ChatMessageDto;
+import com.nl.sprinterbe.domain.notification.application.NotificationService;
+import com.nl.sprinterbe.domain.notification.entity.NotificationType;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,7 @@ import java.util.List;
 public class ChatController {
 
     private final ChatRoomService chatRoomService;
+    private final NotificationService notificationService;
 
     @Operation(summary = "웹소켓으로 메세지 전송", description = "웹소켓을 사용하여 메세지를 전송합니다.")
     @MessageMapping("/room/{projectId}")
@@ -32,7 +35,8 @@ public class ChatController {
     public ChatMessageDto sendMessage(@DestinationVariable Long projectId, ChatMessageDto message) { // 프론트 연동 OK
         message.setProjectId(projectId);
         message.setTimeStamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        chatRoomService.saveMessage(message);
+        Long messageId = chatRoomService.saveMessage(message);
+        notificationService.create(NotificationType.CHATTING,notificationService.makeChattingContent(message.getUserId(),messageId),projectId,null,null);
         return message;
     }
 

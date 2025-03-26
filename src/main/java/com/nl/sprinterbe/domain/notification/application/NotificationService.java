@@ -3,6 +3,7 @@ package com.nl.sprinterbe.domain.notification.application;
 import com.nl.sprinterbe.domain.admin.dto.AlarmRequest;
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
+import com.nl.sprinterbe.domain.chat.dao.ChatMessageRepository;
 import com.nl.sprinterbe.domain.notification.dao.NotificationRepository;
 import com.nl.sprinterbe.domain.notification.dto.NotificationDto;
 import com.nl.sprinterbe.domain.notification.entity.Notification;
@@ -42,6 +43,7 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final BacklogRepository backlogRepository;
     private final ScheduleRepository scheduleRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     // 스케줄 알림 체크 주기 (1분)
     private static final long SCHEDULE_CHECK_INTERVAL = 30 * 1000;
@@ -196,11 +198,10 @@ public class NotificationService {
         User sender = userRepository.findById(senderId).orElseThrow(UserNotFoundException::new);
         String senderName = sender.getNickname();
 
-
-
-        return senderName + "님이 새로운 메시지를 보냈습니다: \"" + ;
+        return senderName + "님이 새로운 메시지를 보냈습니다: \"" + chatMessageRepository.findById(chattingId);
     }
 
+    //chatting URL
     public String makeChattingUrl(Long projectId , Long sprintId , Long backlogId){
         return "/projects/" +projectId;
     }

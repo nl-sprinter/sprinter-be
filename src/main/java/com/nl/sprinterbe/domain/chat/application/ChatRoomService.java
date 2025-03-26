@@ -36,7 +36,7 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public void saveMessage(ChatMessageDto messageDto) {
+    public Long saveMessage(ChatMessageDto messageDto) {
         try {
             ChatRoom chatRoom = getOrCreateChatRoom(messageDto.getProjectId());
             
@@ -49,6 +49,7 @@ public class ChatRoomService {
                 .build();
                 
             chatMessageRepository.save(chatMessageEntity);
+            return chatMessageEntity.getId();
         } catch (Exception e) {
             throw new RuntimeException("메시지 저장 중 오류가 발생했습니다.", e);
         }
