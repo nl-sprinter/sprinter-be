@@ -4,6 +4,7 @@ import com.nl.sprinterbe.domain.schedule.dao.ScheduleRepository;
 import com.nl.sprinterbe.domain.task.dao.TaskRepository;
 import com.nl.sprinterbe.domain.todo.dao.TodoRepository;
 import com.nl.sprinterbe.domain.todo.dto.TodoResponse;
+import com.nl.sprinterbe.domain.todo.entity.TodoType;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.global.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,18 @@ public class TodoServiceImpl implements TodoService {
     public List<TodoResponse> getTodos() {
         long userId = getUserId();
         List<TodoResponse> responses = taskRepository.findUncheckedTasksByUserId(userId);
-        responses.addAll(scheduleRepository.findSchedulesByUserIdAndDate(userId, LocalDateTime.now()));
+        for (TodoResponse t : responses) {
+            t.setTodoType(TodoType.TASK);
+        }
+        List<TodoResponse> schedulesResponses = scheduleRepository.findSchedulesByUserIdAndDate(userId, LocalDateTime.now());
+        for (TodoResponse s : schedulesResponses) {
+            s.setTodoType(TodoType.SCHEDULE);
+        }
+        responses.addAll(schedulesResponses);
+
+        for (TodoResponse r : responses) {
+            System.out.println(r);
+        }
         return responses;
     }
 

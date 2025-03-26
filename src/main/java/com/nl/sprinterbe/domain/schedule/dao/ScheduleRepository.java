@@ -39,7 +39,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>, Sched
 
 
     @Query("SELECT new com.nl.sprinterbe.domain.todo.dto.TodoResponse( " +
-            "CAST('SCHEDULE' AS com.nl.sprinterbe.domain.todo.entity.TodoType)," +
             "s.title, " +
             "p.projectId, " +
             "p.projectName, " +

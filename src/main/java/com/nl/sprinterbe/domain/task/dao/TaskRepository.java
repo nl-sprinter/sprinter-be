@@ -27,7 +27,6 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskSearchQue
 
 
     @Query("SELECT new com.nl.sprinterbe.domain.todo.dto.TodoResponse( " +
-            "CAST('TASK' AS com.nl.sprinterbe.domain.todo.entity.TodoType)," +
             "t.content, " +
             "p.projectId, p.projectName, " +
             "s.sprintId, b.backlogId) " +
