@@ -65,7 +65,7 @@ public class ScheduleService {
         return result;
     }
 
-    public void createSchedule(ScheduleDto request, Long projectId) {
+    public Long createSchedule(ScheduleDto request, Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(ProjectNotFoundException::new);
 
@@ -84,6 +84,7 @@ public class ScheduleService {
 
         schedule.setUsers(users);
         scheduleRepository.save(schedule);
+        return schedule.getScheduleId();
     }
 
     public void deleteSchedule(Long scheduleId) {

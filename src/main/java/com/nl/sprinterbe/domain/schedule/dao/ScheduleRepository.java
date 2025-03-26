@@ -37,6 +37,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>, Sched
                                                     @Param("endOfMonth") LocalDateTime endOfMonth ,
                                                     @Param("projectId") Long projectId , @Param("userId") Long userId);
 
+    // 알림 설정된 모든 스케줄 조회
+    List<Schedule> findAllByNotifyTrue();
+
+
 
     @Query("SELECT new com.nl.sprinterbe.domain.todo.dto.TodoResponse( " +
             "s.title, " +
