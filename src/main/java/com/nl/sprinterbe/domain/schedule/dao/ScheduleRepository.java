@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.schedule.dao;
 
 import com.nl.sprinterbe.domain.schedule.entity.Schedule;
+import com.nl.sprinterbe.domain.todo.dto.TodoResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,4 +37,27 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>, Sched
                                                     @Param("endOfMonth") LocalDateTime endOfMonth ,
                                                     @Param("projectId") Long projectId , @Param("userId") Long userId);
 
+
+    @Query("SELECT new com.nl.sprinterbe.domain.todo.dto.TodoResponse( " +
+            "s.title, " +
+            "p.projectId, " +
+            "p.projectName, " +
+            "s.scheduleId) " +
+            "FROM UserSchedule us " +
+            "JOIN us.schedule s " +
+            "JOIN s.project p " +
+            "WHERE us.user.userId = :userId " +
+            "AND s.startDateTime <= :targetDate " +
+            "AND s.endDateTime >= :targetDate")
+    List<TodoResponse> findSchedulesByUserIdAndDate(
+            @Param("userId") Long userId,
+            @Param("targetDate") LocalDateTime targetDate);
+
+
+    @Query("SELECT COUNT(s) FROM UserSchedule us " +
+            "JOIN us.schedule s " +
+            "WHERE us.user.userId = :userId " +
+            "AND s.startDateTime <= :targetDate " +
+            "AND s.endDateTime >= :targetDate")
+    int countSchedulesTodoByUserIdAndDate(@Param("userId") Long userId, LocalDateTime targetDate);
 }
