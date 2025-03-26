@@ -200,7 +200,7 @@ public class NotificationService {
         String senderName = sender.getNickname();
         ChatMessage chatMessage = chatMessageRepository.findById(chattingId).orElseThrow(UserNotFoundException::new);
 
-        return senderName + "님이 새로운 메시지를 보냈습니다: \"" + chatMessage.getContent();
+        return senderName + "님이 새로운 메시지를 보냈습니다: \"" + chatMessage.getContent() + "\"";
     }
 
     //chatting URL
