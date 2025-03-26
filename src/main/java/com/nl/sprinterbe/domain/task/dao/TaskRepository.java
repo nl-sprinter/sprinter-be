@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TaskRepository extends JpaRepository<Task, Long> {
+public interface TaskRepository extends JpaRepository<Task, Long>, TaskSearchQueryRepository {
 
     @Query("SELECT t FROM Task t WHERE t.backlog.backlogId = :backlogId")
     List<Task> findByBacklogId(@Param("backlogId") Long backlogId);

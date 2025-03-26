@@ -52,6 +52,7 @@ public class Backlog {
 
     // 다대다 매핑 (백로그, 유저)
     @OneToMany(mappedBy = "backlog", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UserBacklog> userBacklogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "backlog", cascade = CascadeType.ALL, orphanRemoval = true)

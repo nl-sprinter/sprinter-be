@@ -39,22 +39,27 @@ public class User {
 
     // 일대다 매핑 (유저, 백로그커맨트)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<BacklogComment> backlogComments = new ArrayList<>();
 
     // 다대다 매핑 (유저, 프로젝트)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UserProject> userProjects = new ArrayList<>();
 
     // 다대다 매핑 (유저 , 스케줄)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UserSchedule> userSchedules = new ArrayList<>();
 
     // 다대다 매핑 (유저, 백로그)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UserBacklog> userBacklogs = new ArrayList<>();
 
     // 다대다 매핑 (유저, 데일리스크럼)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UserDailyScrum> userDailyScrums = new ArrayList<>();
 
 //    // 다대다 매핑 (유저, 알림)
