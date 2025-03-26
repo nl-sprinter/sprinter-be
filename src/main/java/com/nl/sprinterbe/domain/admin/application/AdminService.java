@@ -20,7 +20,6 @@ import java.util.List;
 public class AdminService {
     private final UserRepository userRepository;
 
-    List<User> users = userRepository.findAll();
 
     @Transactional(readOnly = true)
     public Page<UserRequest> getAllUsers(Pageable pageable) {

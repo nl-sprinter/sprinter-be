@@ -33,7 +33,7 @@ public class Notification {
     private List<UserNotification> userNotification;
 
     @ManyToOne
-    @JoinColumn(name = "project_id", nullable = false)
+    @JoinColumn(name = "project_id", nullable = true)
     private Project project;
 
     @Enumerated(EnumType.STRING)

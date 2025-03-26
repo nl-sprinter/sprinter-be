@@ -19,6 +19,7 @@ import com.nl.sprinterbe.global.exception.project.ProjectNotFoundException;
 import com.nl.sprinterbe.global.exception.schedule.ScheduleNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final ProjectRepository projectRepository;
@@ -41,8 +43,6 @@ public class NotificationService {
     private final BacklogRepository backlogRepository;
     private final ScheduleRepository scheduleRepository;
 
-    // 사용자별 SSE 이미터를 저장할 맵
-    private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
     // 스케줄 알림 체크 주기 (1분)
     private static final long SCHEDULE_CHECK_INTERVAL = 30 * 1000;
 
@@ -192,21 +192,24 @@ public class NotificationService {
     }
 
     // 채팅 시 알람
-//    public String makeChattingContent(Long senderId, Long chattingId) {
-//        User sender = userRepository.findById(senderId).orElseThrow(UserNotFoundException::new);
-//        String senderName = sender.getNickname();
-//
-//        return senderName + "님이 새로운 메시지를 보냈습니다: \"" + 채팅 메시지
-//    }
+    public String makeChattingContent(Long senderId, Long chattingId) {
+        User sender = userRepository.findById(senderId).orElseThrow(UserNotFoundException::new);
+        String senderName = sender.getNickname();
 
-//    public String makeChattingUrl(Long projectId , Long sprintId , Long backlogId){
-//        return "/projects/" +projectId
-//    }
+
+
+        return senderName + "님이 새로운 메시지를 보냈습니다: \"" + ;
+    }
+
+    public String makeChattingUrl(Long projectId , Long sprintId , Long backlogId){
+        return "/projects/" +projectId;
+    }
 
     // 스케줄 알림 체크 및 DB에 저장 (스케줄러로 주기적 실행)
     @Scheduled(fixedRate = SCHEDULE_CHECK_INTERVAL)
     @Transactional
     public void checkScheduleNotifications() {
+
         // 현재 시간
         LocalDateTime now = LocalDateTime.now();
         

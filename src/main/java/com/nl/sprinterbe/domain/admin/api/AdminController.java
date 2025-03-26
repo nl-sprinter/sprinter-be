@@ -27,6 +27,49 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getAllUsers(pageable));
     }
 
+    /**
+     *
+     * @param keyword
+     * @param pageable
+     * @return
+     * 반환 예시 Dto
+     * {
+     *     "content": [
+     *         {
+     *             "userId": 3,
+     *             "nickName": null,
+     *             "password": "******",
+     *             "email": "test3",
+     *             "roleUser": "ROLE_USER"
+     *         }
+     *     ],
+     *     "pageable": {
+     *         "pageNumber": 0,
+     *         "pageSize": 20,
+     *         "sort": {
+     *             "empty": true,
+     *             "sorted": false,
+     *             "unsorted": true
+     *         },
+     *         "offset": 0,
+     *         "paged": true,
+     *         "unpaged": false
+     *     },
+     *     "last": true,
+     *     "totalElements": 1,
+     *     "totalPages": 1,
+     *     "size": 20,
+     *     "number": 0,
+     *     "sort": {
+     *         "empty": true,
+     *         "sorted": false,
+     *         "unsorted": true
+     *     },
+     *     "first": true,
+     *     "numberOfElements": 1,
+     *     "empty": false
+     * }
+     */
     @GetMapping("/search")
     public ResponseEntity<Page<UserRequest>> searchUsers(
             @RequestParam(required = false) String keyword,
@@ -37,7 +80,7 @@ public class AdminController {
     /**
      * @Dto
      * {
-     *   "userIds": [3, 4, 5]
+     *   "userId": [3, 4, 5]
      * }
      */
     @DeleteMapping
