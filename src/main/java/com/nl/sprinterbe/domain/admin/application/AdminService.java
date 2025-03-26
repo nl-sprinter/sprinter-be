@@ -34,7 +34,7 @@ public class AdminService {
     public Page<UserRequest> searchUsers(String keyword, Pageable pageable) {
         Page<User> usersPage;
 
-        if (!StringUtils.hasText(keyword)) {
+        if (!StringUtils.hasText(keyword) || keyword.isEmpty() || keyword == null) {
             // 키워드가 없으면 전체 목록 반환
             usersPage = userRepository.findAll(pageable);
         } else {

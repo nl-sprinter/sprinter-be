@@ -151,7 +151,7 @@ public class NotificationService {
 
     public void sendAlarmToUsers(AlarmRequest request) {
         // 유저 ID 목록으로 유저 조회
-        List<User> users = userRepository.findAllById(request.getUserId());
+        List<User> users = userRepository.findAllById(request.getUserIds());
 
         if (users.isEmpty()) {
             return; // 유저가 없으면 아무 작업도 하지 않음

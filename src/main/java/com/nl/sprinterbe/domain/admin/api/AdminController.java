@@ -21,10 +21,11 @@ public class AdminController {
     private final AdminService adminService;
     private final NotificationService notificationService;
 
-    @GetMapping
+    @GetMapping("/users")
     public ResponseEntity<Page<UserRequest>> getAllUsers(
             @PageableDefault(size = 20, page = 0) Pageable pageable,
             @RequestParam(required = false) String searchTerm) {
+        System.out.println("searchTerm = " + searchTerm);
         return ResponseEntity.ok(adminService.searchUsers(searchTerm, pageable));
     }
 
@@ -71,12 +72,6 @@ public class AdminController {
      *     "empty": false
      * }
      */
-    @GetMapping("/search")
-    public ResponseEntity<Page<UserRequest>> searchUsers(
-            @RequestParam(required = false) String keyword,
-            @PageableDefault(size = 20, page = 0) Pageable pageable) {
-        return ResponseEntity.ok(adminService.searchUsers(keyword, pageable));
-    }
 
     /**
      * @Dto
@@ -84,14 +79,14 @@ public class AdminController {
      *   "userId": [3, 4, 5]
      * }
      */
-    @DeleteMapping
+    @DeleteMapping("/users")
     public ResponseEntity<Void> deleteUsers(@RequestBody Map<String,List<Long>> request) {
         List<Long> userIds = request.get("userId");
         adminService.deleteUser(userIds);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/alarm")
+    @PostMapping("/users/message/selected")
     public ResponseEntity<Void> sendAlarm(@RequestBody AlarmRequest request) {
         notificationService.sendAlarmToUsers(request);
         return ResponseEntity.ok().build();
