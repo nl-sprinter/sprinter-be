@@ -7,6 +7,6 @@ import java.util.List;
 
 @Getter
 public class AlarmRequest {
-    private List<Long> userId;
+    private List<Long> userIds;
     private String content;
 }
