@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    @Query("SELECT new com.nl.sprinterbe.domain.notification.dto.NotificationDto(n.notificationType,n.content,n.createdAt,n.navigable,n.url,p.projectId,p.projectName) FROM UserNotification un JOIN un.notification n JOIN n.project p WHERE un.users.userId=:userId")
+    @Query("SELECT new com.nl.sprinterbe.domain.notification.dto.NotificationDto(n.notificationId ,n.notificationType,n.content,n.createdAt,n.navigable,n.url,p.projectId,p.projectName) FROM UserNotification un JOIN un.notification n JOIN n.project p WHERE un.users.userId=:userId")
     List<NotificationDto> findAllByUserId(@Param("userId") Long userId);
 
     @Query("SELECT COUNT(un) FROM UserNotification un WHERE un.users.userId=:userId")
