@@ -19,15 +19,21 @@ import com.nl.sprinterbe.global.exception.project.ProjectNotFoundException;
 import com.nl.sprinterbe.global.exception.schedule.ScheduleNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final ProjectRepository projectRepository;
@@ -35,7 +41,12 @@ public class NotificationService {
     private final BacklogRepository backlogRepository;
     private final ScheduleRepository scheduleRepository;
 
-    public void create(NotificationType notificationType, String content, Long projectId, String url) {
+    // 사용자별 SSE 이미터를 저장할 맵
+    private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
+    // 스케줄 알림 체크 주기 (1분)
+    private static final long SCHEDULE_CHECK_INTERVAL = 30 * 1000;
+
+    public void create(NotificationType notificationType, String content, Long projectId, String url, Long scheduleId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(ProjectNotFoundException::new);
 
@@ -47,23 +58,21 @@ public class NotificationService {
                 .project(project)
                 .createdAt(LocalDateTime.now())
                 .navigable(url != null)
+                .scheduleId(scheduleId)
                 .url(url)
                 .build();
 
 
 
-        // ✅ UserNotification을 먼저 지역 변수로 선언
         List<UserNotification> userNotifications = users.stream()
                 .map(user -> UserNotification.builder()
                         .users(user)
                         .notification(notification)
                         .build())
                 .toList();
-
-        // ✅ Notification에 userNotification 설정
+        
         notification.setUserNotification(userNotifications);
 
-        // ✅ Notification 먼저 저장
         notificationRepository.save(notification);
     }
 
@@ -194,4 +203,36 @@ public class NotificationService {
 //        return "/projects/" +projectId
 //    }
 
+    // 스케줄 알림 체크 및 DB에 저장 (스케줄러로 주기적 실행)
+    @Scheduled(fixedRate = SCHEDULE_CHECK_INTERVAL)
+    @Transactional
+    public void checkScheduleNotifications() {
+        // 현재 시간
+        LocalDateTime now = LocalDateTime.now();
+        
+        // 알림 설정된 모든 스케줄 조회 (notify=true)
+        List<Schedule> schedules = scheduleRepository.findAllByNotifyTrue();
+        
+        for (Schedule schedule : schedules) {
+            // 알림 시간 계산 (시작 시간 - 사전 알림 시간)
+            LocalDateTime notificationTime = schedule.getStartDateTime()
+                    .minusHours(schedule.getPreNotificationHours());
+            
+            // 현재 시간이 알림 시간 이후이고, 시작 시간 이전인 경우에만 알림 생성
+            if (now.isAfter(notificationTime) && now.isBefore(schedule.getStartDateTime())) {
+                // 이미 알림을 보냈는지 확인 (중복 방지)
+                boolean alreadySent = notificationRepository.existsByScheduleIdAndNotificationType(
+                        schedule.getScheduleId(), NotificationType.SCHEDULE);
+                
+                if (!alreadySent) {
+                    // 알림 생성 및 저장
+                    String content = makeScheduleContent(schedule.getScheduleId());
+                    String url = makeScheduleUrl(schedule.getProject().getProjectId(), schedule.getScheduleId());
+                    
+                    // 프로젝트의 모든 사용자에게 알림 생성
+                    create(NotificationType.SCHEDULE,makeScheduleContent(schedule.getScheduleId()),schedule.getProject().getProjectId(),makeScheduleUrl(schedule.getProject().getProjectId(),schedule.getScheduleId()),schedule.getScheduleId());
+                }
+            }
+        }
+    }
 }

@@ -84,7 +84,7 @@ public class ProjectController {
     public ResponseEntity<Void> addUserToProject(@RequestBody Map<String, Long> userIdMap, @PathVariable Long projectId) {
         projectService.addUserToProject(userIdMap.get("userId"), projectId);
         //알림 추가
-        notificationService.create(NotificationType.TEAMMATE,notificationService.makeTeammateContent(userIdMap.get("userId")),projectId,null);
+        notificationService.create(NotificationType.TEAMMATE,notificationService.makeTeammateContent(userIdMap.get("userId")),projectId,null,null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -321,7 +321,7 @@ public class ProjectController {
     public ResponseEntity<BacklogIssueResponse> addIssueToBacklog(@PathVariable Long projectId ,@PathVariable Long sprintId, @PathVariable Long backlogId, @RequestBody IssueRequest issueRequest) {
         String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
         //알림 추가
-        notificationService.create(NotificationType.ISSUE,notificationService.makeIssueContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeIssueUrl(projectId,sprintId,backlogId));
+        notificationService.create(NotificationType.ISSUE,notificationService.makeIssueContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeIssueUrl(projectId,sprintId,backlogId),null);
         return ResponseEntity.ok(backlogService.addIssueToBacklog(backlogId, issueRequest.getContent()));
     }
 
@@ -376,7 +376,7 @@ public class ProjectController {
         backlogCommentService.createBacklogComment(backlogId, jwtUtil.getUserIdByToken(token), request);
         String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
         // 알림 추가
-        notificationService.create(NotificationType.COMMENT,notificationService.makeCommentContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeCommentUrl(projectId, sprintId, backlogId));
+        notificationService.create(NotificationType.COMMENT,notificationService.makeCommentContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeCommentUrl(projectId, sprintId, backlogId),null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -428,7 +428,7 @@ public class ProjectController {
         Long dailyScrumId = dailyScrumService.createDailyScrum(sprintId);
         String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
         // 알림 추가
-        notificationService.create(NotificationType.DAILYSCRUM,notificationService.makeDailyScrumContent(Long.parseLong(userId)),projectId,notificationService.makeDailyScrumUrl(projectId, sprintId,dailyScrumId));
+        notificationService.create(NotificationType.DAILYSCRUM,notificationService.makeDailyScrumContent(Long.parseLong(userId)),projectId,notificationService.makeDailyScrumUrl(projectId, sprintId,dailyScrumId),null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -517,7 +517,6 @@ public class ProjectController {
     public ResponseEntity<Void> addSchedule(@RequestBody ScheduleDto request, @PathVariable Long projectId) {
         Long scheduleId = scheduleService.createSchedule(request, projectId);
         //알림 추가
-        notificationService.create(NotificationType.SCHEDULE,notificationService.makeScheduleContent(scheduleId),projectId,notificationService.makeScheduleUrl(projectId,scheduleId));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

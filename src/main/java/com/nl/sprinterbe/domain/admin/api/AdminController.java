@@ -4,7 +4,6 @@ import com.nl.sprinterbe.domain.admin.application.AdminService;
 import com.nl.sprinterbe.domain.admin.dto.AlarmRequest;
 import com.nl.sprinterbe.domain.admin.dto.UserRequest;
 import com.nl.sprinterbe.domain.notification.application.NotificationService;
-import com.nl.sprinterbe.domain.notification.entity.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

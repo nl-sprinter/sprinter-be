@@ -9,16 +9,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AdminService {
     private final UserRepository userRepository;
+
     List<User> users = userRepository.findAll();
 
+    @Transactional(readOnly = true)
     public Page<UserRequest> getAllUsers(Pageable pageable) {
         // 페이징 처리된 사용자 목록 조회
         Page<User> usersPage = userRepository.findAll(pageable);
@@ -27,6 +31,7 @@ public class AdminService {
         return usersPage.map(UserRequest::of);
     }
 
+    @Transactional(readOnly = true)
     public Page<UserRequest> searchUsers(String keyword, Pageable pageable) {
         Page<User> usersPage;
 

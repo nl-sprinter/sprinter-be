@@ -4,6 +4,7 @@ import com.nl.sprinterbe.domain.notification.application.NotificationService;
 import com.nl.sprinterbe.domain.notification.dto.NotificationDto;
 import com.nl.sprinterbe.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
