@@ -4,6 +4,7 @@ import com.nl.sprinterbe.domain.admin.dto.AlarmRequest;
 import com.nl.sprinterbe.domain.backlog.dao.BacklogRepository;
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.chat.dao.ChatMessageRepository;
+import com.nl.sprinterbe.domain.chat.entity.ChatMessage;
 import com.nl.sprinterbe.domain.notification.dao.NotificationRepository;
 import com.nl.sprinterbe.domain.notification.dto.NotificationDto;
 import com.nl.sprinterbe.domain.notification.entity.Notification;
@@ -197,8 +198,9 @@ public class NotificationService {
     public String makeChattingContent(Long senderId, Long chattingId) {
         User sender = userRepository.findById(senderId).orElseThrow(UserNotFoundException::new);
         String senderName = sender.getNickname();
+        ChatMessage chatMessage = chatMessageRepository.findById(chattingId).orElseThrow(UserNotFoundException::new);
 
-        return senderName + "님이 새로운 메시지를 보냈습니다: \"" + chatMessageRepository.findById(chattingId);
+        return senderName + "님이 새로운 메시지를 보냈습니다: \"" + chatMessage.getContent();
     }
 
     //chatting URL

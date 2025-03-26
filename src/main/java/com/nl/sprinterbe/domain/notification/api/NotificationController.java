@@ -55,14 +55,14 @@ public class NotificationController {
      * 알림 delete는 단건 : notificationId
      * 전체 : userId
      */
-    @DeleteMapping("/notifications/{notificationId}")
+    @DeleteMapping("/{notificationId}")
     public ResponseEntity<Void> deleteNotification(@PathVariable("notificationId") Long notificationId) {
         notificationService.deleteNotificationByNotificationId(notificationId);
         return ResponseEntity.ok().build();
     }
 
     // 알림 전체 삭제
-    @DeleteMapping("/notifications")
+    @DeleteMapping
     public ResponseEntity<Void> deleteAllNotifications(@RequestHeader("Authorization") String token) {
         notificationService.deleteAllNotificationsByUserId(jwtUtil.getUserIdByToken(token));
         return ResponseEntity.ok().build();
