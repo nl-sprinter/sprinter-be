@@ -81,7 +81,7 @@ public class AdminController {
      */
     @DeleteMapping("/users")
     public ResponseEntity<Void> deleteUsers(@RequestBody Map<String,List<Long>> request) {
-        List<Long> userIds = request.get("userId");
+        List<Long> userIds = request.get("userIds");
         adminService.deleteUser(userIds);
         return ResponseEntity.ok().build();
     }

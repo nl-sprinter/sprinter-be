@@ -25,14 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -164,7 +161,7 @@ public class NotificationService {
             // URL은 null 또는 관리자 페이지 URL 사용
             createAdminNotification(
                     NotificationType.ADMIN_NOTICE,
-                    request.getContent(),
+                    request.getMessage(),
                     user.getUserId()
             );
         }
