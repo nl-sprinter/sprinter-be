@@ -22,7 +22,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
+            OAuth2User oAuth2User = super.loadUser(userRequest);
 
         System.out.println(oAuth2User);
 
@@ -67,6 +67,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             UserDetailResponse userDetailResponse = new UserDetailResponse();
             userDetailResponse.setEmail(oAuth2Response.getEmail());
             userDetailResponse.setNickname(oAuth2Response.getNickname());
+            userDetailResponse.setUserId(existingUser.getUserId());
             //userDTO.setProviderName(providerName);
             userDetailResponse.setRole("ROLE_USER");
 
