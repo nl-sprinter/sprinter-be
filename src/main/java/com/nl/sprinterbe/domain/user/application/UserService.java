@@ -103,7 +103,7 @@ public class UserService {
         jwtUtil.isExpired(refreshToken);
 
         String id = jwtUtil.getId(refreshToken);
-        RefreshToken refreshTokenOpt = refreshTokenRepository.findByRefreshAndUserIdAndExpiredFalse(refreshToken, id)
+        RefreshToken refreshTokenOpt = refreshTokenRepository.findByRefresh(refreshToken)
                 .orElseThrow(() -> new RuntimeException("Refresh Token not found with id: " + id));
         User userOpt = userRepository.findById(Long.parseLong(id))
                 .orElseThrow(() -> new UserNotFoundException());
