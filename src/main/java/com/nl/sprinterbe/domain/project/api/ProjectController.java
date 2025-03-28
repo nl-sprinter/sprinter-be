@@ -16,6 +16,8 @@ import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleListResponse;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleDto;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
+import com.nl.sprinterbe.domain.search.application.SearchService;
+import com.nl.sprinterbe.domain.search.dto.SearchResponse;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
 import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
@@ -57,6 +59,7 @@ public class ProjectController {
     private final JwtUtil jwtUtil;
     private final SecurityUtil securityUtil;
     private final NotificationService notificationService;
+    private final SearchService searchService;
 
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
@@ -534,6 +537,18 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Search ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+
+    @Operation(summary = "검색 기능", description = "ISSUE, TASK, BACKLOG, SCHEDULE, DAILYSCRUM을 검색합니다.")
+    @GetMapping("/{projectId}/search")
+    public ResponseEntity<List<SearchResponse>> search(@RequestParam(required = false) String query, @PathVariable Long projectId) {
+        return ResponseEntity.status(HttpStatus.OK).body(searchService.search(query, projectId));
+    }
 
 
 }
