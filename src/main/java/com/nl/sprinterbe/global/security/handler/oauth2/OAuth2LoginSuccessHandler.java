@@ -3,6 +3,7 @@ package com.nl.sprinterbe.global.security.handler.oauth2;
 import com.nl.sprinterbe.dto.CustomOAuth2User;
 import com.nl.sprinterbe.domain.refreshtoken.application.RefreshTokenService;
 import com.nl.sprinterbe.global.security.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler{
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
@@ -31,12 +33,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler{
         refreshTokenService.updateExpiredTokens(id);
         refreshTokenService.addRefresh(id, refreshToken);
 
-        settingResponse(response,HttpStatus.OK,null,refreshToken);
+        settingResponse(response, HttpStatus.OK,null, refreshToken);
         response.sendRedirect("http://localhost:3000/refresh");
     }
 
     //필터단: data 필드 없는 Json
-    public static void settingResponse(HttpServletResponse response, HttpStatus httpStatus, String accessToken , String refreshToken) throws IOException {
+    public static void settingResponse(HttpServletResponse response, HttpStatus httpStatus, String accessToken , String refreshToken) {
         // 응답 헤더 및 쿠키 설정
         if (accessToken != null) {
             response.addHeader("Authorization", "Bearer " + accessToken);

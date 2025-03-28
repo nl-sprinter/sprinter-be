@@ -115,7 +115,7 @@ public class UserService {
         refreshTokenService.save(newRefreshToken, id); // 새로운 refreshToken DB에 저장
 
         response.setHeader("Authorization", "Bearer " + newAccessToken);
-        response.addCookie(jwtUtil.createCookie("Refresh", newRefreshToken));
+//        response.addCookie(jwtUtil.createCookie("Refresh", newRefreshToken));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
