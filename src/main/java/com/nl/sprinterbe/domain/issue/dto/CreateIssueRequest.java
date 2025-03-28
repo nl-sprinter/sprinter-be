@@ -10,7 +10,6 @@ import org.hibernate.validator.constraints.Length;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CreateIssueRequest {
 
     @NotNull(message = "backlogId는 필수값입니다.")
@@ -18,6 +17,7 @@ public class CreateIssueRequest {
 
     @Length(max = 100, message = "content는 100자 이하여야 합니다.")
     private String content;
+
 
     private Boolean checked=false;
 }

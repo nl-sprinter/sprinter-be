@@ -2,6 +2,7 @@ package com.nl.sprinterbe.domain.backlogcomment.entity;
 
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
+import com.nl.sprinterbe.domain.like.entity.Like;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.global.jpa.JpaBaseEntity;
 import jakarta.persistence.*;
@@ -56,5 +57,9 @@ public class BacklogComment {
                 .build();
         return newComment;
     }
+
+    @OneToMany(mappedBy = "backlogComment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Like> likes = new ArrayList<>();
 
 }

@@ -15,4 +15,8 @@ public interface BacklogCommentService {
 
     List<BacklogCommentResponse> getBacklogComments(Long backlogId);
 
+    List<BacklogCommentResponse> onLikeToBacklogComment(Long backlogId, Long backlogCommentId);
+
+    List<BacklogCommentResponse> offLikeToBacklogComment(Long backlogId, Long backlogCommentId);
+
 }

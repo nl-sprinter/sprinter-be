@@ -11,7 +11,6 @@ import lombok.*;
 @AllArgsConstructor
 @Data
 @Builder
-@EqualsAndHashCode(of = "id", callSuper = false)
 public class Issue {
 
     @Id

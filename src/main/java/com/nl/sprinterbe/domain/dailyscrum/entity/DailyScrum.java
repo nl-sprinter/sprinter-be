@@ -5,10 +5,7 @@ import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.global.jpa.JpaBaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
 public class DailyScrum extends JpaBaseEntity {
     @Id
@@ -29,13 +27,13 @@ public class DailyScrum extends JpaBaseEntity {
     private Sprint sprint;
 
     @OneToMany(mappedBy = "dailyScrum", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<DailyScrumBacklog> dailyScrumBacklogs = new ArrayList<>();
 
     // 다대다 매핑 (데일리스크럼, 유저)
     @OneToMany(mappedBy = "dailyScrum", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<UserDailyScrum> userDailyScrums = new ArrayList<>();
-
-    private String title; // TODO: 필요 없음
 
     private String content;
 

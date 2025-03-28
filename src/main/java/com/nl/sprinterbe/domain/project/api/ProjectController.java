@@ -9,7 +9,15 @@ import com.nl.sprinterbe.domain.dailyscrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyscrum.dto.*;
 import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
+import com.nl.sprinterbe.domain.notification.application.NotificationService;
+import com.nl.sprinterbe.domain.notification.entity.NotificationType;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
+import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleListResponse;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleDto;
+import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
+import com.nl.sprinterbe.domain.search.application.SearchService;
+import com.nl.sprinterbe.domain.search.dto.SearchResponse;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
 import com.nl.sprinterbe.domain.sprint.dto.SprintRequest;
 import com.nl.sprinterbe.domain.sprint.dto.SprintResponse;
@@ -19,7 +27,9 @@ import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.dto.UserInfoWithTeamLeaderResponse;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.domain.project.application.ProjectService;
+import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import com.nl.sprinterbe.global.security.JwtUtil;
+import com.nl.sprinterbe.global.security.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +55,11 @@ public class ProjectController {
     private final SprintService sprintService;
     private final IssueService issueService;
     private final BacklogCommentService backlogCommentService;
+    private final ScheduleService scheduleService;
     private final JwtUtil jwtUtil;
+    private final SecurityUtil securityUtil;
+    private final NotificationService notificationService;
+    private final SearchService searchService;
 
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
@@ -72,6 +86,8 @@ public class ProjectController {
     @PostMapping("/{projectId}/users")
     public ResponseEntity<Void> addUserToProject(@RequestBody Map<String, Long> userIdMap, @PathVariable Long projectId) {
         projectService.addUserToProject(userIdMap.get("userId"), projectId);
+        //알림 추가
+        notificationService.create(NotificationType.TEAMMATE,notificationService.makeTeammateContent(userIdMap.get("userId")),projectId,null,null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -125,7 +141,7 @@ public class ProjectController {
      * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      */
     @Operation(summary = "Product Backlog 조회", description = "Product Backlog 리스트를 조회합니다.") // 프론트 연동 OK
-    @GetMapping("/{projectId}/productbacklogs")
+    @GetMapping("/{projectId}/productbacklogs")  // 보길 수정 3/16
     public ResponseEntity<List<ProductBacklogResponse>> getProductBacklogList(@PathVariable Long projectId) {
         return ResponseEntity.ok(backlogService.getProductBacklogsByProjectId(projectId));
     }
@@ -224,7 +240,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "내 Backlog 조회", description = "User 에게 할당된 Backlog 리스트를 조회합니다.") // 프론트 연동 OK
-    @GetMapping("/{projectId}/sprints/user-backlogs")
+    @GetMapping("/{projectId}/sprints/user-backlogs") // 보길 수정 3/16
     public ResponseEntity<List<BacklogInfoResponse>> getUsersBacklogs(@PathVariable Long projectId, @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(backlogService.findUserBacklogs(projectId, jwtUtil.getUserIdByToken(token)));
     }
@@ -305,7 +321,10 @@ public class ProjectController {
 
     @Operation(summary = "이슈 추가", description = "백로그에 이슈를 추가합니다.") // 프론트 연동 OK
     @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/issues")
-    public ResponseEntity<BacklogIssueResponse> addIssueToBacklog(@PathVariable Long backlogId, @RequestBody IssueRequest issueRequest) {
+    public ResponseEntity<BacklogIssueResponse> addIssueToBacklog(@PathVariable Long projectId ,@PathVariable Long sprintId, @PathVariable Long backlogId, @RequestBody IssueRequest issueRequest) {
+        String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
+        //알림 추가
+        notificationService.create(NotificationType.ISSUE,notificationService.makeIssueContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeIssueUrl(projectId,sprintId,backlogId),null);
         return ResponseEntity.ok(backlogService.addIssueToBacklog(backlogId, issueRequest.getContent()));
     }
 
@@ -352,10 +371,15 @@ public class ProjectController {
     @Operation(summary = "댓글 생성", description = "백로그에 댓글을 생성합니다.") // 프론트 연동 OK
     @PostMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments")
     public ResponseEntity<Void> createBacklogComment(
+            @PathVariable Long projectId,
+            @PathVariable Long sprintId,
             @PathVariable Long backlogId,
             @RequestBody @Validated BacklogCommentRequest request,
             @RequestHeader("Authorization") String token) {
         backlogCommentService.createBacklogComment(backlogId, jwtUtil.getUserIdByToken(token), request);
+        String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
+        // 알림 추가
+        notificationService.create(NotificationType.COMMENT,notificationService.makeCommentContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeCommentUrl(projectId, sprintId, backlogId),null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -365,6 +389,19 @@ public class ProjectController {
             @PathVariable Long backlogCommentId,
             @RequestHeader("Authorization") String token) {
         backlogCommentService.deleteBacklogComment(jwtUtil.getUserIdByToken(token), backlogCommentId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Like ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "좋아요 On", description = "백로그 댓글에 좋아요가 on 됩니다.")
+    @PatchMapping("/{projectId}/sprints/{sprintId}/backlogs/{backlogId}/backlogcomments/{backlogCommentId}/likes")
+    public ResponseEntity<Void> onLikeToBacklogComment(@PathVariable Long backlogId, @PathVariable Long backlogCommentId) {
+        backlogCommentService.onLikeToBacklogComment(backlogId, backlogCommentId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -390,8 +427,11 @@ public class ProjectController {
 
     @Operation(summary = "Sprint 에 DailyScrum 생성", description = "Sprint 에 DailyScrum 을 생성합니다.") // 프론트 연동 OK
     @PostMapping("/{projectId}/sprints/{sprintId}/dailyscrums")
-    public ResponseEntity<Void> addDailyScrumToSprint(@PathVariable Long sprintId) {
-        dailyScrumService.createDailyScrum(sprintId);
+    public ResponseEntity<Void> addDailyScrumToSprint(@PathVariable Long projectId, @PathVariable Long sprintId) {
+        Long dailyScrumId = dailyScrumService.createDailyScrum(sprintId);
+        String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
+        // 알림 추가
+        notificationService.create(NotificationType.DAILYSCRUM,notificationService.makeDailyScrumContent(Long.parseLong(userId)),projectId,notificationService.makeDailyScrumUrl(projectId, sprintId,dailyScrumId),null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -454,5 +494,61 @@ public class ProjectController {
         dailyScrumService.deleteDailyScrum(dailyScrumId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Schedule ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @Operation(summary = "프로젝트 내 특정 년/월 Sprint + Schedule list 조회", description = "프로젝트 내부에서 특정 년도와 월의 Sprint + Schedule 정보를 조회합니다.")
+    @GetMapping("/{projectId}/schedule")
+    public ResponseEntity<List<ScheduleListResponse>> getScheduleList(@PathVariable Long projectId, @RequestParam int year, @RequestParam int month) {
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getScheduleList(projectId, year, month));
+    }
+
+    @Operation(summary = "scheduleId 로 Schedule 조회", description = "scheduleId 로 특정 Schedule 을 조회합니다.")
+    @GetMapping("/{projectId}/schedule/{scheduleId}")
+    public ResponseEntity<ScheduleDto> getScheduleByScheduleId(@PathVariable Long scheduleId) {
+        ScheduleDto scheduleDto = scheduleService.getSchedule(scheduleId);
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleDto);
+    }
+
+    @Operation(summary = "Schedule 생성", description = "Schedule 을 생성합니다.")
+    @PostMapping("/{projectId}/schedule")
+    public ResponseEntity<Void> addSchedule(@RequestBody ScheduleDto request, @PathVariable Long projectId) {
+        Long scheduleId = scheduleService.createSchedule(request, projectId);
+        //알림 추가
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "Schedule 수정", description = "해당 년도와 월의 Schedule 정보를 수정합니다.")
+    @PatchMapping("/{projectId}/schedule/{scheduleId}")
+    public ResponseEntity<Void> updateScheduleByScheduleId(@RequestBody ScheduleDto request, @PathVariable Long scheduleId) {
+        scheduleService.updateSchedule(request, scheduleId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "Schedule 삭제", description = "Schedule 을 삭제합니다.")
+    @DeleteMapping("/{projectId}/schedule/{scheduleId}")
+    public ResponseEntity<Void> deleteScheduleByScheduleId(@PathVariable Long scheduleId) {
+        scheduleService.deleteSchedule(scheduleId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: Search ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+
+    @Operation(summary = "검색 기능", description = "ISSUE, TASK, BACKLOG, SCHEDULE, DAILYSCRUM을 검색합니다.")
+    @GetMapping("/{projectId}/search")
+    public ResponseEntity<List<SearchResponse>> search(@RequestParam(required = false) String query, @PathVariable Long projectId) {
+        return ResponseEntity.status(HttpStatus.OK).body(searchService.search(query, projectId));
+    }
+
 
 }

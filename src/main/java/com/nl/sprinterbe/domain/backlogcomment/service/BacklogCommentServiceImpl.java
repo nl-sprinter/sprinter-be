@@ -7,17 +7,22 @@ import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentFromResponse;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
 import com.nl.sprinterbe.domain.backlogcomment.entity.BacklogComment;
+import com.nl.sprinterbe.domain.like.dao.LikeRepository;
+import com.nl.sprinterbe.domain.like.entity.Like;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.global.exception.backlog.BacklogNotFoundException;
 import com.nl.sprinterbe.global.exception.backlogcomment.BacklogCommentNotFoundException;
 import com.nl.sprinterbe.global.exception.backlogcomment.ForbiddenCommentAccessException;
+import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
+import com.nl.sprinterbe.global.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,8 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
     private final BacklogCommentRepository backlogCommentRepository;
     private final UserRepository userRepository;
     private final BacklogRepository backlogRepository;
+    private final LikeRepository likeRepository;
+    private final SecurityUtil securityUtil;
 
     @Override
     public BacklogCommentFromResponse createBacklogComment(Long backlogId, Long userId, BacklogCommentRequest request) {
@@ -54,10 +61,73 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
 
     @Override
     public List<BacklogCommentResponse> getBacklogComments(Long backlogId) {
+        Long userId = getCurrentUserId();
         List<BacklogComment> comments = backlogCommentRepository.findCommentsByBacklogId(backlogId);
-        return comments.stream()
-                .map(BacklogCommentResponse::of)
+
+        return getCommentResponses(userId, comments);
+    }
+
+    @Override
+    public List<BacklogCommentResponse> onLikeToBacklogComment(Long backlogId, Long backlogCommentId) {
+        Long userId = getCurrentUserId();
+
+        if (!likeRepository.existsByUserUserIdAndBacklogCommentBacklogCommentId(userId, backlogCommentId)) {
+            BacklogComment backlogComment = backlogCommentRepository.findById(backlogCommentId)
+                    .orElseThrow(BacklogCommentNotFoundException::new);
+            User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+            Like like = Like.builder()
+                    .backlogComment(backlogComment)
+                    .user(user)
+                    .build();
+
+            likeRepository.save(like);
+        }
+
+        return getBacklogComments(backlogId);
+    }
+
+    @Override
+    public List<BacklogCommentResponse> offLikeToBacklogComment(Long backlogId, Long backlogCommentId) {
+        Long userId = Long.parseLong(securityUtil.getCurrentUserId().get());
+        likeRepository.deleteByBacklogCommentBacklogCommentIdAndUserUserId(backlogCommentId, userId);
+
+        return getBacklogComments(backlogId);
+    }
+
+    /**
+     * 댓글 리스트에 달린 좋아요를 가져와서 댓글 정보와 좋아요 수를 함께 반환하는 메서드
+     * @param comments 해당 백로그에 달린 댓글 리스트
+     */
+    @NotNull
+    private List<BacklogCommentResponse> getCommentResponses(Long userId, List<BacklogComment> comments) {
+        List<Long> commentIds = comments.stream()
+                .map(BacklogComment::getBacklogCommentId)
                 .toList();
+
+        //댓글 좋아요 수를 group by로 가져와 쿼리 한번에 모든 정보를 가져 온다. id를 key로 map에 저장을 한 후 dto에 실어 리턴
+        Map<Long,Long> likeCountMap = commentIds.isEmpty() ?
+                Collections.emptyMap() :
+                likeRepository.countLikesByBacklogCommentIds(commentIds).stream()
+                        .collect(Collectors.toMap(
+                                likeCount -> (Long) likeCount[0],
+                                likeCount -> (Long) likeCount[1]
+                        ));
+
+        Set<Long> likedCommentIds = commentIds.isEmpty() ?
+                Collections.emptySet() :
+                new HashSet<>(likeRepository.findLikedCommentIdsByUserId(userId, commentIds));
+
+        return comments.stream()
+                .map(comment -> BacklogCommentResponse.of(
+                        comment,
+                        likeCountMap.getOrDefault(comment.getBacklogCommentId(), 0L),
+                        likedCommentIds.contains(comment.getBacklogCommentId())))
+                .toList();
+    }
+
+    private Long getCurrentUserId() {
+        return Long.parseLong(securityUtil.getCurrentUserId().get());
     }
 
     /**
@@ -82,6 +152,4 @@ public class BacklogCommentServiceImpl implements BacklogCommentService {
         }
         return commentResponses;
     }
-
-
 }

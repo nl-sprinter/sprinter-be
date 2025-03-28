@@ -21,4 +21,13 @@ public interface SprintRepository extends JpaRepository<Sprint, Long> {
             " ORDER BY s.end_date DESC LIMIT 1"
             , nativeQuery = true)
     Sprint findLatestSprint(@Param("projectId") Long projectId);
+
+    @Query("SELECT s FROM Sprint s " +
+            "JOIN s.project p " +
+            "  WHERE p.projectId = :projectId " +
+            "  AND s.startDate <= :endOfMonth " +
+            "  AND s.endDate >= :startOfMonth")
+    List<Sprint> findAllSprintInMonth(@Param("startOfMonth") LocalDate startOfMonth,
+                                      @Param("endOfMonth") LocalDate endOfMonth ,
+                                      @Param("projectId") Long projectId);
 }

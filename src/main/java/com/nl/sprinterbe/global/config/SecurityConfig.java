@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/signup","/api/v1/auth/refresh", "/login").permitAll()
                         .requestMatchers("/h2-console/**","/api/v1/auth/login", "/oauth2/**", "/login/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/api/v1/chat/ws/**").permitAll() // 채팅 웹소켓
                         .anyRequest().authenticated()
                 )
 //                .formLogin(form -> form

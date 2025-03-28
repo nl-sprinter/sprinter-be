@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BacklogRepository extends JpaRepository<Backlog, Long> {
+public interface BacklogRepository extends JpaRepository<Backlog, Long>, BacklogSearchQueryRepository {
 
     @Query("SELECT b FROM Backlog b" +
             " JOIN UserBacklog ub ON ub.backlog = b" +

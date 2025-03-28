@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 
-public interface DailyScrumRepository extends JpaRepository<DailyScrum, Long> {
+public interface DailyScrumRepository extends JpaRepository<DailyScrum, Long>, DailyScrumSearchQueryRepository {
     @Query("select ud.user from UserDailyScrum ud where ud.dailyScrum.dailyScrumId = :dailyScrumId")
     List<User> findUsersByDailyScrumId(@Param("dailyScrumId") Long dailyScrumId);
 
@@ -27,7 +27,7 @@ public interface DailyScrumRepository extends JpaRepository<DailyScrum, Long> {
     List<DailyScrum> findByCreatedAt(LocalDate startDate);
 
     // 일단 살려는 주실게
-    @Query("SELECT new com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse(b.backlogId, b.isFinished, b.weight, b.title) " +
+    @Query("SELECT new com.nl.sprinterbe.domain.dailyscrum.dto.BacklogResponse(b.backlogId, b.isFinished, b.weight) " +
             "FROM DailyScrum ds " +
             "JOIN ds.dailyScrumBacklogs dsb " +
             "JOIN dsb.backlog b " +

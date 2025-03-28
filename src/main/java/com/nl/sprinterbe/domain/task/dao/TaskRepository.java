@@ -1,6 +1,8 @@
 package com.nl.sprinterbe.domain.task.dao;
 
 import com.nl.sprinterbe.domain.task.entity.Task;
+import com.nl.sprinterbe.domain.todo.dto.TodoResponse;
+import com.nl.sprinterbe.domain.todo.entity.TodoType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TaskRepository extends JpaRepository<Task, Long> {
+public interface TaskRepository extends JpaRepository<Task, Long>, TaskSearchQueryRepository {
 
     @Query("SELECT t FROM Task t WHERE t.backlog.backlogId = :backlogId")
     List<Task> findByBacklogId(@Param("backlogId") Long backlogId);
@@ -21,4 +23,23 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             " SET t.userId = NULL" +
             " WHERE t.userId = :userId")
     void updateUserIdToNullWhenUserGoOutProject(@Param("userId") Long userId);
+
+
+
+    @Query("SELECT new com.nl.sprinterbe.domain.todo.dto.TodoResponse( " +
+            "t.content, " +
+            "p.projectId, p.projectName, " +
+            "s.sprintId, b.backlogId) " +
+            "FROM Task t " +
+            "JOIN t.backlog b " +  // Task → Backlog
+            "JOIN b.sprint s " +   // Backlog → Sprint
+            "JOIN s.project p " +  // Sprint → Project
+            "WHERE t.userId = :userId " +
+            "AND t.checked = false")
+    List<TodoResponse> findUncheckedTasksByUserId(@Param("userId") Long userId);
+
+
+    @Query("SELECT COUNT(t) FROM Task t WHERE t.userId = :userId AND t.checked = false")
+    int countTasksTodoByUserIdAndUnchecked(@Param("userId") Long userId);
+
 }

@@ -17,6 +17,5 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     // userId로 expired 필드가 false인 RefreshToken 리스트 조회
     List<RefreshToken> findByUserIdAndExpiredFalse(String userId);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<RefreshToken> findByRefreshAndUserIdAndExpiredFalse(String refresh, String userId);
 }
