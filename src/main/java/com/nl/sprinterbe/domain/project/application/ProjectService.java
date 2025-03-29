@@ -5,6 +5,7 @@ import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.backlogcomment.dao.BacklogCommentRepository;
 import com.nl.sprinterbe.domain.dailyscrum.dao.DailyScrumBacklogRepository;
 import com.nl.sprinterbe.domain.dailyscrum.dao.UserDailyScrumRepository;
+import com.nl.sprinterbe.domain.project.dto.ProjectProgressResponse;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.task.dao.TaskRepository;
@@ -235,5 +236,17 @@ public class ProjectService {
         return userProjectRepository.findByProjectProjectIdAndUserUserId(projectId, userId)
                 .orElseThrow(UserNotFoundException::new)
                 .getIsProjectLeader();
+    }
+
+    public ProjectProgressResponse getProjectProgress(Long projectId) {
+        int x = backlogRepository.countIsFinishedBacklogs(projectId);
+        int y = backlogRepository.countByProjectId(projectId);
+        ProjectProgressResponse projectProgressResponse = new ProjectProgressResponse();
+        if(y==0){
+            projectProgressResponse.setPercent(0);
+        }else{
+            projectProgressResponse.setPercent((int) ((double) x / y * 100));
+        }
+        return projectProgressResponse;
     }
 }

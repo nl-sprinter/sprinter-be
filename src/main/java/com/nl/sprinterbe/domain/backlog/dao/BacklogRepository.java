@@ -60,4 +60,15 @@ public interface BacklogRepository extends JpaRepository<Backlog, Long>, Backlog
             " WHERE p.projectId=:projectId AND s.sprintId=:sprintId")
     List<Backlog> findBacklogsByProjectIdAndSprintId(@Param("projectId") Long projectId, @Param("sprintId") Long sprintId);
 
+    @Query("SELECT COUNT(b) FROM Backlog b" +
+            " JOIN b.sprint s" +
+            " JOIN s.project p" +
+            " WHERE p.projectId=:projectId AND b.isFinished=true")
+    int countIsFinishedBacklogs(@Param("projectId") Long projectId);
+
+    @Query("SELECT COUNT(b) FROM Backlog b" +
+            " JOIN b.sprint s" +
+            " JOIN s.project p" +
+            " WHERE p.projectId=:projectId")
+    int countByProjectId(@Param("projectId") Long projectId);
 }

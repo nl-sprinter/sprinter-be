@@ -11,6 +11,7 @@ import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
 import com.nl.sprinterbe.domain.notification.application.NotificationService;
 import com.nl.sprinterbe.domain.notification.entity.NotificationType;
+import com.nl.sprinterbe.domain.project.dto.ProjectProgressResponse;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
 import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleListResponse;
@@ -134,6 +135,11 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "프로젝트 진행률", description = "프로젝트의 백로그 진행률을 조회합니다.") // 프론트 연동 OK
+    @GetMapping("/{projectId}/progress-percent")
+    public ResponseEntity<ProjectProgressResponse> getProjectProgress(@PathVariable Long projectId) {
+        return ResponseEntity.status(HttpStatus.OK).body(projectService.getProjectProgress(projectId));
+    }
 
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
