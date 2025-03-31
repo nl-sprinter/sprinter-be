@@ -12,11 +12,11 @@ import com.nl.sprinterbe.domain.issue.service.IssueService;
 import com.nl.sprinterbe.domain.notification.application.NotificationService;
 import com.nl.sprinterbe.domain.notification.entity.NotificationType;
 import com.nl.sprinterbe.domain.project.dto.ProjectProgressResponse;
+import com.nl.sprinterbe.domain.project.dto.SoftwareEngineeringElementResponse;
 import com.nl.sprinterbe.domain.project.dto.SprintPeriodUpdateRequest;
 import com.nl.sprinterbe.domain.schedule.application.ScheduleService;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleListResponse;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleDto;
-import com.nl.sprinterbe.domain.schedule.dto.ScheduleResponse;
 import com.nl.sprinterbe.domain.search.application.SearchService;
 import com.nl.sprinterbe.domain.search.dto.SearchResponse;
 import com.nl.sprinterbe.domain.sprint.application.SprintService;
@@ -137,10 +137,15 @@ public class ProjectController {
 
     @Operation(summary = "프로젝트 진행률", description = "프로젝트의 백로그 진행률을 조회합니다.") // 프론트 연동 OK
     @GetMapping("/{projectId}/progress-percent")
-    public ResponseEntity<ProjectProgressResponse> getProjectProgress(@PathVariable Long projectId) {
-        return ResponseEntity.status(HttpStatus.OK).body(projectService.getProjectProgress(projectId));
+    public ResponseEntity<ProjectProgressResponse> getProjectProgressPercent(@PathVariable Long projectId) {
+        return ResponseEntity.status(HttpStatus.OK).body(projectService.getProjectProgressPercent(projectId));
     }
 
+    @Operation()
+    @GetMapping("/{projectId}/software-engineering-elements")
+    public ResponseEntity<List<SoftwareEngineeringElementResponse>> getBurnDownChartAndVelocityChartData(@PathVariable Long projectId) {
+        return ResponseEntity.ok(projectService.getBurnDownChartAndVelocityChartData(projectId));
+    }
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
      * ::::: Product Backlogs ::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
