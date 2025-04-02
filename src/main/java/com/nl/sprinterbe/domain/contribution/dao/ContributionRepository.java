@@ -19,8 +19,7 @@ public class ContributionRepository {
 
     public List<ContributionDto> findUserContributionBySprintAndProject(Long projectId, Long sprintId) {
         return em.createQuery("""
-            SELECT new com.nl.sprinterbe.domain.contribution.dto.ContributionDto(
-                u.userId, u.nickname, SUM(b.weight))
+            SELECT new com.nl.sprinterbe.domain.contribution.dto.ContributionDto(u.userId,u.nickname,SUM(b.weight))
             FROM UserBacklog ub
             JOIN ub.user u
             JOIN ub.backlog b

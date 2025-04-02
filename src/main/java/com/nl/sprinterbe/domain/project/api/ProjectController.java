@@ -589,16 +589,8 @@ public class ProjectController {
     //각 Sprint에서의 Contribution
     @GetMapping("/{projectId}/sprints/{sprintId}/individual-contribution-chart")
     public ResponseEntity<List<ContributionDto>> getContributions(@PathVariable Long projectId, @PathVariable Long sprintId) {
-        return ResponseEntity.ok(contributionService.getContribution(projectId, sprintId));
-    }
-
-    //하나의 프로젝트 안에서의 Contribution
-    @GetMapping("/{projectId}/individual-contribution-chart")
-    public ResponseEntity<List<ContributionDto>> getContributions(@PathVariable Long projectId) {
-        //return ResponseEntity.ok(contributionService.getContribution(projectId));
-        List<ContributionDto> contribution = contributionService.getContribution(projectId);
+        List<ContributionDto> contribution = contributionService.getContribution(projectId, sprintId);
         return ResponseEntity.ok(contribution);
     }
-
 
 }
