@@ -580,8 +580,10 @@ public class ProjectController {
     }
 
   
-     * ::::: 개인별 기여도 차트 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     /**
+     * ::::: 개인별 기여도 차트 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      */
        
     //각 Sprint에서의 Contribution
@@ -593,7 +595,9 @@ public class ProjectController {
     //하나의 프로젝트 안에서의 Contribution
     @GetMapping("/{projectId}/individual-contribution-chart")
     public ResponseEntity<List<ContributionDto>> getContributions(@PathVariable Long projectId) {
-        return ResponseEntity.ok(contributionService.getContribution(projectId));
+        //return ResponseEntity.ok(contributionService.getContribution(projectId));
+        List<ContributionDto> contribution = contributionService.getContribution(projectId);
+        return ResponseEntity.ok(contribution);
     }
 
 

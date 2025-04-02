@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class FreeSpeechDto {
-    private Long postId;
+    private Long id;
     private String content;
     private LocalDateTime createdAt;
 
