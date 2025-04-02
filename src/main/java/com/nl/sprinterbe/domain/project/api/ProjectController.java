@@ -5,6 +5,8 @@ import com.nl.sprinterbe.domain.backlog.dto.*;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentRequest;
 import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
 import com.nl.sprinterbe.domain.backlogcomment.service.BacklogCommentService;
+import com.nl.sprinterbe.domain.contribution.api.ContributionService;
+import com.nl.sprinterbe.domain.contribution.dto.ContributionDto;
 import com.nl.sprinterbe.domain.dailyscrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyscrum.dto.*;
 import com.nl.sprinterbe.domain.freespeech.api.FreeSpeechService;
@@ -58,6 +60,7 @@ public class ProjectController {
     private final IssueService issueService;
     private final BacklogCommentService backlogCommentService;
     private final ScheduleService scheduleService;
+    private final ContributionService contributionService;
     private final JwtUtil jwtUtil;
     private final SecurityUtil securityUtil;
     private final NotificationService notificationService;
@@ -576,8 +579,22 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+  
+     * ::::: 개인별 기여도 차트 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+       
+    //각 Sprint에서의 Contribution
+    @GetMapping("/{projectId}/sprints/{sprintId}/individual-contribution-chart")
+    public ResponseEntity<List<ContributionDto>> getContributions(@PathVariable Long projectId, @PathVariable Long sprintId) {
+        return ResponseEntity.ok(contributionService.getContribution(projectId, sprintId));
+    }
 
-
+    //하나의 프로젝트 안에서의 Contribution
+    @GetMapping("/{projectId}/individual-contribution-chart")
+    public ResponseEntity<List<ContributionDto>> getContributions(@PathVariable Long projectId) {
+        return ResponseEntity.ok(contributionService.getContribution(projectId));
+    }
 
 
 }
