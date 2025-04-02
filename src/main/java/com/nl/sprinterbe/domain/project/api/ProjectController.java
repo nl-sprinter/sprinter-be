@@ -7,6 +7,8 @@ import com.nl.sprinterbe.domain.backlogcomment.dto.BacklogCommentResponse;
 import com.nl.sprinterbe.domain.backlogcomment.service.BacklogCommentService;
 import com.nl.sprinterbe.domain.dailyscrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyscrum.dto.*;
+import com.nl.sprinterbe.domain.freespeech.api.FreeSpeechService;
+import com.nl.sprinterbe.domain.freespeech.dto.FreeSpeechDto;
 import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
 import com.nl.sprinterbe.domain.notification.application.NotificationService;
@@ -60,6 +62,7 @@ public class ProjectController {
     private final SecurityUtil securityUtil;
     private final NotificationService notificationService;
     private final SearchService searchService;
+    private final FreeSpeechService freeSpeechService;
 
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
@@ -549,6 +552,32 @@ public class ProjectController {
     public ResponseEntity<List<SearchResponse>> search(@RequestParam(required = false) String query, @PathVariable Long projectId) {
         return ResponseEntity.status(HttpStatus.OK).body(searchService.search(query, projectId));
     }
+
+    /**
+     * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: 자유 발언대 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @GetMapping("/{projectId}/freespeech")
+    public ResponseEntity<List<FreeSpeechDto>> getFreeSpeeches(@PathVariable Long projectId) {
+        return ResponseEntity.ok(freeSpeechService.getFreeSpeechesByProjectId(projectId));
+    }
+
+    @PostMapping("/{projectId}/freespeech")
+    public ResponseEntity<Void> addFreeSpeech(@PathVariable Long projectId,@RequestBody FreeSpeechDto post) {
+        freeSpeechService.createFreeSpeech(projectId,post.getContent());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{projectId}/freespeech/{postId}")
+    public ResponseEntity<Void> deleteFreeSpeech(@PathVariable Long projectId, @PathVariable Long postId) {
+        freeSpeechService.deleteFreeSpeech(postId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+
 
 
 }
