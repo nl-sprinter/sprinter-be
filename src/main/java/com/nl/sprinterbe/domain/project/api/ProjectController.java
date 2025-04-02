@@ -9,6 +9,8 @@ import com.nl.sprinterbe.domain.contribution.api.ContributionService;
 import com.nl.sprinterbe.domain.contribution.dto.ContributionDto;
 import com.nl.sprinterbe.domain.dailyscrum.application.DailyScrumService;
 import com.nl.sprinterbe.domain.dailyscrum.dto.*;
+import com.nl.sprinterbe.domain.freespeech.api.FreeSpeechService;
+import com.nl.sprinterbe.domain.freespeech.dto.FreeSpeechDto;
 import com.nl.sprinterbe.domain.issue.dto.IssueCheckedDto;
 import com.nl.sprinterbe.domain.issue.service.IssueService;
 import com.nl.sprinterbe.domain.notification.application.NotificationService;
@@ -63,6 +65,7 @@ public class ProjectController {
     private final SecurityUtil securityUtil;
     private final NotificationService notificationService;
     private final SearchService searchService;
+    private final FreeSpeechService freeSpeechService;
 
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
@@ -555,9 +558,32 @@ public class ProjectController {
 
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::: 자유 발언대 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
+     * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+     */
+
+    @GetMapping("/{projectId}/freespeech")
+    public ResponseEntity<List<FreeSpeechDto>> getFreeSpeeches(@PathVariable Long projectId) {
+        return ResponseEntity.ok(freeSpeechService.getFreeSpeechesByProjectId(projectId));
+    }
+
+    @PostMapping("/{projectId}/freespeech")
+    public ResponseEntity<Void> addFreeSpeech(@PathVariable Long projectId,@RequestBody FreeSpeechDto post) {
+        freeSpeechService.createFreeSpeech(projectId,post.getContent());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{projectId}/freespeech/{postId}")
+    public ResponseEntity<Void> deleteFreeSpeech(@PathVariable Long projectId, @PathVariable Long postId) {
+        freeSpeechService.deleteFreeSpeech(postId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+  
      * ::::: 개인별 기여도 차트 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
      * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      */
+       
     //각 Sprint에서의 Contribution
     @GetMapping("/{projectId}/sprints/{sprintId}/individual-contribution-chart")
     public ResponseEntity<List<ContributionDto>> getContributions(@PathVariable Long projectId, @PathVariable Long sprintId) {
@@ -569,7 +595,6 @@ public class ProjectController {
     public ResponseEntity<List<ContributionDto>> getContributions(@PathVariable Long projectId) {
         return ResponseEntity.ok(contributionService.getContribution(projectId));
     }
-
 
 
 }
