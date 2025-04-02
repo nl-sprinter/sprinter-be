@@ -5,6 +5,8 @@ import com.nl.sprinterbe.domain.backlog.entity.Backlog;
 import com.nl.sprinterbe.domain.backlogcomment.dao.BacklogCommentRepository;
 import com.nl.sprinterbe.domain.dailyscrum.dao.DailyScrumBacklogRepository;
 import com.nl.sprinterbe.domain.dailyscrum.dao.UserDailyScrumRepository;
+import com.nl.sprinterbe.domain.project.dto.ProjectProgressResponse;
+import com.nl.sprinterbe.domain.project.dto.SoftwareEngineeringElementResponse;
 import com.nl.sprinterbe.domain.sprint.dao.SprintRepository;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.task.dao.TaskRepository;
@@ -235,5 +237,68 @@ public class ProjectService {
         return userProjectRepository.findByProjectProjectIdAndUserUserId(projectId, userId)
                 .orElseThrow(UserNotFoundException::new)
                 .getIsProjectLeader();
+    }
+
+    public ProjectProgressResponse getProjectProgressPercent(Long projectId) {
+        int x = backlogRepository.countIsFinishedBacklogs(projectId);
+        int y = backlogRepository.countByProjectId(projectId);
+        ProjectProgressResponse projectProgressResponse = new ProjectProgressResponse();
+        if(y==0){
+            projectProgressResponse.setPercent(0);
+        }else{
+            projectProgressResponse.setPercent((int) ((double) x / y * 100));
+        }
+        return projectProgressResponse;
+    }
+
+    public List<SoftwareEngineeringElementResponse> getBurnDownChartAndVelocityChartData(Long projectId) {
+        /*예상 : 백로그의 모든 가중치를 합쳐 스프린트 1으로 보내고 스프린트 갯수로 나눈 값을 빼서 리스트에 각각 담는다.
+         실제 : 스프린트당 끝낸 백로그의 가중치를 전체에서 뺌
+         밸로시티: 스프린트당 끝낸 백로그의 가중치*/
+        List<Sprint> sprints = sprintRepository.findAllByProjectProjectId(projectId);
+
+        List<SoftwareEngineeringElementResponse> softwareEngineeringElementResponses = new ArrayList<>();
+        Long totalWeight = 0L;
+        Long totalfinishedWeight = 0L;
+        Map<Long, Long> sprintIdToVelocity = new HashMap<>();
+
+        for(Sprint sprint : sprints){
+            List<Backlog> backlogs = backlogRepository.findBySprintSprintId(sprint.getSprintId());
+            Long finishedWeight = 0L;
+            for(Backlog backlog : backlogs){
+                totalWeight += backlog.getWeight();
+                if(backlog.getIsFinished()){
+                    finishedWeight += backlog.getWeight();
+                }
+            }
+            sprintIdToVelocity.put(sprint.getSprintId(), finishedWeight);
+            totalfinishedWeight += finishedWeight;
+        }
+
+        double estimateSize = totalWeight / sprints.size();
+        double totalWeightCopy = totalWeight;
+
+        for(Sprint sprint : sprints){
+
+            Long velocity = sprintIdToVelocity.get(sprint.getSprintId());
+            SoftwareEngineeringElementResponse softwareEngineeringElementResponse = new SoftwareEngineeringElementResponse();
+            softwareEngineeringElementResponse.setRealBurndownPoint(Math.round(totalWeightCopy - velocity));
+            softwareEngineeringElementResponse.setEstimatedBurndownPoint(Math.round(totalWeightCopy - estimateSize));
+            softwareEngineeringElementResponse.setSprintOrder(sprint.getSprintOrder());
+            softwareEngineeringElementResponse.setVelocity(velocity);
+            softwareEngineeringElementResponse.setSprintId(sprint.getSprintId());
+
+            if(sprint.getSprintOrder() == sprints.size()){
+                softwareEngineeringElementResponse.setEstimatedBurndownPoint(0L);
+                if(totalfinishedWeight == totalWeight){
+                    softwareEngineeringElementResponse.setRealBurndownPoint(0L);
+                }
+            }
+
+            softwareEngineeringElementResponses.add(softwareEngineeringElementResponse);
+            totalWeightCopy -= estimateSize;
+        }
+
+        return softwareEngineeringElementResponses;
     }
 }
