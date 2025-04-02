@@ -55,7 +55,7 @@ public class ChatRoomService {
         }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<ChatMessageDto> getChatHistory(Long projectId) {
         ChatRoom chatRoom = getOrCreateChatRoom(projectId);
         
@@ -65,7 +65,7 @@ public class ChatRoomService {
             .collect(Collectors.toList());
     }
     
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<ChatMessageDto> getChatHistoryPaginated(Long projectId, int page, int size) {
         ChatRoom chatRoom = getOrCreateChatRoom(projectId);
         Pageable pageable = PageRequest.of(page, size);

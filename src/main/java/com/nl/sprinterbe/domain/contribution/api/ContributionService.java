@@ -23,8 +23,4 @@ public class ContributionService {
         return contributionRepository.findUserContributionBySprintAndProject(projectId, sprinterId);
     }
 
-    @Transactional(readOnly = true)
-    public List<ContributionDto> getContribution(Long projectId) {
-        return contributionRepository.findUserContributionByProject(projectId);
-    }
 }
