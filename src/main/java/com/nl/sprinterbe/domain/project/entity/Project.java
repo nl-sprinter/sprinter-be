@@ -1,5 +1,6 @@
 package com.nl.sprinterbe.domain.project.entity;
 
+import com.nl.sprinterbe.domain.freespeech.entity.FreeSpeech;
 import com.nl.sprinterbe.domain.sprint.entity.Sprint;
 import com.nl.sprinterbe.domain.userproject.entity.UserProject;
 import jakarta.persistence.*;
@@ -39,6 +40,9 @@ public class Project {
     // 다대다 매핑 (유저,프로젝트)
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<UserProject> userProjects = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<FreeSpeech> freeSpeeches = new ArrayList<>();
 
     // 컬렉션 초기화 문제 때문에 빌더 재정의
     @Builder

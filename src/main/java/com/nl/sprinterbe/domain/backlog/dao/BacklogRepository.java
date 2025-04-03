@@ -1,6 +1,7 @@
 package com.nl.sprinterbe.domain.backlog.dao;
 
 import com.nl.sprinterbe.domain.backlog.entity.Backlog;
+import com.nl.sprinterbe.domain.contribution.dto.ContributionDto;
 import com.nl.sprinterbe.domain.issue.entity.Issue;
 import com.nl.sprinterbe.domain.task.entity.Task;
 import com.nl.sprinterbe.domain.user.entity.User;
@@ -59,5 +60,19 @@ public interface BacklogRepository extends JpaRepository<Backlog, Long>, Backlog
             " JOIN FETCH s.project p" +
             " WHERE p.projectId=:projectId AND s.sprintId=:sprintId")
     List<Backlog> findBacklogsByProjectIdAndSprintId(@Param("projectId") Long projectId, @Param("sprintId") Long sprintId);
+
+    @Query("SELECT COUNT(b) FROM Backlog b" +
+            " JOIN b.sprint s" +
+            " JOIN s.project p" +
+            " WHERE p.projectId=:projectId AND b.isFinished=true")
+    int countIsFinishedBacklogs(@Param("projectId") Long projectId);
+
+    @Query("SELECT COUNT(b) FROM Backlog b" +
+            " JOIN b.sprint s" +
+            " JOIN s.project p" +
+            " WHERE p.projectId=:projectId")
+    int countByProjectId(@Param("projectId") Long projectId);
+
+    List<Backlog> findBySprintSprintId(Long sprintId);
 
 }
