@@ -145,7 +145,7 @@ public class StartingFormService {
     private String readFile(String filePath) {
         try {
             Resource resource = resourceLoader.getResource(filePath);
-            return new String(Files.readAllBytes(resource.getFile().toPath()), StandardCharsets.UTF_8);
+            return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new FileReadException();
         }
