@@ -1,8 +1,15 @@
 {
     "project_name": "%s",
     "project_goal": "%s",
-    "estimated_duration": "%s",
-    "sprint_cycle": "%s",
+    "domain": "%s",
     "team_members": %d,
-    "essential_features": %s
+    "team_roles": [%s],
+    "project_duration": %d,
+    "essential_features": "%s",
+    "priority_quality_aspect": "%s",
+    "sprint_cycle": %d,
+    "backlog_detail_level": "%s",
+    "preferred_tech_stack": "%s",
+    "other_considerations": "%s"
 }
+

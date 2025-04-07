@@ -20,23 +20,26 @@ Based on the following project information, create a JSON object with the struct
   ]
 }
 
-### Project Information:
-- Project Name: [Insert value]
-- Project Goal: [Insert value]
-- Domain: [Insert one: Web/Mobile Services, Enterprise Systems, Data & Analytics, Education, Healthcare, Finance, IoT, Security, AI/Chatbot, Government, Other]
-- Team Members: [Number]
-- Team Roles: [List of roles such as Frontend Developer, Backend Developer, Designer, PM, QA, etc.]
-- Project Duration (in days): [Insert number]
-- Essential Features: [Comma-separated list of required features]
-- Priority Quality Aspect: [One of: Speed, Stability, Scalability, UX, Security, None]
-- Sprint Cycle (in days): [Insert number]
-- Backlog Detail Level: [High, Medium, Low]
-- Preferred Tech Stack: [Insert text]
-- Other Considerations: [Insert any additional info]
+### The Request JSON I will send to you is as follows:
+
+{
+    "project_name": "(Project Name)",
+    "project_goal": "(Project Goal)",
+    "domain": "(Web/Mobile Services, Enterprise Systems, Data & Analytics, Education, Healthcare, Finance, IoT, Security, AI/Chatbot, Government, Other)",
+    "team_members": "(Number of team members)",
+    "team_roles": "(List of roles such as Frontend Developer, Backend Developer, Designer, PM, QA, etc.)",
+    "project_duration": "(Project Duration in days)",
+    "essential_features": "(Comma-separated list of required features)",
+    "priority_quality_aspect": "(Speed, Stability, Scalability, UX, Security, None)",
+    "sprint_cycle": "(Sprint Cycle in days)",
+    "backlog_detail_level": "(High, Medium, Low)",
+    "preferred_tech_stack": "(Preferred Tech Stack)",
+    "other_considerations": "(Any additional information)"
+}
 
 Use the above information to:
 1. Divide the project into a fixed number of sprints.
-2. Generate backlog items for each sprint, each with a short title and weight (1 to 5).
+2. Generate backlog items for each sprint, each with a short title and weight (1 to 3).
 3. Distribute the features reasonably based on importance, complexity, and sprint sequence.
 4. Make sure the total number of sprints and sprint duration match the input.
 

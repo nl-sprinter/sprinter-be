@@ -6,6 +6,7 @@ import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.dto.StartingFormDto;
 import com.nl.sprinterbe.global.exception.form.FileReadException;
 import com.nl.sprinterbe.global.exception.form.JsonParseException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.Resource;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class StartingFormService {
     @Value("${openai.api.key}")
     private String apiKey;
@@ -46,11 +48,11 @@ public class StartingFormService {
     private final ResourceLoader resourceLoader;
 
 
-    public StartingFormService(RestTemplateBuilder builder , ObjectMapper objectMapper, ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-        this.restTemplate = builder.build();
-        this.objectMapper = objectMapper;
-    }
+//    public StartingFormService(RestTemplateBuilder builder , ObjectMapper objectMapper, ResourceLoader resourceLoader) {
+//        this.resourceLoader = resourceLoader;
+//        this.restTemplate = builder.build();
+//        this.objectMapper = objectMapper;
+//    }
 
     public StartingDataDto generateProjectPlan(StartingFormDto requestDTO) {
         HttpHeaders headers = new HttpHeaders();
@@ -66,59 +68,6 @@ public class StartingFormService {
         ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
 
         return parseGPTResponse(response.getBody());
-//        StartingDataDto dummyStartingDataDto = new StartingDataDto(
-//                new StartingDataDto.ProjectInfo(
-//                        "카카오톡"
-//                ),
-//                new StartingDataDto.SprintInfo(
-//                        3,
-//                        30
-//                ),
-//                List.of(
-//                        new StartingDataDto.BacklogItem(
-//                                1,
-//                                "친구 등록 기능 구현",
-//                                3L
-//                        ),
-//                        new StartingDataDto.BacklogItem(
-//                                1,
-//                                "친구 삭제 기능 구현",
-//                                1L
-//                        ),
-//                        new StartingDataDto.BacklogItem(
-//                                1,
-//                                "친구 조회 기능 구현",
-//                                2L
-//                        ),
-//                        new StartingDataDto.BacklogItem(
-//                                2,
-//                                "기본 채팅 기능 구현",
-//                                3L
-//                        ),
-//                        new StartingDataDto.BacklogItem(
-//                                2,
-//                                "단체 채팅 기능 구현",
-//                                3L
-//                        ),
-//                        new StartingDataDto.BacklogItem(
-//                                3,
-//                                "사진 및 동영상 보내기 기능 구현",
-//                                2L
-//                        ),
-//                        new StartingDataDto.BacklogItem(
-//                                3,
-//                                "음성 통화 기능",
-//                                2L
-//                        ),
-//                        new StartingDataDto.BacklogItem(
-//                                3,
-//                                "최종 테스트",
-//                                2L
-//                        )
-//                )
-//        );
-//        return dummyStartingDataDto; // 더미데이터 주입
-
     }
 
     private Object buildPrompt(StartingFormDto startingFormDto) {
@@ -132,15 +81,24 @@ public class StartingFormService {
 
     private String generateUserPrompt(StartingFormDto startingFormDto) {
         String userPromptTemplate = readFile(userPromptPath);
+
         return String.format(userPromptTemplate,
-                startingFormDto.getProjectName(),
+                startingFormDto.getProjectName(),                 // %s: projectName (String)
                 startingFormDto.getProjectGoal(),
-                startingFormDto.getEstimatedDuration(),
-                startingFormDto.getSprintCycle(),
+                startingFormDto.getDomain(),// %s: projectGoal (String)
                 startingFormDto.getTeamMembers(),
-                startingFormDto.getEssentialFeatures()
+                String.join(", ", startingFormDto.getTeamRoles()),// %d: projectDuration (Integer -> int)
+                startingFormDto.getProjectDuration(),
+                startingFormDto.getEssentialFeatures(),
+                startingFormDto.getPriorityQualityAspect(),
+                startingFormDto.getSprintCycle(),// %d: teamMembers (Integer -> int)
+                startingFormDto.getBacklogDetailLevel(),
+                startingFormDto.getPreferredTechStack(),
+                startingFormDto.getOtherConsiderations()
         );
     }
+
+
 
     private String readFile(String filePath) {
         try {
