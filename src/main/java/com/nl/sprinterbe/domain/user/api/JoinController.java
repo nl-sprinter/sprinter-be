@@ -28,6 +28,11 @@ public class JoinController {
         return ResponseEntity.status(HttpStatus.OK).body("Check successful");
     }
 
+
+    //로그인
+    //PostMapping
+    //localhost:8080/api/v1/auth/login
+
     @Operation(summary = "회원가입", description = "회원가입을 합니다.") // 프론트 연동 OK
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponseDto> join(@RequestBody @Validated SignUpRequestDto request){

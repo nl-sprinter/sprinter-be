@@ -81,6 +81,9 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+//    @PostMapping("/create-gpt")
+//    public
+
     @Operation(summary = "프로젝트에 추가할 유저 검색", description = "프로젝트에 추가할 유저를 이메일 또는 닉네임으로 검색합니다.") // 프론트 연동 OK
     @GetMapping("/{projectId}/users/search")
     public ResponseEntity<List<UserInfoResponse>> searchUserToAddProject(@RequestParam String keyword, @PathVariable Long projectId) {
