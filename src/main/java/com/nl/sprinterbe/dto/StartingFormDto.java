@@ -4,7 +4,6 @@ package com.nl.sprinterbe.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,16 +25,19 @@ public class StartingFormDto {
     private String projectGoal;
 
     @NotBlank
-    private String domain;
+    private List<String> projectDomain;
 
     @NotBlank
-    private Integer teamMembers;
+    private String teamMembers;
 
     @NotBlank
-    private List<String> teamRoles; // 팀 역할을 List로 받음
+    private List<String> teamPositions; // 팀 역할을 List로 받음
 
     @NotBlank
-    private Integer projectDuration;
+    private String projectDuration;
+
+    @NotBlank
+    private String estimatedDuration;
 
     @NotBlank
     private String essentialFeatures;
@@ -44,13 +46,11 @@ public class StartingFormDto {
     private String priorityQualityAspect;
 
     @NotBlank
-    private Integer sprintCycle;
+    private String sprintCycle;
 
     @NotBlank
     private String backlogDetailLevel;
 
     private String preferredTechStack;
-
-    private String otherConsiderations;
 
 }

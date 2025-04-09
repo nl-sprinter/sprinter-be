@@ -26,7 +26,6 @@ public class StartingFormController {
     @PostMapping("/gptData")
     public ResponseEntity<StartingDataDto> getBacklogByStartingForm(@RequestBody StartingFormDto startingFormDto) throws JsonProcessingException {
         StartingDataDto startingDataDto = startingFormService.generateProjectPlan(startingFormDto);
-        System.out.println(startingDataDto.toString());
         return ResponseEntity.status(200).body(startingDataDto);
     }
 

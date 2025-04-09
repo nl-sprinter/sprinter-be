@@ -2,14 +2,13 @@
     "project_name": "%s",
     "project_goal": "%s",
     "domain": "%s",
-    "team_members": %d,
-    "team_roles": [%s],
-    "project_duration": %d,
+    "team_members": %s,
+    "team_positions": [%s],
+    "project_duration": %s,
     "essential_features": "%s",
     "priority_quality_aspect": "%s",
-    "sprint_cycle": %d,
+    "sprint_cycle": %s,
     "backlog_detail_level": "%s",
     "preferred_tech_stack": "%s",
-    "other_considerations": "%s"
 }
 

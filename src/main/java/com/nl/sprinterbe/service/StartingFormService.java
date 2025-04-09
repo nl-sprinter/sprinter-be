@@ -8,7 +8,6 @@ import com.nl.sprinterbe.global.exception.form.FileReadException;
 import com.nl.sprinterbe.global.exception.form.JsonParseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
@@ -18,9 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -47,12 +44,6 @@ public class StartingFormService {
     private final ObjectMapper objectMapper;
     private final ResourceLoader resourceLoader;
 
-
-//    public StartingFormService(RestTemplateBuilder builder , ObjectMapper objectMapper, ResourceLoader resourceLoader) {
-//        this.resourceLoader = resourceLoader;
-//        this.restTemplate = builder.build();
-//        this.objectMapper = objectMapper;
-//    }
 
     public StartingDataDto generateProjectPlan(StartingFormDto requestDTO) {
         HttpHeaders headers = new HttpHeaders();
@@ -83,18 +74,17 @@ public class StartingFormService {
         String userPromptTemplate = readFile(userPromptPath);
 
         return String.format(userPromptTemplate,
-                startingFormDto.getProjectName(),                 // %s: projectName (String)
+                startingFormDto.getProjectName(),
                 startingFormDto.getProjectGoal(),
-                startingFormDto.getDomain(),// %s: projectGoal (String)
+                String.join(", ",startingFormDto.getProjectDomain()),
                 startingFormDto.getTeamMembers(),
-                String.join(", ", startingFormDto.getTeamRoles()),// %d: projectDuration (Integer -> int)
+                String.join(", ", startingFormDto.getTeamPositions()),
                 startingFormDto.getProjectDuration(),
                 startingFormDto.getEssentialFeatures(),
                 startingFormDto.getPriorityQualityAspect(),
-                startingFormDto.getSprintCycle(),// %d: teamMembers (Integer -> int)
+                startingFormDto.getSprintCycle(),
                 startingFormDto.getBacklogDetailLevel(),
-                startingFormDto.getPreferredTechStack(),
-                startingFormDto.getOtherConsiderations()
+                startingFormDto.getPreferredTechStack()
         );
     }
 
