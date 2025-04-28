@@ -30,6 +30,7 @@ import com.nl.sprinterbe.domain.sprint.dto.SprintUpdateRequest;
 import com.nl.sprinterbe.domain.task.dto.TaskCheckedDto;
 import com.nl.sprinterbe.domain.user.dto.UserInfoResponse;
 import com.nl.sprinterbe.domain.user.dto.UserInfoWithTeamLeaderResponse;
+import com.nl.sprinterbe.dto.SimpleStartingDataDto;
 import com.nl.sprinterbe.dto.StartingDataDto;
 import com.nl.sprinterbe.domain.project.application.ProjectService;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
@@ -81,6 +82,13 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(summary = "AI 없이 프로젝트 생성", description = "AI 없이 스프린트 이름과 스프린트 주기만으로 프로젝트를 생성합니다.")
+    @PostMapping("/create/without-ai")
+    public ResponseEntity<Void> createProjectWithoutAi(@RequestBody SimpleStartingDataDto simpleStartingDataDto, @RequestHeader("Authorization") String token) {
+        projectService.createProjectWithoutAi(simpleStartingDataDto, jwtUtil.getUserIdByToken(token));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
 //    @PostMapping("/create-gpt")
 //    public
 
@@ -97,7 +105,7 @@ public class ProjectController {
     public ResponseEntity<Void> addUserToProject(@RequestBody Map<String, Long> userIdMap, @PathVariable Long projectId) {
         projectService.addUserToProject(userIdMap.get("userId"), projectId);
         //알림 추가
-        notificationService.create(NotificationType.TEAMMATE,notificationService.makeTeammateContent(userIdMap.get("userId")),projectId,null,null);
+        notificationService.createNotification(NotificationType.TEAMMATE,notificationService.makeTeammateContent(userIdMap.get("userId")),projectId,null,null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -150,10 +158,16 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(projectService.getProjectProgressPercent(projectId));
     }
 
-    @Operation()
+    @Operation(summary = "Burndown Chart, Velocity Chart 데이터", description = "Burndown Chart와 Velocity Chart 데이터를 조회합니다.")
     @GetMapping("/{projectId}/software-engineering-elements")
     public ResponseEntity<List<SoftwareEngineeringElementResponse>> getBurnDownChartAndVelocityChartData(@PathVariable Long projectId) {
-        return ResponseEntity.ok(projectService.getBurnDownChartAndVelocityChartData(projectId));
+        List<SoftwareEngineeringElementResponse> data = projectService.getBurnDownChartAndVelocityChartData(projectId);
+
+        if (data == null || data.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(data);
     }
     /**
      * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*
@@ -344,7 +358,7 @@ public class ProjectController {
     public ResponseEntity<BacklogIssueResponse> addIssueToBacklog(@PathVariable Long projectId ,@PathVariable Long sprintId, @PathVariable Long backlogId, @RequestBody IssueRequest issueRequest) {
         String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
         //알림 추가
-        notificationService.create(NotificationType.ISSUE,notificationService.makeIssueContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeIssueUrl(projectId,sprintId,backlogId),null);
+        notificationService.createNotification(NotificationType.ISSUE,notificationService.makeIssueContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeIssueUrl(projectId,sprintId,backlogId),null);
         return ResponseEntity.ok(backlogService.addIssueToBacklog(backlogId, issueRequest.getContent()));
     }
 
@@ -399,7 +413,7 @@ public class ProjectController {
         backlogCommentService.createBacklogComment(backlogId, jwtUtil.getUserIdByToken(token), request);
         String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
         // 알림 추가
-        notificationService.create(NotificationType.COMMENT,notificationService.makeCommentContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeCommentUrl(projectId, sprintId, backlogId),null);
+        notificationService.createNotification(NotificationType.COMMENT,notificationService.makeCommentContent(Long.parseLong(userId),backlogId),projectId,notificationService.makeCommentUrl(projectId, sprintId, backlogId),null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -451,7 +465,7 @@ public class ProjectController {
         Long dailyScrumId = dailyScrumService.createDailyScrum(sprintId);
         String userId = securityUtil.getCurrentUserId().orElseThrow(UserNotFoundException::new);
         // 알림 추가
-        notificationService.create(NotificationType.DAILYSCRUM,notificationService.makeDailyScrumContent(Long.parseLong(userId)),projectId,notificationService.makeDailyScrumUrl(projectId, sprintId,dailyScrumId),null);
+        notificationService.createNotification(NotificationType.DAILYSCRUM,notificationService.makeDailyScrumContent(Long.parseLong(userId)),projectId,notificationService.makeDailyScrumUrl(projectId, sprintId,dailyScrumId),null);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -538,8 +552,7 @@ public class ProjectController {
     @Operation(summary = "Schedule 생성", description = "Schedule 을 생성합니다.")
     @PostMapping("/{projectId}/schedule")
     public ResponseEntity<Void> addSchedule(@RequestBody ScheduleDto request, @PathVariable Long projectId) {
-        Long scheduleId = scheduleService.createSchedule(request, projectId);
-        //알림 추가
+        scheduleService.createSchedule(request, projectId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

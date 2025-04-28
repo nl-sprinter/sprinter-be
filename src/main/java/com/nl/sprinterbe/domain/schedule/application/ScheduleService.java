@@ -1,5 +1,6 @@
 package com.nl.sprinterbe.domain.schedule.application;
 
+import com.nl.sprinterbe.domain.notification.application.ScheduleNotificationService;
 import com.nl.sprinterbe.domain.project.dao.ProjectRepository;
 import com.nl.sprinterbe.domain.project.entity.Project;
 import com.nl.sprinterbe.domain.schedule.dto.ScheduleListResponse;
@@ -37,9 +38,10 @@ public class ScheduleService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
+    private final ScheduleNotificationService scheduleNotificationService;
 
     @Transactional(readOnly = true)
-    public List<ScheduleListResponse> getScheduleList(Long projectId, int year , int month) {
+    public List<ScheduleListResponse> getScheduleList(Long projectId, int year, int month) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDateTime startOfMonth = startDate.atStartOfDay();
 
@@ -84,11 +86,34 @@ public class ScheduleService {
 
         schedule.setUsers(users);
         scheduleRepository.save(schedule);
+
+        // 알림 희망하면 예약
+        if (schedule.getNotify()) {
+            scheduleNotificationService.scheduleNotification(schedule);
+        }
+
         return schedule.getScheduleId();
     }
 
-    public void deleteSchedule(Long scheduleId) {
-        scheduleRepository.deleteById(scheduleId);
+    public ScheduleDto getSchedule(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(ScheduleNotFoundException::new);
+
+        List<Long> userList = schedule.getUserSchedules().stream()
+                .map(us -> us.getUser().getUserId())
+                .toList();
+
+        ScheduleDto scheduleDto = ScheduleDto.builder()
+                .userId(userList)
+                .title(schedule.getTitle())
+                .isAllDay(schedule.getIsAllDay())
+                .startTime(schedule.getStartDateTime())
+                .endTime(schedule.getEndDateTime())
+                .notify(schedule.getNotify())
+                .preNotificationHours(schedule.getPreNotificationHours())
+                .color(schedule.getColor())
+                .build();
+
+        return scheduleDto;
     }
 
     public void updateSchedule(ScheduleDto request, Long scheduleId) {
@@ -115,27 +140,19 @@ public class ScheduleService {
                 user.getUserSchedules().add(userSchedule);
             }
         }
+
+        // 알림 희망했다면 재예약
+        if (schedule.getNotify()) {
+            scheduleNotificationService.cancelScheduleNotification(scheduleId);
+            scheduleNotificationService.scheduleNotification(schedule);
+        }
     }
 
-    public ScheduleDto getSchedule(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(ScheduleNotFoundException::new);
+    public void deleteSchedule(Long scheduleId) {
+        scheduleRepository.deleteById(scheduleId);
 
-        List<Long> userList = schedule.getUserSchedules().stream()
-                .map(us -> us.getUser().getUserId())
-                .toList();
-
-        ScheduleDto scheduleDto = ScheduleDto.builder()
-                .userId(userList)
-                .title(schedule.getTitle())
-                .isAllDay(schedule.getIsAllDay())
-                .startTime(schedule.getStartDateTime())
-                .endTime(schedule.getEndDateTime())
-                .notify(schedule.getNotify())
-                .preNotificationHours(schedule.getPreNotificationHours())
-                .color(schedule.getColor())
-                .build();
-
-        return scheduleDto;
+        // 예약된 알림 취소
+        scheduleNotificationService.cancelScheduleNotification(scheduleId);
     }
 
 }

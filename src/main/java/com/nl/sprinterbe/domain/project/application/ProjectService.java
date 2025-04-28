@@ -52,6 +52,26 @@ public class ProjectService {
     private final BacklogCommentRepository backlogCommentRepository;
     private final TaskRepository taskRepository;
 
+    public void createProjectWithoutAi(SimpleStartingDataDto simpleStartingDataDto, Long userId) {
+        // 유저 검증
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        Project project = Project.builder()
+                .createdAt(LocalDateTime.now())
+                .projectName(simpleStartingDataDto.getProjectName())
+                .sprintPeriod(simpleStartingDataDto.getSprintPeriod())
+                .build();
+
+        // 프로젝트 저장
+        project = projectRepository.save(project);
+
+        // UserProject 관계 생성
+        UserProject userProject = new UserProject(user, project, true);
+        userProjectRepository.save(userProject);
+
+    }
+
     public void createProject(StartingDataDto startingDataDto, Long userId) {
         // 유저 검증
         User user = userRepository.findById(userId)
@@ -256,10 +276,13 @@ public class ProjectService {
          실제 : 스프린트당 끝낸 백로그의 가중치를 전체에서 뺌
          밸로시티: 스프린트당 끝낸 백로그의 가중치*/
         List<Sprint> sprints = sprintRepository.findAllByProjectProjectId(projectId);
+        if (sprints.size() <= 0) {
+            return null;
+        }
 
         List<SoftwareEngineeringElementResponse> softwareEngineeringElementResponses = new ArrayList<>();
         Long totalWeight = 0L;
-        Long totalfinishedWeight = 0L;
+        long totalfinishedWeight = 0L;
         Map<Long, Long> sprintIdToVelocity = new HashMap<>();
 
         for(Sprint sprint : sprints){
@@ -275,7 +298,7 @@ public class ProjectService {
             totalfinishedWeight += finishedWeight;
         }
 
-        double estimateSize = totalWeight / sprints.size();
+        double estimateSize = (double) totalWeight / sprints.size();
         double totalWeightCopy = totalWeight;
 
         for(Sprint sprint : sprints){
@@ -301,4 +324,6 @@ public class ProjectService {
 
         return softwareEngineeringElementResponses;
     }
+
+
 }

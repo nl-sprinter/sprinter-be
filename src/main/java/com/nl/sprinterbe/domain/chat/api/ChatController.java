@@ -36,7 +36,7 @@ public class ChatController {
         message.setProjectId(projectId);
         message.setTimeStamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         Long messageId = chatRoomService.saveMessage(message);
-        notificationService.create(NotificationType.CHATTING,notificationService.makeChattingContent(message.getUserId(),messageId),projectId,null,null);
+        notificationService.createNotification(NotificationType.CHATTING,notificationService.makeChattingContent(message.getUserId(),messageId),projectId,null,null);
         return message;
     }
 

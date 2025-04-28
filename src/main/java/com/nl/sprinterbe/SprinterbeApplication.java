@@ -34,7 +34,7 @@ public class SprinterbeApplication {
 		System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));
 
 //		// OpenAI API 설정
-		System.setProperty("OPENAI_API_KEY", dotenv.get("OPENAI_API_KEY"));
+//		System.setProperty("OPENAI_API_KEY", dotenv.get("OPENAI_API_KEY"));
 //		System.setProperty("OPENAI_API_URL", dotenv.get("OPENAI_API_URL"));
 //		System.setProperty("OPENAI_API_MODEL", dotenv.get("OPENAI_API_MODEL"));
 	}

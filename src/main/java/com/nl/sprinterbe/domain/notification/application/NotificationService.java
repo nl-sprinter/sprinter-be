@@ -12,17 +12,13 @@ import com.nl.sprinterbe.domain.notification.entity.NotificationType;
 import com.nl.sprinterbe.domain.notification.entity.UserNotification;
 import com.nl.sprinterbe.domain.project.dao.ProjectRepository;
 import com.nl.sprinterbe.domain.project.entity.Project;
-import com.nl.sprinterbe.domain.schedule.dao.ScheduleRepository;
-import com.nl.sprinterbe.domain.schedule.entity.Schedule;
 import com.nl.sprinterbe.domain.user.dao.UserRepository;
 import com.nl.sprinterbe.domain.user.entity.User;
 import com.nl.sprinterbe.global.exception.backlog.BacklogNotFoundException;
 import com.nl.sprinterbe.global.exception.project.ProjectNotFoundException;
-import com.nl.sprinterbe.global.exception.schedule.ScheduleNotFoundException;
 import com.nl.sprinterbe.global.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,13 +36,10 @@ public class NotificationService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final BacklogRepository backlogRepository;
-    private final ScheduleRepository scheduleRepository;
     private final ChatMessageRepository chatMessageRepository;
 
-    // 스케줄 알림 체크 주기 (1분)
-    private static final long SCHEDULE_CHECK_INTERVAL = 30 * 1000;
 
-    public void create(NotificationType notificationType, String content, Long projectId, String url, Long scheduleId) {
+    public void createNotification(NotificationType notificationType, String content, Long projectId, String url, Long scheduleId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(ProjectNotFoundException::new);
 
@@ -70,7 +63,7 @@ public class NotificationService {
                         .notification(notification)
                         .build())
                 .toList();
-        
+
         notification.setUserNotification(userNotifications);
 
         notificationRepository.save(notification);
@@ -132,20 +125,6 @@ public class NotificationService {
         return user.getNickname() + "님이 프로젝트에 참여했습니다.";
     }
 
-    // 스케줄 알림 시간 전에 Request 없이 해야됨.
-    public String makeScheduleContent(Long scheduleId) {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분");
-        String formattedDateTime = now.format(formatter);
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(ScheduleNotFoundException::new);
-        return formattedDateTime + "에 \""+ schedule.getTitle() +"\"가 예정되어 있습니다.";
-    }
-
-    public String makeScheduleUrl(Long projectId ,Long scheduleId){
-        return "/projects/" + projectId + "/calendar/schedule/" + scheduleId;
-    }
-
-
     public void sendAlarmToUsers(AlarmRequest request) {
         // 유저 ID 목록으로 유저 조회
         List<User> users = userRepository.findAllById(request.getUserIds());
@@ -198,44 +177,5 @@ public class NotificationService {
         ChatMessage chatMessage = chatMessageRepository.findById(chattingId).orElseThrow(UserNotFoundException::new);
 
         return senderName + "님이 새로운 메시지를 보냈습니다: \"" + chatMessage.getContent() + "\"";
-    }
-
-    //chatting URL
-    public String makeChattingUrl(Long projectId , Long sprintId , Long backlogId){
-        return "/projects/" +projectId;
-    }
-
-    // 스케줄 알림 체크 및 DB에 저장 (스케줄러로 주기적 실행)
-    @Scheduled(fixedRate = SCHEDULE_CHECK_INTERVAL)
-    @Transactional
-    public void checkScheduleNotifications() {
-
-        // 현재 시간
-        LocalDateTime now = LocalDateTime.now();
-        
-        // 알림 설정된 모든 스케줄 조회 (notify=true)
-        List<Schedule> schedules = scheduleRepository.findAllByNotifyTrue();
-        
-        for (Schedule schedule : schedules) {
-            // 알림 시간 계산 (시작 시간 - 사전 알림 시간)
-            LocalDateTime notificationTime = schedule.getStartDateTime()
-                    .minusHours(schedule.getPreNotificationHours());
-            
-            // 현재 시간이 알림 시간 이후이고, 시작 시간 이전인 경우에만 알림 생성
-            if (now.isAfter(notificationTime) && now.isBefore(schedule.getStartDateTime())) {
-                // 이미 알림을 보냈는지 확인 (중복 방지)
-                boolean alreadySent = notificationRepository.existsByScheduleIdAndNotificationType(
-                        schedule.getScheduleId(), NotificationType.SCHEDULE);
-                
-                if (!alreadySent) {
-                    // 알림 생성 및 저장
-                    String content = makeScheduleContent(schedule.getScheduleId());
-                    String url = makeScheduleUrl(schedule.getProject().getProjectId(), schedule.getScheduleId());
-                    
-                    // 프로젝트의 모든 사용자에게 알림 생성
-                    create(NotificationType.SCHEDULE,makeScheduleContent(schedule.getScheduleId()),schedule.getProject().getProjectId(),makeScheduleUrl(schedule.getProject().getProjectId(),schedule.getScheduleId()),schedule.getScheduleId());
-                }
-            }
-        }
     }
 }
