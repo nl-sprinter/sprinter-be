@@ -21,9 +21,9 @@ public class SprinterbeApplication {
 
 	private static void settingEnv(Dotenv dotenv) {
 		// MySQL 설정
-//		System.setProperty("MYSQL_URL", dotenv.get("MYSQL_URL"));
-//		System.setProperty("MYSQL_USERNAME", dotenv.get("MYSQL_USERNAME"));
-//		System.setProperty("MYSQL_PASSWORD", dotenv.get("MYSQL_PASSWORD"));
+		System.setProperty("MYSQL_URL", dotenv.get("MYSQL_URL"));
+		System.setProperty("MYSQL_USERNAME", dotenv.get("MYSQL_USERNAME"));
+		System.setProperty("MYSQL_PASSWORD", dotenv.get("MYSQL_PASSWORD"));
 //
 //		// OAuth2 설정
 //		System.setProperty("GOOGLE_CLIENT_ID", dotenv.get("GOOGLE_CLIENT_ID"));
@@ -34,8 +34,8 @@ public class SprinterbeApplication {
 		System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));
 
 //		// OpenAI API 설정
-//		System.setProperty("OPENAI_API_KEY", dotenv.get("OPENAI_API_KEY"));
-//		System.setProperty("OPENAI_API_URL", dotenv.get("OPENAI_API_URL"));
-//		System.setProperty("OPENAI_API_MODEL", dotenv.get("OPENAI_API_MODEL"));
+		System.setProperty("OPENAI_API_KEY", dotenv.get("OPENAI_API_KEY"));
+		System.setProperty("OPENAI_API_URL", dotenv.get("OPENAI_API_URL"));
+		System.setProperty("OPENAI_API_MODEL", dotenv.get("OPENAI_API_MODEL"));
 	}
 }
